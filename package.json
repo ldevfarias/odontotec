@@ -1,0 +1,25 @@
+{
+    "name": "odonto-monorepo",
+    "version": "1.0.0",
+    "packageManager": "npm@10.2.4",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "turbo run build",
+        "dev": "turbo run dev",
+        "lint": "turbo run lint",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "clean-ports": "npx kill-port 3000 3001"
+    },
+    "devDependencies": {
+        "prettier": "^3.4.2",
+        "turbo": "latest"
+    },
+    "dependencies": {
+        "uid": "2.0.2",
+        "validator": "13.15.26"
+    }
+}
