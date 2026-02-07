@@ -20,3 +20,5 @@
 - [ ] Role-Based Access Control (RBAC) UI
 - [ ] Inventory Management
 - [ ] SMS/WhatsApp Notifications
+
+https://antigravity-kit.vercel.app/docs/guide/examples/plan
