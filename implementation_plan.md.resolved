@@ -1,0 +1,38 @@
+# Authentication Refactor & Bug Fix Plan
+
+## Problem Identified
+The 15-minute logout issue happens because the [refreshTokens](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/auth/auth.controller.ts#82-89) flow in the backend fails unconditionally. In [user.entity.ts](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/users/entities/user.entity.ts), the column `currentHashedRefreshToken` has `select: false`. When `AuthService.refreshTokens` calls `UsersService.findOne(userId)`, the database does not return the hashed token, making the check `if (!user || !user.currentHashedRefreshToken)` always trigger an `UnauthorizedException`.
+
+## Proposed Changes
+
+### 1. Fix Backend Token Renewal Bug
+#### [MODIFY] [apps/odonto-api/src/modules/users/users.service.ts](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/users/users.service.ts)
+- Add a new method `findOneWithRefreshToken(id: number)` that explicitly selects the `currentHashedRefreshToken` field.
+
+#### [MODIFY] [apps/odonto-api/src/modules/auth/auth.service.ts](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/auth/auth.service.ts)
+- Update the [refreshTokens](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/auth/auth.controller.ts#82-89) method to use `findOneWithRefreshToken` instead of [findOne](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/users/users.service.ts#203-206).
+
+### 2. Full Migration to HttpOnly Cookies (Frontend)
+Currently, despite backend sending secure cookies, the frontend still manually manages `token` in `localStorage` and injects it in headers, leaving it vulnerable to XSS and creating redundancy.
+
+#### [MODIFY] [apps/odonto-front/src/contexts/AuthContext.tsx](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-front/src/contexts/AuthContext.tsx)
+- Remove all `token` manipulation from `localStorage`.
+- Retain only `authUser` and `clinicName` in `localStorage` for UI reference.
+- Update [login](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-api/src/modules/auth/auth.controller.ts#41-46) function to simply redirect after receiving the API success (backend already sets the cookies).
+- Update [logout](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-front/src/contexts/AuthContext.tsx#55-65) function to explicitly call `api.post('/auth/logout')` **before** clearing local state and redirecting. This ensures the backend clears the cookies and invalidates the session in the DB.
+- Change `isAuthenticated` check. Since we can't read `HttpOnly` cookies via JavaScript, we can track authenticity purely via the presence of `authUser` in memory/localStorage, while the API requests will naturally fail with 401 if the cookie is expired.
+
+#### [MODIFY] [apps/odonto-front/src/lib/api.ts](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-front/src/lib/api.ts)
+- Remove `api.interceptors.request.use` which manually injects the `Authorization: Bearer ...` header. The Axios `withCredentials: true` setup handles the cookies securely and automatically.
+- Simplify the `api.interceptors.response.use` `401` handler. When `/auth/refresh` succeeds, the backend will answer with new `Set-Cookie` headers. We no longer need to update `localStorage` or manually inject headers in `originalRequest`. We just retry the `originalRequest` and the browser will automatically attach the newly refreshed cookies!
+
+## Verification Plan
+
+### Automated/Manual Testing
+1. **Login Test**: Perform a login and verify via browser DevTools (Application > Cookies) that `access_token` and `refresh_token` are set as HttpOnly.
+2. **Access Test**: Verify that requests to protected routes (e.g., `/users` decorators) work properly using only cookies.
+3. **Expiration Test**: 
+   - Temporarily change `access_token` expiry in `auth.service.ts` from `15m` to `10s`.
+   - Wait 11 seconds and navigate in the dashboard.
+   - Verify Network tab to see a `401` request followed by a `/auth/refresh` request, followed by a transparent retry of the original request.
+4. **Logout Test**: Click "Logout", confirm `/auth/logout` API is called, cookies are cleared from browser DevTools, and user is redirected to `/login`.
