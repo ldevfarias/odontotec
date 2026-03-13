@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cores claras */
+  --color-background: #fafafa;
+  --color-foreground: #1c1f23;
+  --color-card: #ffffff;
+  --color-card-foreground: #1c1f23;
+
+  --color-primary: #41b883;
+  --color-primary-foreground: #ffffff;
+
+  --color-border: #e9ecef;
+  --color-muted: #f1f3f5;
+  --color-muted-foreground: #868e96;
+  --color-accent: #e6fcf5;
+  --color-accent-foreground: #0ca678;
+
+  /* Fontes e raios */
+  --font-sans: "Instrument Sans", sans-serif;
+  --font-mono: "Roboto", sans-serif;
+  --font-display: "Instrument Sans", sans-serif;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  .dark {
+    --color-background: #0f1115;
+    --color-foreground: #f8f9fa;
+    --color-card: #15181d;
+    --color-card-foreground: #f8f9fa;
+
+    --color-primary: #38d9a9;
+    --color-primary-foreground: #0b2b22;
+
+    --color-border: #212529;
+    --color-muted: #212529;
+    --color-muted-foreground: #adb5bd;
+    --color-accent: #212529;
+    --color-accent-foreground: #f8f9fa;
+  }
+}
+
+@layer components {
+  /* ==================== TYPOGRAPHY & BUTTON CLASSES ==================== */
+
+  .heading-hero {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--color-foreground);
+  }
+
+  .heading-1 {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground);
+  }
+
+  .heading-2 {
+    font-family: var(--font-sans);
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--color-foreground);
+  }
+
+  .heading-3 {
+    font-family: var(--font-sans);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--color-foreground);
+  }
+
+  .body-large {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-muted-foreground);
+  }
+
+  .body-regular {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-muted-foreground);
+  }
+
+  .body-small {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-muted-foreground);
+  }
+
+  .fill-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    padding: 1rem 2rem;
+    border-radius: var(--radius-full);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .fill-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 10px 20px -10px var(--color-primary);
+  }
+
+  .ghost-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+    border-radius: var(--radius-full);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ghost-button:hover {
+    background-color: var(--color-muted);
+  }
+}

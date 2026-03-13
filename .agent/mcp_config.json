@@ -15,10 +15,17 @@
                 "shadcn@latest",
                 "mcp"
             ]
+        },
+        "firecrawl": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "firecrawl-mcp@latest",
+                "--api-key",
+                "fc-7481799018a94b80a80d0357e395270a"
+            ]
         }
         //other mcp servers
     }
 }
-
 // setup mcp server in  ~/.gemini\antigravity\mcp_config.json
-

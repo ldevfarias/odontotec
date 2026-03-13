@@ -22,3 +22,6 @@
 - [ ] SMS/WhatsApp Notifications
 
 https://antigravity-kit.vercel.app/docs/guide/examples/plan
+
+ em vez de lembrar explicitamente de anexar Cookies em métodos específicos, a longo prazo pode ser vantajoso se criássemos um intercetor ou "Transformer" global para que instâncias contendo chaves access_token sejam apanhadas e transformadas em cookies globalmente.
+

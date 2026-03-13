@@ -1,0 +1,80 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Qualidade de Código ────────────────────────────────────────────────────
+  quality:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint – Frontend
+        run: npm run lint --workspace=apps/odonto-front
+
+      - name: Lint – API
+        run: npm run lint --workspace=apps/odonto-api
+
+      - name: Type check – API
+        run: npx tsc --noEmit --project apps/odonto-api/tsconfig.json
+
+  # ── Build API ──────────────────────────────────────────────────────────────
+  build-api:
+    name: Build API
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --workspace=apps/odonto-api
+
+  # ── Build Frontend ─────────────────────────────────────────────────────────
+  build-front:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Build
+        run: npm run build --workspace=apps/odonto-front
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+  # ── Deploy (apenas na main) ────────────────────────────────────────────────
+  deploy:
+    name: Deploy API → Railway
+    runs-on: ubuntu-latest
+    needs: [build-api, build-front]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy odonto-api
+        run: railway up --service odonto-api --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
