@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(start:*)",
+      "Bash(claude -p 'what tools and skills do you have available?' --output-format json)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''result'''',''''''''\\)[:500]\\)\")",
+      "Bash(cd:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
+}

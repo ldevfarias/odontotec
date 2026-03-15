@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "odonto-front",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace=odonto-front"],
+      "port": 3001
+    }
+  ]
+}
