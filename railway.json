@@ -4,6 +4,7 @@
     "buildCommand": "npm install --include=dev && cd apps/odonto-api && npm run build"
   },
   "deploy": {
+    "preDeploy": "cd apps/odonto-api && npm run sync-db",
     "startCommand": "node apps/odonto-api/dist/src/main"
   }
 }
