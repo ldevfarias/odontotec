@@ -33,18 +33,18 @@ import { StorageModule } from './common/providers/storage/storage.module';
       useFactory: (configService: ConfigService) => {
         const isProd = configService.get<string>('NODE_ENV') === 'production';
         const password = configService.get<string>('POSTGRES_PASSWORD');
-        
+
         if (isProd && !password) {
           throw new Error('FATAL SECURITY ERROR: POSTGRES_PASSWORD is required in production environments to prevent fallback vulnerabilities.');
         }
 
         return {
           type: 'postgres',
-          host: configService.get<string>('POSTGRES_HOST', 'localhost'),
-          port: configService.get<number>('POSTGRES_PORT', 5434),
-          username: configService.get<string>('POSTGRES_USER', 'postgres'),
+          host: configService.get<string>('POSTGRES_HOST') || configService.get<string>('PGHOST') || 'localhost',
+          port: configService.get<number>('POSTGRES_PORT') || configService.get<number>('PGPORT') || 5434,
+          username: configService.get<string>('POSTGRES_USER') || configService.get<string>('PGUSER') || 'postgres',
           password: password || 'postgres_password',
-          database: configService.get<string>('POSTGRES_DB', 'odonto_tec'),
+          database: configService.get<string>('POSTGRES_DB') || configService.get<string>('PGDATABASE') || 'odonto_tec',
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: !isProd,
         };
