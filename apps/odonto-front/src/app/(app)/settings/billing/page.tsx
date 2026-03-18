@@ -268,7 +268,7 @@ export default function BillingPage() {
                             </ul>
                         </CardContent>
                         <CardFooter>
-                            <Button className="w-full" size="lg" onClick={() => checkoutMutation.mutate()} disabled={checkoutMutation.isPending || isRedirecting}>
+                            <Button className="w-full" size="lg" onClick={() => checkoutMutation.mutate(undefined)} disabled={checkoutMutation.isPending || isRedirecting}>
                                 {(checkoutMutation.isPending || isRedirecting) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}
                                 Assinar Agora
                             </Button>

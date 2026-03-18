@@ -127,7 +127,6 @@ function AdminDashboard() {
                     <div className="h-[340px]">
                         <RevenueChart
                             revenue={stats.revenue}
-                            expectedRevenue={stats.expectedRevenue}
                             period={period}
                         />
                     </div>

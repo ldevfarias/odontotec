@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, XCircle, Loader2, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAppointmentsControllerPublicCancel } from '@/generated/hooks/useAppointmentsControllerPublicCancel';
 
-export default function AppointmentCancelPage() {
+function AppointmentCancelContent() {
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
     const token = searchParams.get('token');
@@ -80,5 +80,13 @@ export default function AppointmentCancelPage() {
                 </CardContent>
             </Card>
         </div>
+    );
+}
+
+export default function AppointmentCancelPage() {
+    return (
+        <Suspense>
+            <AppointmentCancelContent />
+        </Suspense>
     );
 }
