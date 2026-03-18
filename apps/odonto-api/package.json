@@ -22,7 +22,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "generate:openapi": "ts-node src/generate-openapi.ts",
     "sync-db": "ts-node -r tsconfig-paths/register src/sync-database.ts",
-    "migrate": "npm run build && npm run sync-db"
+    "migration:run": "ts-node -r tsconfig-paths/register src/run-migrations.ts",
+    "migration:generate": "ts-node -r tsconfig-paths/register src/generate-initial-migration.ts",
+    "migrate": "npm run build && npm run migration:run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1003.0",

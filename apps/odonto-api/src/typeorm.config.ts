@@ -11,6 +11,9 @@ export const AppDataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB || process.env.PGDATABASE || 'odonto_tec',
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,
   logging: false,
+  migrationsRun: false,
+  migrationsTableName: 'typeorm_migrations',
 });

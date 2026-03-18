@@ -46,7 +46,10 @@ import { StorageModule } from './common/providers/storage/storage.module';
           password: password || 'postgres_password',
           database: configService.get<string>('POSTGRES_DB') || configService.get<string>('PGDATABASE') || 'odonto_tec',
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          migrations: [__dirname + '/migrations/*{.ts,.js}'],
           synchronize: !isProd,
+          migrationsRun: false,
+          migrationsTableName: 'typeorm_migrations',
         };
       },
     }),
