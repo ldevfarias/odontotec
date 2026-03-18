@@ -98,6 +98,52 @@ NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
 PostgreSQL runs on port **5434** (non-standard). `synchronize: true` in dev, disabled in production.
 
+## Database Migrations
+
+OdontoTec uses **TypeORM migrations** for database schema management in production. This replaces the old `synchronize` pattern and ensures schema versions are tracked and reversible.
+
+### Migration Workflow
+
+**For Developers:**
+1. Modify entities in `apps/odonto-api/src/modules/*/entities/*.entity.ts`
+2. Locally, the app uses `synchronize: true` (in dev only) to auto-sync schema
+3. When ready to commit:
+   - Run `npm run build` in odonto-api
+   - Run `npm run migration:generate -- DescriptiveName` to generate a migration file from the current schema diff
+   - Review the generated migration in `apps/odonto-api/src/migrations/`
+   - Commit both the entity and migration files
+
+**For Deployment (Railway):**
+- `railway.json` runs `npm run migration:run` during the build phase
+- This connects to the Railway database and applies all pending migrations
+- Migrations are tracked in the `typeorm_migrations` table to prevent re-running
+
+### Migration Commands
+
+```bash
+# In apps/odonto-api/
+
+npm run migration:generate -- MigrationName    # Generate migration from schema diff (requires dev DB connection)
+npm run migration:run                          # Run all pending migrations
+npm run migration:revert                       # Revert the last migration (use sparingly)
+npm run migrate                                # Build + run migrations (used in production builds)
+```
+
+### Key Points
+
+- **Migrations are versioned**: Each migration is timestamped (e.g., `1710000000000-InitialSchema.ts`)
+- **No manual SQL needed**: Use TypeORM's `QueryRunner` API in migrations for DB-agnostic code
+- **Production-safe**: Migrations only run once, tracked in `typeorm_migrations` table
+- **Reversible**: Each migration has an `up()` and `down()` method for rolling back if needed
+- **Development convenience**: Keep `synchronize: true` in dev so you can quickly iterate without generating migrations for every small change
+
+### File Locations
+
+- **Migrations**: `apps/odonto-api/src/migrations/`
+- **TypeORM Config**: `apps/odonto-api/src/typeorm.config.ts`
+- **App Module**: `apps/odonto-api/src/app.module.ts`
+- **Migration Runner**: `apps/odonto-api/src/run-migrations.ts`
+
 ## Deployment
 
 - **Frontend**: Vercel (auto-deploy from `main`)
