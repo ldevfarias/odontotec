@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "amount": { "type": "number", "example": 250 },
+    "method": {
+      "type": "string",
+      "enum": ["CASH", "CREDIT_CARD", "DEBIT_CARD", "PIX", "INSURANCE"],
+      "example": "CREDIT_CARD"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "COMPLETED", "CANCELED", "CANCELLED"],
+      "example": "PENDING"
+    },
+    "date": { "type": "string", "example": "2023-10-27T10:00:00Z" },
+    "patientId": { "type": "number", "example": 1 },
+    "treatmentPlanId": { "type": "number", "example": 1 }
+  },
+  "required": ["amount", "method", "date", "patientId"],
+  "x-readme-ref-name": "CreatePaymentDto"
+}

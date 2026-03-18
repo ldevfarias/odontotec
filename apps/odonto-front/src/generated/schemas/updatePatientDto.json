@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "email": { "type": "string" },
+    "phone": { "type": "string" },
+    "birthDate": { "type": "string" },
+    "address": { "type": "string" },
+    "document": { "type": "string" }
+  },
+  "x-readme-ref-name": "UpdatePatientDto"
+}

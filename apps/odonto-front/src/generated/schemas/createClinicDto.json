@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string", "description": "The name of the clinic" },
+    "phone": {
+      "type": "string",
+      "description": "The phone number of the clinic"
+    },
+    "address": { "type": "string", "description": "The address of the clinic" }
+  },
+  "required": ["name"],
+  "x-readme-ref-name": "CreateClinicDto"
+}

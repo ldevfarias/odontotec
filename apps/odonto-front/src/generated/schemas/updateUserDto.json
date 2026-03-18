@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "email": { "type": "string" },
+    "role": { "type": "string", "enum": ["ADMIN", "SIMPLE", "DENTIST"] },
+    "isActive": { "type": "boolean" }
+  },
+  "x-readme-ref-name": "UpdateUserDto"
+}

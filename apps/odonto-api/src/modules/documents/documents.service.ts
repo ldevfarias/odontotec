@@ -1,0 +1,57 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PatientDocument } from './entities/patient-document.entity';
+import { CreatePatientDocumentDto, UpdatePatientDocumentDto } from './dto/patient-document.dto';
+
+@Injectable()
+export class DocumentsService {
+    constructor(
+        @InjectRepository(PatientDocument)
+        private documentRepository: Repository<PatientDocument>,
+    ) { }
+
+    async create(createDto: CreatePatientDocumentDto, clinicId: number): Promise<PatientDocument> {
+        const document = this.documentRepository.create({
+            ...createDto,
+            clinicId,
+        });
+        return this.documentRepository.save(document);
+    }
+
+    async findAll(clinicId: number, patientId?: number): Promise<PatientDocument[]> {
+        const where: any = { clinicId };
+        if (patientId) {
+            where.patientId = patientId;
+        }
+        return this.documentRepository.find({
+            where,
+            relations: ['patient', 'dentist'],
+            order: { date: 'DESC' },
+        });
+    }
+
+    async findOne(id: number, clinicId: number): Promise<PatientDocument> {
+        const document = await this.documentRepository.findOne({
+            where: { id, clinicId },
+            relations: ['patient', 'dentist'],
+        });
+
+        if (!document) {
+            throw new NotFoundException(`Document with ID ${id} not found`);
+        }
+
+        return document;
+    }
+
+    async update(id: number, updateDto: UpdatePatientDocumentDto, clinicId: number): Promise<PatientDocument> {
+        const document = await this.findOne(id, clinicId);
+        Object.assign(document, updateDto);
+        return this.documentRepository.save(document);
+    }
+
+    async remove(id: number, clinicId: number): Promise<void> {
+        await this.findOne(id, clinicId);
+        await this.documentRepository.softDelete({ id, clinicId });
+    }
+}

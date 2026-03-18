@@ -1,0 +1,3238 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/clinics/mine": {
+      "get": {
+        "operationId": "ClinicsController_getMyClinics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinics"
+        ]
+      }
+    },
+    "/clinics/active": {
+      "get": {
+        "operationId": "ClinicsController_getActive",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinics"
+        ]
+      },
+      "patch": {
+        "operationId": "ClinicsController_updateActive",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClinicDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinics"
+        ]
+      }
+    },
+    "/clinics": {
+      "post": {
+        "operationId": "ClinicsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClinicDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinics"
+        ]
+      }
+    },
+    "/clinics/active/logo": {
+      "put": {
+        "operationId": "ClinicsController_uploadLogo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinics"
+        ]
+      }
+    },
+    "/users/me/accept-terms": {
+      "post": {
+        "operationId": "UsersController_acceptTerms",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Accept terms of use for the logged in user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/invitation/{token}": {
+      "get": {
+        "operationId": "UsersController_findInvitation",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get invitation details by token",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/invite": {
+      "post": {
+        "operationId": "UsersController_invite",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invitation created and sent."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite a new professional",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/invitations": {
+      "get": {
+        "operationId": "UsersController_findAllInvitations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all clinic invitations",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all clinic users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user information",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deactivate user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return JWT tokens"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "User login",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/register-invitation": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created and logged in"
+          }
+        },
+        "summary": "Register from invitation token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/register-tenant": {
+      "post": {
+        "operationId": "AuthController_registerTenant",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterTenantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Clinic and User created, returns tokens"
+          }
+        },
+        "summary": "Register a new clinic and admin user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/initiate-registration": {
+      "post": {
+        "operationId": "AuthController_initiateRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiateRegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Verification email sent"
+          }
+        },
+        "summary": "Initiate account registration",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "operationId": "AuthController_verifyEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created, returns tokens"
+          }
+        },
+        "summary": "Verify email and create user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/complete-clinic": {
+      "post": {
+        "operationId": "AuthController_completeClinicSetup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteClinicDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Clinic setup completed"
+          }
+        },
+        "summary": "Complete clinic setup",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User logged out"
+          }
+        },
+        "summary": "User logout",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User data and clinics"
+          }
+        },
+        "summary": "Get current authenticated user and clinics",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshTokens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return new JWT tokens"
+          }
+        },
+        "summary": "Refresh access token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email sent if user exists"
+          }
+        },
+        "summary": "Request password reset email",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful"
+          }
+        },
+        "summary": "Reset password using token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/patients": {
+      "post": {
+        "operationId": "PatientsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The patient has been successfully created."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new patient",
+        "tags": [
+          "Patients"
+        ]
+      },
+      "get": {
+        "operationId": "PatientsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all patients with their latest procedure and next appointment dates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PatientResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all patients in the clinic",
+        "tags": [
+          "Patients"
+        ]
+      }
+    },
+    "/patients/{id}": {
+      "get": {
+        "operationId": "PatientsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get patient details",
+        "tags": [
+          "Patients"
+        ]
+      },
+      "patch": {
+        "operationId": "PatientsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update patient information",
+        "tags": [
+          "Patients"
+        ]
+      },
+      "delete": {
+        "operationId": "PatientsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a patient",
+        "tags": [
+          "Patients"
+        ]
+      }
+    },
+    "/procedures": {
+      "post": {
+        "operationId": "ProceduresController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProcedureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Procedures"
+        ]
+      }
+    },
+    "/procedures/patient/{patientId}": {
+      "get": {
+        "operationId": "ProceduresController_findAllByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Procedures"
+        ]
+      }
+    },
+    "/procedures/{id}": {
+      "get": {
+        "operationId": "ProceduresController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Procedures"
+        ]
+      },
+      "patch": {
+        "operationId": "ProceduresController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProcedureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Procedures"
+        ]
+      },
+      "delete": {
+        "operationId": "ProceduresController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Procedures"
+        ]
+      }
+    },
+    "/anamnesis": {
+      "post": {
+        "operationId": "AnamnesisController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnamnesisDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The record has been successfully created."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new anamnesis record",
+        "tags": [
+          "Anamnesis"
+        ]
+      }
+    },
+    "/anamnesis/patient/{patientId}": {
+      "get": {
+        "operationId": "AnamnesisController_findAllByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all anamnesis records for a specific patient",
+        "tags": [
+          "Anamnesis"
+        ]
+      }
+    },
+    "/anamnesis/{id}": {
+      "get": {
+        "operationId": "AnamnesisController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single anamnesis record",
+        "tags": [
+          "Anamnesis"
+        ]
+      },
+      "patch": {
+        "operationId": "AnamnesisController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAnamnesisDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update an anamnesis record",
+        "tags": [
+          "Anamnesis"
+        ]
+      },
+      "delete": {
+        "operationId": "AnamnesisController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete an anamnesis record",
+        "tags": [
+          "Anamnesis"
+        ]
+      }
+    },
+    "/payments": {
+      "post": {
+        "operationId": "PaymentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/patient/{patientId}": {
+      "get": {
+        "operationId": "PaymentsController_findAllByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/{id}": {
+      "get": {
+        "operationId": "PaymentsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Payments"
+        ]
+      },
+      "patch": {
+        "operationId": "PaymentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Payments"
+        ]
+      },
+      "delete": {
+        "operationId": "PaymentsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/exams/upload": {
+      "post": {
+        "operationId": "ExamsController_upload",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "patientId": {
+                    "type": "number"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                },
+                "required": [
+                  "title",
+                  "patientId",
+                  "files"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The file has been successfully uploaded."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a clinical exam document",
+        "tags": [
+          "Exams"
+        ]
+      }
+    },
+    "/exams/patient/{patientId}": {
+      "get": {
+        "operationId": "ExamsController_findAllByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all exams for a specific patient",
+        "tags": [
+          "Exams"
+        ]
+      }
+    },
+    "/exams/{id}": {
+      "delete": {
+        "operationId": "ExamsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete an exam",
+        "tags": [
+          "Exams"
+        ]
+      }
+    },
+    "/appointments": {
+      "post": {
+        "operationId": "AppointmentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppointmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The appointment has been successfully created."
+          },
+          "400": {
+            "description": "Conflict: Dentist occupied."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new appointment",
+        "tags": [
+          "Appointments"
+        ]
+      },
+      "get": {
+        "operationId": "AppointmentsController_findAll",
+        "parameters": [
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dentistId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "patientId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "includeOccurrences",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List clinic appointments",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments/public/cancel": {
+      "get": {
+        "operationId": "AppointmentsController_publicCancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel appointment via public link",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments/check-availability": {
+      "get": {
+        "operationId": "AppointmentsController_checkAvailability",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "duration",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "dentistId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "excludeId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "patientId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check dentist availability",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments/available-slots": {
+      "get": {
+        "operationId": "AppointmentsController_getAvailableSlots",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "YYYY-MM-DD",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dentistId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "duration",
+            "required": false,
+            "in": "query",
+            "description": "Duration in minutes (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "patientId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of time strings (HH:mm)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get available time slots for a dentist on a specific date",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/appointments/{id}": {
+      "get": {
+        "operationId": "AppointmentsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get appointment details",
+        "tags": [
+          "Appointments"
+        ]
+      },
+      "patch": {
+        "operationId": "AppointmentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAppointmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update appointment",
+        "tags": [
+          "Appointments"
+        ]
+      },
+      "delete": {
+        "operationId": "AppointmentsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel appointment",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/notifications": {
+      "get": {
+        "operationId": "NotificationsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List clinic notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markAsRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark notification as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllAsRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/treatment-plans": {
+      "post": {
+        "operationId": "TreatmentPlansController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTreatmentPlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The treatment plan has been successfully created."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new treatment plan",
+        "tags": [
+          "Treatment Plans"
+        ]
+      },
+      "get": {
+        "operationId": "TreatmentPlansController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all treatment plans for the clinic",
+        "tags": [
+          "Treatment Plans"
+        ]
+      }
+    },
+    "/treatment-plans/{id}": {
+      "get": {
+        "operationId": "TreatmentPlansController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a treatment plan by id",
+        "tags": [
+          "Treatment Plans"
+        ]
+      },
+      "patch": {
+        "operationId": "TreatmentPlansController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTreatmentPlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a treatment plan",
+        "tags": [
+          "Treatment Plans"
+        ]
+      },
+      "delete": {
+        "operationId": "TreatmentPlansController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a treatment plan",
+        "tags": [
+          "Treatment Plans"
+        ]
+      }
+    },
+    "/clinic-procedures": {
+      "post": {
+        "operationId": "ClinicProceduresController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClinicProcedureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clinic Procedures"
+        ]
+      },
+      "get": {
+        "operationId": "ClinicProceduresController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clinic Procedures"
+        ]
+      }
+    },
+    "/clinic-procedures/{id}": {
+      "get": {
+        "operationId": "ClinicProceduresController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clinic Procedures"
+        ]
+      },
+      "patch": {
+        "operationId": "ClinicProceduresController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClinicProcedureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clinic Procedures"
+        ]
+      },
+      "delete": {
+        "operationId": "ClinicProceduresController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clinic Procedures"
+        ]
+      }
+    },
+    "/dashboard/stats": {
+      "get": {
+        "operationId": "DashboardController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/dashboard/revenue-history": {
+      "get": {
+        "operationId": "DashboardController_getRevenueHistory",
+        "parameters": [
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/documents": {
+      "post": {
+        "operationId": "DocumentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePatientDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new patient document",
+        "tags": [
+          "documents"
+        ]
+      },
+      "get": {
+        "operationId": "DocumentsController_findAll",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all documents in the clinic",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/documents/{id}": {
+      "get": {
+        "operationId": "DocumentsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get document details",
+        "tags": [
+          "documents"
+        ]
+      },
+      "patch": {
+        "operationId": "DocumentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePatientDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update document",
+        "tags": [
+          "documents"
+        ]
+      },
+      "delete": {
+        "operationId": "DocumentsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove document",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/subscription/status": {
+      "get": {
+        "operationId": "SubscriptionController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Subscription"
+        ]
+      }
+    },
+    "/subscription/checkout": {
+      "post": {
+        "operationId": "SubscriptionController_createCheckoutSession",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Subscription"
+        ]
+      }
+    },
+    "/subscription/portal": {
+      "post": {
+        "operationId": "SubscriptionController_createPortalSession",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Subscription"
+        ]
+      }
+    },
+    "/webhooks/stripe": {
+      "post": {
+        "operationId": "StripeWebhookController_handleWebhook",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "StripeWebhook"
+        ]
+      }
+    },
+    "/budgets": {
+      "post": {
+        "operationId": "BudgetsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBudgetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Budget created successfully."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new budget",
+        "tags": [
+          "Budgets"
+        ]
+      }
+    },
+    "/budgets/patient/{patientId}": {
+      "get": {
+        "operationId": "BudgetsController_findAllByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all budgets for a patient",
+        "tags": [
+          "Budgets"
+        ]
+      }
+    },
+    "/budgets/{id}": {
+      "get": {
+        "operationId": "BudgetsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a budget by id",
+        "tags": [
+          "Budgets"
+        ]
+      },
+      "patch": {
+        "operationId": "BudgetsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBudgetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a budget",
+        "tags": [
+          "Budgets"
+        ]
+      },
+      "delete": {
+        "operationId": "BudgetsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a budget",
+        "tags": [
+          "Budgets"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "OdontoTec API",
+    "description": "Clínica Odontológica Multi-tenant API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreateClinicDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the clinic"
+          },
+          "phone": {
+            "type": "string",
+            "description": "The phone number of the clinic"
+          },
+          "address": {
+            "type": "string",
+            "description": "The address of the clinic"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateClinicDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "InviteUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "professional@example.com"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "123.456.789-00"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "SIMPLE",
+              "DENTIST"
+            ],
+            "example": "DENTIST"
+          }
+        },
+        "required": [
+          "email",
+          "cpf",
+          "role"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "SIMPLE",
+              "DENTIST"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "dentist@example.com",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RegisterInvitationDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "uuid-token-here"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "token",
+          "name",
+          "password"
+        ]
+      },
+      "RegisterTenantDto": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string",
+            "description": "The name of the user (admin)"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email of the user"
+          },
+          "password": {
+            "type": "string",
+            "description": "The password of the user"
+          },
+          "clinicName": {
+            "type": "string",
+            "description": "The name of the clinic"
+          },
+          "clinicPhone": {
+            "type": "string",
+            "description": "The phone number of the clinic"
+          },
+          "clinicAddress": {
+            "type": "string",
+            "description": "The address of the clinic"
+          }
+        },
+        "required": [
+          "userName",
+          "email",
+          "password",
+          "clinicName"
+        ]
+      },
+      "InitiateRegistrationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email of the user"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The verification token sent via email"
+          },
+          "password": {
+            "type": "string",
+            "description": "The new password for the account"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "description": "Confirm the new password"
+          }
+        },
+        "required": [
+          "token",
+          "password",
+          "confirmPassword"
+        ]
+      },
+      "CompleteClinicDto": {
+        "type": "object",
+        "properties": {
+          "clinicName": {
+            "type": "string",
+            "description": "The name of the clinic"
+          },
+          "clinicPhone": {
+            "type": "string",
+            "description": "The phone number of the clinic"
+          },
+          "clinicAddress": {
+            "type": "string",
+            "description": "The address of the clinic"
+          }
+        },
+        "required": [
+          "clinicName"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@clinic.com",
+            "description": "The email of the user"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The reset token sent via email"
+          },
+          "password": {
+            "type": "string",
+            "example": "newStrongPassword123",
+            "description": "The new password",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "CreatePatientDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PatientResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          },
+          "clinicId": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "lastProcedureDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nextAppointmentDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "clinicId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdatePatientDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateProcedureDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Root Canal Treatment"
+          },
+          "type": {
+            "type": "string",
+            "example": "Restoration"
+          },
+          "date": {
+            "type": "string",
+            "example": "2023-10-27T10:00:00Z"
+          },
+          "cost": {
+            "type": "number",
+            "example": 1500
+          },
+          "patientId": {
+            "type": "number",
+            "example": 1
+          },
+          "toothNumber": {
+            "type": "string",
+            "example": "11"
+          },
+          "toothFaces": {
+            "type": "string",
+            "example": "O,M,D"
+          }
+        },
+        "required": [
+          "date",
+          "patientId"
+        ]
+      },
+      "UpdateProcedureDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Root Canal Treatment"
+          },
+          "type": {
+            "type": "string",
+            "example": "Restoration"
+          },
+          "date": {
+            "type": "string",
+            "example": "2023-10-27T10:00:00Z"
+          },
+          "cost": {
+            "type": "number",
+            "example": 1500
+          },
+          "patientId": {
+            "type": "number",
+            "example": 1
+          },
+          "toothNumber": {
+            "type": "string",
+            "example": "11"
+          },
+          "toothFaces": {
+            "type": "string",
+            "example": "O,M,D"
+          }
+        }
+      },
+      "AnamnesisAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "example": "hypertension"
+          },
+          "value": {
+            "type": "object",
+            "example": true
+          },
+          "details": {
+            "type": "string",
+            "example": "Controlada com medicação"
+          }
+        },
+        "required": [
+          "questionId",
+          "value"
+        ]
+      },
+      "AnamnesisDataDto": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnamnesisAnswerDto"
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ]
+      },
+      "CreateAnamnesisDto": {
+        "type": "object",
+        "properties": {
+          "complaint": {
+            "type": "string",
+            "example": "Toothache in the lower right molar"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AnamnesisDataDto"
+          },
+          "patientId": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "complaint",
+          "data",
+          "patientId"
+        ]
+      },
+      "UpdateAnamnesisDto": {
+        "type": "object",
+        "properties": {
+          "complaint": {
+            "type": "string",
+            "example": "Toothache in the lower right molar"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AnamnesisDataDto"
+          },
+          "patientId": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "CreatePaymentDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 250
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "CREDIT_CARD",
+              "DEBIT_CARD",
+              "PIX",
+              "INSURANCE"
+            ],
+            "example": "CREDIT_CARD"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "CANCELED",
+              "CANCELLED"
+            ],
+            "example": "PENDING"
+          },
+          "date": {
+            "type": "string",
+            "example": "2023-10-27T10:00:00Z"
+          },
+          "patientId": {
+            "type": "number",
+            "example": 1
+          },
+          "treatmentPlanId": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "amount",
+          "method",
+          "date",
+          "patientId"
+        ]
+      },
+      "UpdatePaymentDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 250
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "CREDIT_CARD",
+              "DEBIT_CARD",
+              "PIX",
+              "INSURANCE"
+            ],
+            "example": "CREDIT_CARD"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "CANCELED",
+              "CANCELLED"
+            ],
+            "example": "PENDING"
+          },
+          "date": {
+            "type": "string",
+            "example": "2023-10-27T10:00:00Z"
+          },
+          "patientId": {
+            "type": "number",
+            "example": 1
+          },
+          "treatmentPlanId": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "CreateAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-01-20T10:00:00Z"
+          },
+          "duration": {
+            "type": "number",
+            "example": 30
+          },
+          "dentistId": {
+            "type": "number"
+          },
+          "patientId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "duration",
+          "dentistId",
+          "patientId"
+        ]
+      },
+      "UpdateAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number"
+          },
+          "dentistId": {
+            "type": "number"
+          },
+          "patientId": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SCHEDULED",
+              "CONFIRMED",
+              "CANCELLED",
+              "COMPLETED",
+              "ABSENT"
+            ]
+          },
+          "cancelledBy": {
+            "type": "string",
+            "enum": [
+              "PATIENT",
+              "CLINIC"
+            ]
+          },
+          "cancellationReason": {
+            "type": "string"
+          }
+        }
+      },
+      "TreatmentPlanItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "toothNumber": {
+            "type": "number"
+          },
+          "surface": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PLANNED",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "CANCELED",
+              "CANCELLED"
+            ]
+          }
+        },
+        "required": [
+          "description",
+          "value"
+        ]
+      },
+      "CreateTreatmentPlanDto": {
+        "type": "object",
+        "properties": {
+          "patientId": {
+            "type": "number"
+          },
+          "dentistId": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "REJECTED",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TreatmentPlanItemDto"
+            }
+          }
+        },
+        "required": [
+          "patientId",
+          "dentistId",
+          "items"
+        ]
+      },
+      "UpdateTreatmentPlanDto": {
+        "type": "object",
+        "properties": {
+          "patientId": {
+            "type": "number"
+          },
+          "dentistId": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "REJECTED",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TreatmentPlanItemDto"
+            }
+          }
+        }
+      },
+      "CreateClinicProcedureDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Limpeza e Profilaxia"
+          },
+          "description": {
+            "type": "string",
+            "example": "Limpeza completa dos dentes"
+          },
+          "category": {
+            "type": "string",
+            "example": "Preventivo"
+          },
+          "baseValue": {
+            "type": "number",
+            "example": 150
+          },
+          "selectionMode": {
+            "type": "string",
+            "example": "FACE",
+            "enum": [
+              "FACE",
+              "TOOTH",
+              "GENERAL"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "baseValue"
+        ]
+      },
+      "UpdateClinicProcedureDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Limpeza e Profilaxia"
+          },
+          "description": {
+            "type": "string",
+            "example": "Limpeza completa dos dentes"
+          },
+          "category": {
+            "type": "string",
+            "example": "Preventivo"
+          },
+          "baseValue": {
+            "type": "number",
+            "example": 150
+          },
+          "selectionMode": {
+            "type": "string",
+            "example": "FACE",
+            "enum": [
+              "FACE",
+              "TOOTH",
+              "GENERAL"
+            ]
+          }
+        }
+      },
+      "CreatePatientDocumentDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "ATESTADO",
+              "RECEITA",
+              "OUTRO"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "patientId": {
+            "type": "number"
+          },
+          "dentistId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "content",
+          "patientId",
+          "dentistId"
+        ]
+      },
+      "UpdatePatientDocumentDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBudgetDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateBudgetDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

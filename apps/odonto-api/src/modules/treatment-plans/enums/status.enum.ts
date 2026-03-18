@@ -1,0 +1,16 @@
+export enum TreatmentPlanStatus {
+    DRAFT = 'DRAFT',
+    PENDING_APPROVAL = 'PENDING_APPROVAL',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED',
+}
+
+export enum TreatmentPlanItemStatus {
+    PLANNED = 'PLANNED',
+    IN_PROGRESS = 'IN_PROGRESS',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED',
+    CANCELLED = 'CANCELLED',
+}

@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "complaint": {
+      "type": "string",
+      "example": "Toothache in the lower right molar"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "questionId": { "type": "string", "example": "hypertension" },
+              "value": { "type": "object", "example": true },
+              "details": {
+                "type": "string",
+                "example": "Controlada com medicação"
+              }
+            },
+            "required": ["questionId", "value"],
+            "x-readme-ref-name": "AnamnesisAnswerDto"
+          }
+        }
+      },
+      "required": ["answers"],
+      "x-readme-ref-name": "AnamnesisDataDto"
+    },
+    "patientId": { "type": "number", "example": 1 }
+  },
+  "x-readme-ref-name": "UpdateAnamnesisDto"
+}

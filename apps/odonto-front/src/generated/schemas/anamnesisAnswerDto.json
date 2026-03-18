@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "questionId": { "type": "string", "example": "hypertension" },
+    "value": { "type": "object", "example": true },
+    "details": { "type": "string", "example": "Controlada com medicação" }
+  },
+  "required": ["questionId", "value"],
+  "x-readme-ref-name": "AnamnesisAnswerDto"
+}

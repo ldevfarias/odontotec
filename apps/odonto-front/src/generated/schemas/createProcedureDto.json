@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "description": { "type": "string", "example": "Root Canal Treatment" },
+    "type": { "type": "string", "example": "Restoration" },
+    "date": { "type": "string", "example": "2023-10-27T10:00:00Z" },
+    "cost": { "type": "number", "example": 1500 },
+    "patientId": { "type": "number", "example": 1 },
+    "toothNumber": { "type": "string", "example": "11" },
+    "toothFaces": { "type": "string", "example": "O,M,D" }
+  },
+  "required": ["date", "patientId"],
+  "x-readme-ref-name": "CreateProcedureDto"
+}
