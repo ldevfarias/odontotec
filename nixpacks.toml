@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+[phases.install]
+cmds = ["npm install --include=dev"]
+
+[phases.build]
+cmds = ["cd apps/odonto-api && npm run build"]
+
+[start]
+cmd = "node apps/odonto-api/dist/src/main"
