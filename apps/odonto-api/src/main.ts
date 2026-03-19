@@ -5,8 +5,19 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { AppDataSource } from './typeorm.config';
+
+async function runMigrations() {
+  console.log('🔄 Running database migrations...');
+  await AppDataSource.initialize();
+  await AppDataSource.runMigrations();
+  await AppDataSource.destroy();
+  console.log('✅ Migrations complete');
+}
 
 async function bootstrap() {
+  await runMigrations();
+
   const app = await NestFactory.create(AppModule, {
     rawBody: true, // Enable raw body for Stripe Webhooks
   });

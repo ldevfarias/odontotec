@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.railway.com/railway.json",
   "build": {
-    "buildCommand": "npm install --include=dev && cd apps/odonto-api && npm run build && npm run migration:run"
+    "buildCommand": "npm install --include=dev && cd apps/odonto-api && npm run build"
   },
   "deploy": {
     "startCommand": "node apps/odonto-api/dist/src/main"
