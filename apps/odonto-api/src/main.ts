@@ -27,8 +27,8 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true,
   }));
-  app.use(helmet());
   app.use(cookieParser());
+
   const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3001')
     .split(',')
     .map((url) => url.trim());
@@ -36,8 +36,13 @@ async function bootstrap() {
   app.enableCors({
     origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Clinic-Id'],
     credentials: true,
   });
+
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }));
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
