@@ -1,4 +1,4 @@
-app = "odonto-api"
+app = "odontotec"
 primary_region = "gru"
 
 [build]
