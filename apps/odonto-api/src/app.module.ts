@@ -50,6 +50,7 @@ import { StorageModule } from './common/providers/storage/storage.module';
           synchronize: !isProd,
           migrationsRun: false,
           migrationsTableName: 'typeorm_migrations',
+          ssl: isProd ? { rejectUnauthorized: false } : false,
         };
       },
     }),
