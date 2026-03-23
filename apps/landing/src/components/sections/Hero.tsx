@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { staggerContainer, fadeInUp, slideInFromRight } from "@/lib/animations";
 import { User, Users, Building } from "lucide-react";
+import { APP_URL } from "@/lib/config";
 
 export function Hero() {
     const ref = useRef(null);
@@ -55,7 +56,7 @@ export function Hero() {
 
                         <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <a
-                                href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/register`}
+                                href={`${APP_URL}/register`}
                                 className="fill-button w-full sm:w-auto group shadow-lg shadow-primary/20 flex items-center justify-center cursor-pointer"
                             >
                                 Testar grátis por 14 dias

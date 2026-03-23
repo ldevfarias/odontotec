@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { APP_URL } from "@/lib/config";
 
 export function Nav() {
     const { scrollY } = useScroll();
@@ -45,13 +46,13 @@ export function Nav() {
                 {/* CTA */}
                 <div className="flex items-center gap-4">
                     <a
-                        href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/login`}
+                        href={`${APP_URL}/login`}
                         className="hidden md:inline-flex bg-white text-gray-900 border border-gray-200 shadow-sm hover:bg-gray-50 hover:border-gray-300 py-2 px-6 text-sm font-semibold transition-all rounded-full cursor-pointer"
                     >
                         Fazer login
                     </a>
                     <a
-                        href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/register`}
+                        href={`${APP_URL}/register`}
                         className="fill-button py-2 px-6 text-sm cursor-pointer"
                     >
                         Começar agora

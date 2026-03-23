@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 import { Check } from "lucide-react";
+import { APP_URL } from "@/lib/config";
 
 export function Pricing() {
     return (
@@ -99,7 +100,7 @@ export function Pricing() {
                                     </span>
                                 </div>
                                 <a
-                                    href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/register`}
+                                    href={`${APP_URL}/register`}
                                     className="fill-button w-full justify-center group cursor-pointer shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 flex items-center"
                                 >
                                     Começar meus 14 dias grátis
