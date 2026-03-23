@@ -45,17 +45,17 @@ export function DentistDashboard() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-slate-800">
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-800">
                         Bom dia, Dr. {user?.name?.split(' ')[0]}
                     </h1>
                     <p className="text-sm text-gray-400 mt-0.5 font-medium">
                         {format(new Date(), "EEEE',' dd 'de' MMMM", { locale: ptBR })}
                     </p>
                 </div>
-                <Link href="/agendamentos">
-                    <Button variant="outline" className="gap-2 border-slate-200 text-slate-600 hover:bg-slate-50">
+                <Link href="/agendamentos" className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full sm:w-auto gap-2 border-slate-200 text-slate-600 hover:bg-slate-50 active:scale-[0.98] transition-all">
                         <CalendarDays className="h-4 w-4" />
                         Ver Agenda Completa
                         <ArrowRight className="h-4 w-4" />
@@ -65,7 +65,7 @@ export function DentistDashboard() {
 
 
             {/* Main Content: Timeline + Recent Patients */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8">
 
                 {/* Timeline */}
                 <div className="lg:col-span-8 bg-white border border-gray-100 rounded-sm shadow-sm overflow-hidden flex flex-col">

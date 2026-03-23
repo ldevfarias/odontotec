@@ -87,8 +87,7 @@ export function DentistTimeline({
     return (
         <div
             ref={scrollRef}
-            className="relative overflow-y-auto custom-scrollbar"
-            style={{ height: '480px' }}
+            className="relative overflow-y-auto custom-scrollbar h-[60vh] sm:h-[480px] min-h-[400px]"
         >
             <div
                 className="relative"
@@ -139,13 +138,13 @@ export function DentistTimeline({
                     return (
                         <div
                             key={apt.id}
-                            className="absolute left-14 right-2 z-20 cursor-pointer"
+                            className="absolute left-14 right-2 sm:right-4 z-20 cursor-pointer"
                             style={{ top: `${top}px`, height: `${height}px` }}
                             onClick={() => onEditAppointment?.(apt)}
                         >
                             <div
                                 className={cn(
-                                    'h-full rounded-sm border-l-4 px-2.5 py-1.5 shadow-sm overflow-hidden transition-all hover:shadow-md hover:translate-x-0.5',
+                                    'h-full rounded-sm border-l-4 px-2.5 py-1.5 shadow-sm overflow-hidden transition-all hover:shadow-md hover:translate-x-0.5 active:scale-[0.98]',
                                     statusStyle
                                 )}
                             >

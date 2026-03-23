@@ -16,11 +16,11 @@ export function DentistRecentPatients({ appointments, isLoading }: DentistRecent
         return (
             <div className="space-y-3">
                 {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                        <Skeleton className="h-9 w-9 rounded-full" />
-                        <div className="flex-1 space-y-1.5">
-                            <Skeleton className="h-3 w-[120px]" />
-                            <Skeleton className="h-2.5 w-[80px]" />
+                    <div key={i} className="flex items-center gap-3 p-1">
+                        <Skeleton className="h-10 w-10 sm:h-9 sm:w-9 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                            <Skeleton className="h-3.5 w-[140px]" />
+                            <Skeleton className="h-2.5 w-[90px]" />
                         </div>
                     </div>
                 ))}
@@ -58,9 +58,9 @@ export function DentistRecentPatients({ appointments, isLoading }: DentistRecent
                     <Link
                         key={patient?.id}
                         href={`/patients?id=${patient?.id}`}
-                        className="flex items-center gap-3 p-2.5 rounded-sm hover:bg-slate-50 transition-colors group border border-transparent hover:border-slate-100"
+                        className="flex items-center gap-3 p-2.5 sm:p-3 rounded-md hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100 active:scale-[0.98] active:bg-slate-100"
                     >
-                        <div className="h-9 w-9 rounded-full bg-teal-100 border border-teal-200 flex items-center justify-center text-[11px] font-black text-teal-700 shrink-0">
+                        <div className="h-10 w-10 sm:h-9 sm:w-9 rounded-full bg-teal-100 border border-teal-200 flex items-center justify-center text-[11px] font-black text-teal-700 shrink-0">
                             {initials}
                         </div>
                         <div className="flex-1 min-w-0">

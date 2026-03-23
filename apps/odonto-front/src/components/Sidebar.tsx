@@ -50,7 +50,7 @@ function isActive(pathname: string, href: string, exact?: boolean): boolean {
     return pathname === href || pathname.startsWith(href + '/');
 }
 
-export function Sidebar() {
+export function Sidebar({ className, isMobile }: { className?: string; isMobile?: boolean } = {}) {
     const pathname = usePathname();
     const router = useRouter();
     const { logout, activeClinic, setActiveClinic, clinics, user } = useAuth();
@@ -72,13 +72,15 @@ export function Sidebar() {
 
     // Persist collapsed state after hydration
     useEffect(() => {
+        if (isMobile) return;
         const stored = localStorage.getItem('sidebar-collapsed');
         if (stored === 'true') setCollapsed(true);
-    }, []);
+    }, [isMobile]);
 
     useEffect(() => {
+        if (isMobile) return;
         localStorage.setItem('sidebar-collapsed', String(collapsed));
-    }, [collapsed]);
+    }, [collapsed, isMobile]);
 
     const initials = user?.name
         ? user.name.split(' ').slice(0, 2).map((n) => n[0].toUpperCase()).join('')
@@ -89,44 +91,50 @@ export function Sidebar() {
         return true;
     });
 
+    const isCollapsed = !isMobile && collapsed;
+
     return (
         <div
             className={cn(
-                'hidden md:flex flex-col h-full card-surface transition-all duration-300 relative shrink-0',
-                collapsed ? 'w-16' : 'w-64'
+                'flex flex-col h-full card-surface transition-all duration-300 relative shrink-0',
+                isMobile ? 'w-full border-none' : 'hidden md:flex',
+                !isMobile && (collapsed ? 'w-16' : 'w-64'),
+                className
             )}
         >
             {/* Collapse toggle */}
-            <button
-                onClick={() => setCollapsed((p) => !p)}
-                aria-label={collapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
-                className="absolute -right-3 top-6 z-10 h-6 w-6 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-400 hover:text-gray-700 hover:shadow-md transition-all duration-200"
-            >
-                {collapsed
-                    ? <ChevronRight className="h-3.5 w-3.5" />
-                    : <ChevronLeft className="h-3.5 w-3.5" />
-                }
-            </button>
+            {!isMobile && (
+                <button
+                    onClick={() => setCollapsed((p) => !p)}
+                    aria-label={collapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+                    className="absolute -right-3 top-6 z-10 h-6 w-6 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-400 hover:text-gray-700 hover:shadow-md transition-all duration-200"
+                >
+                    {collapsed
+                        ? <ChevronRight className="h-3.5 w-3.5" />
+                        : <ChevronLeft className="h-3.5 w-3.5" />
+                    }
+                </button>
+            )}
 
             {/* Brand header */}
             <div className={cn(
                 'flex h-16 items-center border-b border-gray-100 shrink-0 transition-all duration-300',
-                collapsed ? 'justify-center px-3' : 'px-5 gap-3'
+                isCollapsed ? 'justify-center px-3' : 'px-5 gap-3'
             )}>
                 {clinics.length > 0 ? (
                     <Popover open={clinicOpen} onOpenChange={setClinicOpen}>
                         <PopoverTrigger asChild>
                             <button className={cn(
                                 "flex items-center gap-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group outline-none border border-transparent hover:border-gray-200 shrink-0 w-full text-left",
-                                collapsed ? "justify-center p-1.5" : "px-2.5 py-1.5 -ml-2.5"
+                                isCollapsed ? "justify-center p-1.5" : "px-2.5 py-1.5 -ml-2.5"
                             )}>
                                 <div className={cn(
                                     "shrink-0 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 group-hover:bg-teal-100 transition-colors",
-                                    collapsed ? "h-10 w-10" : "h-9 w-9"
+                                    isCollapsed ? "h-10 w-10" : "h-9 w-9"
                                 )}>
-                                    <Building2 className={cn("text-teal-600", collapsed ? "h-5 w-5" : "h-4 w-4")} />
+                                    <Building2 className={cn("text-teal-600", isCollapsed ? "h-5 w-5" : "h-4 w-4")} />
                                 </div>
-                                {!collapsed && (
+                                {!isCollapsed && (
                                     <div className="flex flex-col overflow-hidden flex-1 min-w-0">
                                         <div className="flex items-center justify-between gap-1 w-full">
                                             <span className="text-sm font-semibold text-foreground leading-tight truncate">
@@ -165,11 +173,11 @@ export function Sidebar() {
                     <>
                         <div className={cn(
                             "shrink-0 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600",
-                            collapsed ? "h-10 w-10" : "h-9 w-9"
+                            isCollapsed ? "h-10 w-10" : "h-9 w-9"
                         )}>
-                            <Building2 className={cn("text-teal-600", collapsed ? "h-5 w-5" : "h-4 w-4")} />
+                            <Building2 className={cn("text-teal-600", isCollapsed ? "h-5 w-5" : "h-4 w-4")} />
                         </div>
-                        {!collapsed && (
+                        {!isCollapsed && (
                             <div className="flex flex-col overflow-hidden">
                                 <span className="text-sm font-semibold text-foreground leading-tight truncate">
                                     {activeClinic?.name || 'OdontoTec'}
@@ -182,12 +190,13 @@ export function Sidebar() {
 
             {/* Navigation */}
             <nav className={cn(
-                'flex-1 py-4 space-y-0.5 overflow-y-auto transition-all duration-300',
-                collapsed ? 'px-2' : 'px-3'
+                'flex-1 py-4 overflow-y-auto transition-all duration-300 flex flex-col',
+                isCollapsed ? 'px-2' : 'px-3'
             )}>
-                {filteredGroups.map((group, gi) => (
+                <div className="space-y-0.5">
+                    {filteredGroups.map((group, gi) => (
                     <div key={group.label} className={gi > 0 ? 'mt-4' : ''}>
-                        {!collapsed && (
+                        {!isCollapsed && (
                             <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                                 {group.label}
                             </p>
@@ -199,22 +208,23 @@ export function Sidebar() {
                                     key={item.href}
                                     href={item.href}
                                     prefetch={true}
-                                    title={collapsed ? item.label : undefined}
+                                    title={isCollapsed ? item.label : undefined}
                                     className={cn(
                                         'flex items-center gap-3 rounded-xl px-3 py-2.5',
                                         'text-sm font-medium',
                                         'transition-all duration-150 group',
-                                        collapsed && 'justify-center px-0',
+                                        isCollapsed && 'justify-center px-0',
                                         active
                                             ? 'bg-primary text-primary-foreground shadow-sm'
-                                            : 'text-muted-foreground hover:bg-gray-100 hover:text-foreground'
+                                            : 'text-muted-foreground hover:bg-gray-100 hover:text-foreground',
+                                        isMobile && 'active:scale-[0.98]'
                                     )}
                                 >
                                     <item.icon className={cn(
                                         'h-[18px] w-[18px] shrink-0 transition-transform duration-150 group-hover:scale-110',
                                         active ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-primary'
                                     )} />
-                                    {!collapsed && (
+                                    {!isCollapsed && (
                                         <span className="truncate">{item.label}</span>
                                     )}
                                 </Link>
@@ -222,17 +232,22 @@ export function Sidebar() {
                         })}
                     </div>
                 ))}
-            </nav>
+                </div>
 
-            {/* Upgrade card */}
-            {!collapsed && <UpgradePlanCard />}
+                {/* Upgrade card stacking right below the menu */}
+                {!isCollapsed && (
+                    <div className="mt-8 mb-2">
+                        <UpgradePlanCard />
+                    </div>
+                )}
+            </nav>
 
             {/* User section */}
             <div className={cn(
                 'shrink-0 border-t border-gray-100 transition-all duration-300',
-                collapsed ? 'p-2' : 'p-3'
+                isCollapsed ? 'p-2' : 'p-3'
             )}>
-                {collapsed ? (
+                {isCollapsed ? (
                     <div className="flex flex-col items-center gap-2">
                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
                             {initials}

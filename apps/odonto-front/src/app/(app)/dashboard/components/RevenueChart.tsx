@@ -62,7 +62,7 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
 
     if (isLoading) {
         return (
-            <div className="bg-white rounded-[24px] px-7 py-6 shadow-sm border border-gray-100 flex flex-col w-full h-full min-h-[300px]">
+            <div className="bg-white rounded-[24px] px-7 py-6 shadow-sm border border-gray-100 flex flex-col w-full h-full min-h-[340px]">
                 <div className="flex justify-between mb-4">
                     <div className="space-y-2">
                         <Skeleton className="h-5 w-36" />
@@ -79,7 +79,7 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
     }
 
     return (
-        <div className="bg-white rounded-[24px] px-7 py-6 shadow-sm border border-gray-100 flex flex-col w-full h-full min-h-[400px] relative overflow-hidden">
+        <div className="bg-white rounded-[24px] px-7 py-6 shadow-sm border border-gray-100 flex flex-col w-full h-full min-h-[340px] relative overflow-hidden">
             {/* Header */}
             <div className="flex justify-between items-start mb-6 z-10 w-full">
                 <div>

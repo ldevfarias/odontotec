@@ -66,7 +66,7 @@ function AdminDashboard() {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-6">
-            <div className="grid gap-4 lg:grid-cols-12">
+            <div className="grid gap-6 lg:gap-8 lg:grid-cols-12">
                 {/* Left Column */}
                 <div className="lg:col-span-8 flex flex-col gap-4">
                     {/* Section Header with Period Filter */}

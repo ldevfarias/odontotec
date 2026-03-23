@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { NotificationBell } from './notifications/NotificationBell';
-import { Search, Settings, LogOut, ChevronDown, Target } from 'lucide-react';
+import { Search, Settings, LogOut, ChevronDown, Target, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -12,9 +12,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PatientSearchCMDK } from '@/components/patients/PatientSearchCMDK';
+import { Sidebar } from '@/components/Sidebar';
 
 export function DashboardHeader() {
     const { user, logout } = useAuth();
@@ -27,14 +29,27 @@ export function DashboardHeader() {
         : '?';
 
     return (
-        <header className="card-surface min-h-[4rem] flex items-center justify-between px-6 py-3 shrink-0 rounded-2xl border border-gray-100 shadow-sm bg-white">
-            {/* Left: Logo */}
-            <div className="flex items-center flex-1 overflow-hidden pr-4 gap-4">
+        <header className="card-surface min-h-[4rem] flex items-center justify-between px-4 sm:px-6 py-3 shrink-0 rounded-2xl border border-gray-100 shadow-sm bg-white">
+            {/* Left: Mobile Menu & Logo */}
+            <div className="flex items-center flex-1 overflow-hidden pr-4 gap-3">
+                <div className="md:hidden flex items-center">
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <button className="p-2 -ml-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors active:scale-95">
+                                <Menu className="h-5 w-5" />
+                            </button>
+                        </SheetTrigger>
+                        <SheetContent side="left" className="p-0 w-72 flex flex-col border-r-0">
+                            <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
+                            <Sidebar isMobile />
+                        </SheetContent>
+                    </Sheet>
+                </div>
                 <div
                     className="flex items-center gap-2 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => router.push('/dashboard')}
                 >
-                    <span className="font-bold text-xl tracking-tight text-gray-800 hidden md:block">
+                    <span className="font-bold text-[1.1rem] sm:text-xl tracking-tight text-gray-800">
                         Odonto<span className="text-teal-600 font-extrabold">Eh</span>Tec
                     </span>
                 </div>
