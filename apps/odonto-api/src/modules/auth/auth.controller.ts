@@ -22,19 +22,18 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     private setCookies(res: Response, accessToken: string, refreshToken: string) {
-        res.cookie('access_token', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 15 * 60 * 1000, // 15 minutes
-        });
+        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieDomain = process.env.COOKIE_DOMAIN; // e.g. '.odontoehtec.com' in production
 
-        res.cookie('refresh_token', refreshToken, {
+        const base = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
+            secure: isProduction,
+            sameSite: 'lax' as const,
+            ...(cookieDomain && { domain: cookieDomain }),
+        };
+
+        res.cookie('access_token', accessToken, { ...base, maxAge: 15 * 60 * 1000 });
+        res.cookie('refresh_token', refreshToken, { ...base, maxAge: 7 * 24 * 60 * 60 * 1000 });
     }
 
     @Throttle({ default: { limit: 5, ttl: 60000 } })
@@ -103,8 +102,10 @@ export class AuthController {
     @ApiResponse({ status: 200, description: 'User logged out' })
     async logout(@Request() req, @Res({ passthrough: true }) res: Response) {
         await this.authService.logout(req.user.userId);
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        const cookieDomain = process.env.COOKIE_DOMAIN;
+        const clearOptions = cookieDomain ? { domain: cookieDomain } : {};
+        res.clearCookie('access_token', clearOptions);
+        res.clearCookie('refresh_token', clearOptions);
         return { message: 'Logged out successfully' };
     }
 
