@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_URL } from '@/lib/config';
 import { useExamsControllerFindAllByPatient } from '@/generated/hooks/useExamsControllerFindAllByPatient';
 import { useExamsControllerUpload } from '@/generated/hooks/useExamsControllerUpload';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -59,7 +60,7 @@ export function ExamsTab({ patientId }: { patientId: number }) {
     };
 
     const getFileUrl = (fileUrl: string) => {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+        const baseUrl = API_URL;
         return `${baseUrl}/${fileUrl}`;
     };
 

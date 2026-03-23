@@ -1,11 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosInstance } from 'axios';
+import { API_URL } from './config';
 
 // Export types that Kubb-generated clients expect
 export type RequestConfig<TData = unknown> = AxiosRequestConfig<any>;
 export type ResponseErrorConfig<TError = unknown> = any;
 
 export const api: AxiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+    baseURL: API_URL,
     withCredentials: true,
 });
 
