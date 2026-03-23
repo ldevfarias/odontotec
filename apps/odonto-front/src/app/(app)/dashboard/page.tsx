@@ -17,7 +17,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 
 // Components
-import { MetricCard } from './components/MetricCard';
 import { DentistQuickBook } from './components/DentistQuickBook';
 import { RevenueChart } from './components/RevenueChart';
 import { TopTreatments } from './components/TopTreatments';
@@ -68,56 +67,34 @@ function AdminDashboard() {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-6">
             <div className="grid gap-4 lg:grid-cols-12">
-
                 {/* Left Column */}
                 <div className="lg:col-span-8 flex flex-col gap-4">
-
-                    {/* Overview Section */}
-                    <div>
-                        {/* Section Header with Period Filter */}
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-[16px] font-bold text-gray-900 tracking-tight">Visão Geral</h2>
-                                <Badge className="text-[11px] font-semibold px-2.5 py-0 h-5 rounded-full bg-primary/10 text-primary border border-primary/20 shadow-none">
-                                    {selectedLabel}
-                                </Badge>
-                            </div>
-
-                            {/* Beautiful Period Select */}
-                            <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
-                                <SelectTrigger className="h-8 w-auto min-w-[148px] text-[13px] font-medium border-gray-200 bg-white rounded-full px-4 shadow-sm hover:border-gray-300 focus:ring-1 focus:ring-primary/20 gap-1.5">
-                                    <CalendarDays className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent align="end" className="min-w-[180px] rounded-xl p-1 shadow-lg border-gray-100">
-                                    {PERIOD_OPTIONS.map(opt => (
-                                        <SelectItem
-                                            key={opt.value}
-                                            value={opt.value}
-                                            className="rounded-lg text-[13px] font-medium cursor-pointer"
-                                        >
-                                            {opt.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                    {/* Section Header with Period Filter */}
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <Badge className="text-[11px] font-semibold px-2.5 py-0 h-5 rounded-full bg-primary/10 text-primary border border-primary/20 shadow-none">
+                                {selectedLabel}
+                            </Badge>
                         </div>
 
-                        {/* KPI Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <MetricCard
-                                title="Pacientes Atendidos"
-                                value={stats.patientsToday}
-                                icon={<Users className="w-[18px] h-[18px]" />}
-                                trend={{ value: 12.5, isPositive: true, label: `vs ${selectedLabel.toLowerCase()}` }}
-                            />
-                            <MetricCard
-                                title="Receita Projetada"
-                                value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(stats.expectedRevenue).replace('R$', '').trim()}
-                                icon={<Wallet className="w-[18px] h-[18px]" />}
-                                trend={{ value: 8.2, isPositive: true, label: `vs ${selectedLabel.toLowerCase()}` }}
-                            />
-                        </div>
+                        {/* Beautiful Period Select */}
+                        <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
+                            <SelectTrigger className="h-8 w-auto min-w-[148px] text-[13px] font-medium border-gray-200 bg-white rounded-full px-4 shadow-sm hover:border-gray-300 focus:ring-1 focus:ring-primary/20 gap-1.5">
+                                <CalendarDays className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent align="end" className="min-w-[180px] rounded-xl p-1 shadow-lg border-gray-100">
+                                {PERIOD_OPTIONS.map(opt => (
+                                    <SelectItem
+                                        key={opt.value}
+                                        value={opt.value}
+                                        className="rounded-lg text-[13px] font-medium cursor-pointer"
+                                    >
+                                        {opt.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Dentist Quick Book Banner */}
@@ -134,10 +111,10 @@ function AdminDashboard() {
 
                 {/* Right Column */}
                 <div className="lg:col-span-4 flex flex-col gap-4">
-                    <TopTreatments />
                     <div className="flex-1">
                         <RecentActivity appointments={stats.recentAppointments} />
                     </div>
+                    <TopTreatments />
                 </div>
 
             </div>
@@ -148,18 +125,17 @@ function AdminDashboard() {
 function DashboardLoading() {
     return (
         <div className="space-y-4 p-1 max-w-[1400px] mx-auto">
-            <Skeleton className="h-8 w-[180px]" />
             <div className="grid gap-4 lg:grid-cols-12">
                 <div className="lg:col-span-8 space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <Skeleton className="h-[180px] rounded-[24px]" />
-                        <Skeleton className="h-[180px] rounded-[24px]" />
+                    <div className="flex items-center justify-between mb-3">
+                        <Skeleton className="h-5 w-24 rounded-full" />
+                        <Skeleton className="h-8 w-[148px] rounded-full" />
                     </div>
-                    <Skeleton className="h-[120px] rounded-[24px]" />
+                    <Skeleton className="h-[140px] rounded-[24px]" />
                     <Skeleton className="h-[340px] rounded-[24px]" />
                 </div>
-                <div className="lg:col-span-4 space-y-4">
-                    <Skeleton className="h-[360px] rounded-[24px]" />
+                <div className="lg:col-span-4 flex flex-col gap-4">
+                    <Skeleton className="flex-1 min-h-[360px] rounded-[24px]" />
                     <Skeleton className="h-[360px] rounded-[24px]" />
                 </div>
             </div>

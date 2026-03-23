@@ -61,7 +61,7 @@ export function TopTreatments() {
 
     return (
         <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col w-full h-full">
-            <h3 className="text-[17px] font-bold text-gray-900 tracking-tight mb-6">Procedimentos Populares</h3>
+            <h3 className="text-[17px] font-bold text-gray-900 tracking-tight mb-6">Procedimentos</h3>
 
             <div className="flex flex-col gap-4 flex-1">
                 {isLoading ? (

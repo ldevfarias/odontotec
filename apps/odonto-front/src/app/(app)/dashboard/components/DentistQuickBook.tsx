@@ -14,6 +14,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
@@ -87,27 +93,32 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <button className="flex flex-col items-center gap-2 min-w-[64px] group cursor-pointer outline-none">
-                    <div className="relative">
-                        <Avatar className="h-14 w-14 border-2 border-white shadow-md ring-2 ring-transparent group-hover:ring-primary/40 transition-all duration-200">
-                            <AvatarImage src={`https://i.pravatar.cc/150?u=dentist-${dentist.id}`} alt={dentist.name} />
-                            <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">{initials}</AvatarFallback>
-                        </Avatar>
-                        {/* Online indicator */}
-                        <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white" />
-                    </div>
-                    <span className="text-[12px] font-semibold text-gray-700 group-hover:text-primary transition-colors line-clamp-1 max-w-[64px]">
-                        {dentist.name?.split(' ')[0]}
-                    </span>
-                </button>
-            </PopoverTrigger>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                        <button className="flex flex-col items-center gap-2 min-w-[64px] group cursor-pointer outline-none">
+                            <div className="relative">
+                                <Avatar className="h-14 w-14 border-2 border-white shadow-md ring-offset-background transition-all duration-200 group-hover:ring-2 group-hover:ring-primary group-hover:ring-offset-2">
+                                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">{initials}</AvatarFallback>
+                                </Avatar>
+                                {/* Online indicator */}
+                                <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white" />
+                            </div>
+                            <span className="text-[12px] font-semibold text-gray-700 group-hover:text-primary transition-colors line-clamp-1 max-w-[64px]">
+                                {dentist.name?.split(' ')[0]}
+                            </span>
+                        </button>
+                    </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={10} className="bg-slate-900 border-slate-800 text-white font-medium">
+                    {dentist.name}
+                </TooltipContent>
+            </Tooltip>
 
             <PopoverContent className="w-72 p-0 shadow-xl rounded-2xl border-gray-100" align="start" sideOffset={10}>
                 {/* Header */}
                 <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-t-2xl">
                     <Avatar className="h-11 w-11 border-2 border-white shadow-sm">
-                        <AvatarImage src={`https://i.pravatar.cc/150?u=dentist-${dentist.id}`} alt={dentist.name} />
                         <AvatarFallback className="bg-primary/10 text-primary font-bold">{initials}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
@@ -293,11 +304,13 @@ export function DentistQuickBook() {
                     Nenhum profissional encontrado na clínica.
                 </div>
             ) : (
-                <div className="flex items-center gap-5 overflow-x-auto scrollbar-hide pb-1">
-                    {professionals.map((dentist: any) => (
-                        <DentistCard key={dentist.id} dentist={dentist} patients={allPatients as any[]} />
-                    ))}
-                </div>
+                <TooltipProvider delayDuration={300}>
+                    <div className="flex items-center gap-5 overflow-x-auto scrollbar-hide pb-3 pt-1 -mx-1 px-1">
+                        {professionals.map((dentist: any) => (
+                            <DentistCard key={dentist.id} dentist={dentist} patients={allPatients as any[]} />
+                        ))}
+                    </div>
+                </TooltipProvider>
             )}
         </div>
     );

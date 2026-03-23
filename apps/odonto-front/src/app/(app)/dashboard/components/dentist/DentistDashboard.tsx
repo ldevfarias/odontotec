@@ -13,7 +13,7 @@ import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmen
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { DentistKPIStrip } from './DentistKPIStrip';
+
 import { DentistTimeline } from './DentistTimeline';
 import { DentistRecentPatients } from './DentistRecentPatients';
 
@@ -63,14 +63,6 @@ export function DentistDashboard() {
                 </Link>
             </div>
 
-            {/* KPI Strip */}
-            {isLoading ? (
-                <div className="grid grid-cols-3 gap-4">
-                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 rounded-sm" />)}
-                </div>
-            ) : (
-                <DentistKPIStrip appointments={appointments} />
-            )}
 
             {/* Main Content: Timeline + Recent Patients */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
