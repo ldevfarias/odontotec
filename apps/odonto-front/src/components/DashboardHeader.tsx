@@ -14,11 +14,13 @@ import {
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PatientSearchCMDK } from '@/components/patients/PatientSearchCMDK';
 
 export function DashboardHeader() {
     const { user, logout } = useAuth();
     const router = useRouter();
     const [open, setOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
 
     const initials = user?.name
         ? user.name.split(' ').slice(0, 2).map((n) => n[0].toUpperCase()).join('')
@@ -28,8 +30,8 @@ export function DashboardHeader() {
         <header className="card-surface min-h-[4rem] flex items-center justify-between px-6 py-3 shrink-0 rounded-2xl border border-gray-100 shadow-sm bg-white">
             {/* Left: Logo */}
             <div className="flex items-center flex-1 overflow-hidden pr-4 gap-4">
-                <div 
-                    className="flex items-center gap-2 shrink-0 cursor-pointer hover:opacity-90 transition-opacity" 
+                <div
+                    className="flex items-center gap-2 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => router.push('/dashboard')}
                 >
                     <span className="font-bold text-xl tracking-tight text-gray-800 hidden md:block">
@@ -38,13 +40,20 @@ export function DashboardHeader() {
                 </div>
             </div>
 
-            {/* Search */}
+            {/* Search Trigger */}
             <div className="relative w-full max-w-sm hidden md:block group mr-4">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
-                <Input
-                    placeholder="Pesquisar..."
-                    className="pl-11 rounded-full bg-gray-50 border-gray-100 shadow-sm hover:border-gray-200 focus-visible:ring-1 focus-visible:ring-primary/20 h-10 w-full transition-all text-sm"
-                />
+                <button
+                    onClick={() => setSearchOpen(true)}
+                    className="relative w-full flex items-center justify-between pl-4 pr-3 py-2 text-sm text-muted-foreground rounded-full bg-gray-50 border border-gray-100 shadow-sm hover:border-gray-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/20 transition-all h-10 group-hover:bg-gray-100/50 cursor-pointer"
+                >
+                    <div className="flex items-center gap-2">
+                        <Search className="h-4 w-4 group-hover:text-primary transition-colors duration-200" />
+                        <span>Pesquisar paciente</span>
+                    </div>
+                    <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                        <span className="text-xs">⌘</span>K
+                    </kbd>
+                </button>
             </div>
 
             {/* Actions */}
@@ -96,6 +105,9 @@ export function DashboardHeader() {
                     </PopoverContent>
                 </Popover>
             </div>
+
+            {/* CMDK Search Palette */}
+            <PatientSearchCMDK open={searchOpen} onOpenChange={setSearchOpen} />
         </header>
     );
 }

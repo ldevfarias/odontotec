@@ -82,9 +82,10 @@ interface AppointmentModalProps {
     onOpenChange: (open: boolean) => void;
     initialDate?: Date;
     appointmentToEdit?: any;
+    initialPatientId?: number;
 }
 
-export function AppointmentModal({ open, onOpenChange, initialDate, appointmentToEdit }: AppointmentModalProps) {
+export function AppointmentModal({ open, onOpenChange, initialDate, appointmentToEdit, initialPatientId }: AppointmentModalProps) {
     const queryClient = useQueryClient();
     const { user } = useAuth();
     const isDentist = user?.role === 'DENTIST';
@@ -170,7 +171,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
                 });
             } else {
                 form.reset({
-                    patientId: 0,
+                    patientId: initialPatientId || 0,
                     dentistId: isDentist ? (user?.id ?? 0) : 0,
                     duration: 30,
                     dateOnly: format(initialDate || new Date(), "yyyy-MM-dd"),
@@ -178,7 +179,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
                 });
             }
         }
-    }, [open, initialDate, isDentist, user?.id, form, appointmentToEdit]);
+    }, [open, initialDate, isDentist, user?.id, form, appointmentToEdit, initialPatientId]);
 
     async function onSubmit(values: AppointmentFormValues) {
         // Construct the full ISO date string from dateOnly and timeOnly

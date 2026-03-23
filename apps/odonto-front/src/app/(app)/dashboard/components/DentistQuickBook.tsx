@@ -229,7 +229,7 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
                                         <input
                                             autoFocus
                                             type="text"
-                                            placeholder="Pesquisar paciente..."
+                                            placeholder="Pesquisar paciente"
                                             value={patientSearch}
                                             onChange={(e) => setPatientSearch(e.target.value)}
                                             className="w-full text-[13px] px-3 py-1.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-medium text-gray-800 placeholder:text-gray-400"
