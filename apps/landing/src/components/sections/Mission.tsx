@@ -7,7 +7,7 @@ export function MissionAndFooter() {
     return (
         <>
             {/* Mission / CTA Section */}
-            <section className="py-32 bg-foreground text-background relative overflow-hidden">
+            <section className="py-16 md:py-32 bg-foreground text-background relative overflow-hidden">
                 {/* Optical illusion bg */}
                 <div className="absolute inset-0 opacity-5">
                     <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '40px 40px' }} />
@@ -42,9 +42,9 @@ export function MissionAndFooter() {
             </section>
 
             {/* Footer Minimalista */}
-            <footer className="bg-background py-16 border-t border-border">
+            <footer className="bg-background py-16 md:py-24 border-t border-border">
                 <div className="container mx-auto px-6 md:px-12">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8 border-b border-border pb-12 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-8 border-b border-border pb-10 md:pb-12 mb-8">
                         <div className="md:col-span-2">
                             <span className="font-display font-bold text-3xl tracking-tighter text-foreground mb-4 block">
                                 Odonto<span className="text-primary">Eh</span>Tec

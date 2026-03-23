@@ -82,11 +82,11 @@ export function Features() {
     }, [showTeamPopover]);
 
     return (
-        <section id="features" className="py-24 bg-card relative z-10 border-t border-border">
+        <section id="features" className="py-16 md:py-24 bg-card relative z-10 border-t border-border">
             <div className="container mx-auto px-6 md:px-12">
 
                 <motion.div
-                    className="max-w-3xl mb-16"
+                    className="max-w-3xl mb-8 md:mb-16"
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
@@ -112,7 +112,7 @@ export function Features() {
                         <motion.div
                             key={index}
                             variants={fadeInUp}
-                            className={`p-8 rounded-3xl border transition-colors ${feature.highlight
+                            className={`p-6 md:p-8 rounded-3xl border transition-colors ${feature.highlight
                                 ? "bg-primary/5 border-primary/20 hover:border-primary/40 col-span-1"
                                 : "bg-background border-border hover:border-gray-300 col-span-1"
                                 } ${feature.colSpan}`}
@@ -139,10 +139,10 @@ export function Features() {
                                                             initial={{ opacity: 0, scale: 0.9, y: 10 }}
                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                                             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                                                            className="absolute top-full mt-4 left-1/2 -translate-x-1/2 md:-translate-x-[20%] w-[280px] bg-card border border-border rounded-2xl shadow-2xl p-5 z-50 text-left cursor-default ring-1 ring-black/5"
+                                                            className="absolute top-full mt-4 right-0 md:left-1/2 md:right-auto md:-translate-x-[20%] w-[260px] md:w-[280px] origin-top-right md:origin-top bg-card border border-border rounded-2xl shadow-2xl p-5 z-50 text-left cursor-default ring-1 ring-black/5"
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <div className="absolute -top-2 left-1/2 md:left-[20%] -translate-x-1/2 w-4 h-4 bg-card border-t border-l border-border rotate-45" />
+                                                            <div className="absolute -top-2 right-4 md:left-[20%] md:right-auto md:-translate-x-1/2 w-4 h-4 bg-card border-t border-l border-border rotate-45" />
                                                             <h4 className="font-bold text-sm text-foreground mb-1 flex items-center gap-2">
                                                                 <span className="w-2 h-2 rounded-full bg-red-400" />
                                                                 Nos concorrentes

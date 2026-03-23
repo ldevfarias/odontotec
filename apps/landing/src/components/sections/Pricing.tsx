@@ -7,7 +7,7 @@ import { APP_URL } from "@/lib/config";
 
 export function Pricing() {
     return (
-        <section id="pricing" className="py-24 bg-background relative overflow-hidden">
+        <section id="pricing" className="py-16 md:py-24 bg-background relative overflow-hidden">
             {/* Background soft element */}
             <div className="absolute -left-[20%] top-1/2 w-[60%] h-[60%] bg-primary/5 rounded-full blur-3xl -translate-y-1/2" />
 
@@ -59,7 +59,7 @@ export function Pricing() {
                     >
                         {/* The Pricing Card - Editorial style */}
                         <div className="relative p-1 bg-gradient-to-b from-border to-transparent rounded-[2rem] max-w-md mx-auto lg:ml-auto">
-                            <div className="bg-card rounded-[1.9rem] p-10 shadow-2xl relative overflow-hidden">
+                            <div className="bg-card rounded-[1.9rem] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
 
                                 {/* Decorative top anchor */}
                                 <div className="absolute top-0 inset-x-0 h-1 bg-primary" />
@@ -73,7 +73,7 @@ export function Pricing() {
                                 </div>
                                 <div className="flex items-baseline gap-1 mb-8">
                                     <span className="text-foreground font-medium text-lg">R$</span>
-                                    <span className="font-display text-6xl font-bold text-foreground tracking-tighter">49</span>
+                                    <span className="font-display text-5xl sm:text-6xl font-bold text-foreground tracking-tighter">49</span>
                                     <span className="text-foreground font-medium text-lg">,99</span>
                                     <span className="body-small ml-1">/mês</span>
                                 </div>

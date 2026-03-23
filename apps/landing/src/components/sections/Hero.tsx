@@ -88,16 +88,16 @@ export function Hero() {
                         {/* Minimalist Dashboard Interface Mock */}
                         <div className="relative w-full aspect-[4/5] md:aspect-square bg-white rounded-3xl border border-border shadow-2xl overflow-hidden translate-x-0 lg:translate-x-12 z-20">
                             {/* Fake UI Header */}
-                            <div className="h-16 border-b border-border flex items-center px-6">
+                            <div className="h-12 md:h-16 border-b border-border flex items-center px-4 md:px-6">
                                 <div className="flex gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-border" />
-                                    <div className="w-3 h-3 rounded-full bg-border" />
-                                    <div className="w-3 h-3 rounded-full bg-border" />
+                                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-border" />
+                                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-border" />
+                                    <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-border" />
                                 </div>
                             </div>
 
                             {/* Fake UI Content */}
-                            <div className="p-8 space-y-8">
+                            <div className="p-4 sm:p-8 space-y-5 sm:space-y-8">
                                 <div className="flex justify-between items-end">
                                     <div className="space-y-3">
                                         <div className="w-24 h-4 bg-muted rounded-full" />
@@ -110,20 +110,20 @@ export function Hero() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="h-32 bg-gray-50 rounded-2xl border border-gray-100 p-5 flex flex-col justify-between">
+                                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                    <div className="h-28 sm:h-32 bg-gray-50 rounded-2xl border border-gray-100 p-4 sm:p-5 flex flex-col justify-between">
                                         <div className="w-8 h-8 rounded-full bg-success/20" />
                                         <div className="w-3/4 h-3 bg-muted rounded-full mt-auto" />
                                         <div className="w-1/2 h-4 bg-gray-300 rounded-full mt-2" />
                                     </div>
-                                    <div className="h-32 bg-gray-50 rounded-2xl border border-gray-100 p-5 flex flex-col justify-between">
+                                    <div className="h-28 sm:h-32 bg-gray-50 rounded-2xl border border-gray-100 p-4 sm:p-5 flex flex-col justify-between">
                                         <div className="w-8 h-8 rounded-full bg-accent" />
                                         <div className="w-3/4 h-3 bg-muted rounded-full mt-auto" />
                                         <div className="w-1/2 h-4 bg-gray-300 rounded-full mt-2" />
                                     </div>
                                 </div>
 
-                                <div className="h-48 bg-gray-50 rounded-2xl border border-gray-100 p-5">
+                                <div className="h-40 sm:h-48 bg-gray-50 rounded-2xl border border-gray-100 p-4 sm:p-5">
                                     {/* Fake Chart lines */}
                                     <div className="w-full flex items-end h-full gap-2 pb-2">
                                         {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (

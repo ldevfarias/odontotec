@@ -23,12 +23,12 @@ const steps = [
 
 export function HowItWorks() {
     return (
-        <section id="how-it-works" className="py-24 bg-card relative z-10 border-t border-border">
+        <section id="how-it-works" className="py-16 md:py-24 bg-card relative z-10 border-t border-border">
             <div className="container mx-auto px-6 md:px-12">
                 <div className="flex flex-col lg:flex-row gap-16 items-start">
 
                     <motion.div
-                        className="w-full lg:w-[40%] sticky top-32"
+                        className="w-full lg:w-[40%] relative lg:sticky lg:top-32"
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-100px" }}
@@ -49,7 +49,7 @@ export function HowItWorks() {
                     </motion.div>
 
                     <motion.div
-                        className="w-full lg:w-[60%] flex flex-col gap-12"
+                        className="w-full lg:w-[60%] flex flex-col gap-8 md:gap-12"
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-100px" }}

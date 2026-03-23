@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OdontoEhTec | Seu consultório no seu ritmo",
+  title: "OdontoEhTec | Prontuário, Agenda e Financeiro com Eficiência",
   description: "Gerencie sua clínica odontológica com equipe ilimitada, prontuário, agenda e financeiro. Design premium e um preço único transparente.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   themeColor: "#41b883",
@@ -38,11 +38,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
   },
 };
 
