@@ -96,13 +96,15 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
     return (
         <Card>
             <CardContent className="pt-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4 sm:mb-6">
                     <div className="flex items-center gap-2">
                         <FileText className="h-5 w-5 text-primary" />
-                        <h2 className="text-xl font-semibold">Documentos e Receitas</h2>
+                        <h2 className="text-base sm:text-xl font-semibold">Documentos e Receitas</h2>
                     </div>
-                    <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
-                        <Plus className="h-4 w-4" /> Novo Documento
+                    <Button onClick={() => setIsDialogOpen(true)} size="sm" className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        <span className="hidden sm:inline">Novo Documento</span>
+                        <span className="sm:hidden">Novo</span>
                     </Button>
                 </div>
 
@@ -117,33 +119,80 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
                         </Button>
                     </div>
                 ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Data</TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Título</TableHead>
-                                <TableHead>Profissional</TableHead>
-                                <TableHead className="text-right">Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
+                    <>
+                        {/* Desktop table */}
+                        <div className="hidden sm:block">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Data</TableHead>
+                                        <TableHead>Tipo</TableHead>
+                                        <TableHead>Título</TableHead>
+                                        <TableHead>Profissional</TableHead>
+                                        <TableHead className="text-right">Ações</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {documents.map((doc: any) => (
+                                        <TableRow key={doc.id}>
+                                            <TableCell className="font-medium">
+                                                {doc.date && format(subHours(new Date(doc.date), 3), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={doc.type === 'ATESTADO' ? 'default' : 'secondary'}>
+                                                    {doc.type}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>{doc.title}</TableCell>
+                                            <TableCell>{(doc as any).dentist?.name || 'N/A'}</TableCell>
+                                            <TableCell className="text-right space-x-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    title="Imprimir"
+                                                    onClick={() => handlePrint(doc.content, doc.title)}
+                                                >
+                                                    <Printer className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-destructive hover:text-destructive"
+                                                    onClick={() => {
+                                                        setDocumentToDelete(doc.id);
+                                                        setIsDeleteDialogOpen(true);
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+
+                        {/* Mobile card list */}
+                        <div className="sm:hidden flex flex-col divide-y divide-border rounded-xl border border-border overflow-hidden">
                             {documents.map((doc: any) => (
-                                <TableRow key={doc.id}>
-                                    <TableCell className="font-medium">
-                                        {doc.date && format(subHours(new Date(doc.date), 3), "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={doc.type === 'ATESTADO' ? 'default' : 'secondary'}>
-                                            {doc.type}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{doc.title}</TableCell>
-                                    <TableCell>{(doc as any).dentist?.name || 'N/A'}</TableCell>
-                                    <TableCell className="text-right space-x-2">
+                                <div key={doc.id} className="flex items-center gap-3 px-4 py-3 bg-card">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <Badge variant={doc.type === 'ATESTADO' ? 'default' : 'secondary'} className="text-[10px]">
+                                                {doc.type}
+                                            </Badge>
+                                            <span className="text-xs text-muted-foreground">
+                                                {doc.date && format(subHours(new Date(doc.date), 3), "dd/MM/yyyy", { locale: ptBR })}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm font-semibold text-foreground truncate mt-0.5">{doc.title}</p>
+                                        <p className="text-xs text-muted-foreground">{(doc as any).dentist?.name || 'N/A'}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
                                         <Button
                                             variant="ghost"
                                             size="icon"
+                                            className="h-8 w-8"
                                             title="Imprimir"
                                             onClick={() => handlePrint(doc.content, doc.title)}
                                         >
@@ -152,7 +201,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="text-destructive hover:text-destructive"
+                                            className="h-8 w-8 text-destructive hover:text-destructive"
                                             onClick={() => {
                                                 setDocumentToDelete(doc.id);
                                                 setIsDeleteDialogOpen(true);
@@ -160,11 +209,11 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
-                                    </TableCell>
-                                </TableRow>
+                                    </div>
+                                </div>
                             ))}
-                        </TableBody>
-                    </Table>
+                        </div>
+                    </>
                 )}
 
                 <DocumentDialog

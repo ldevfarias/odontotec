@@ -242,32 +242,32 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
     return (
         <div className="space-y-6">
             {/* KPI Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="card-surface p-5 flex items-start gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
+                <div className="card-surface p-3 sm:p-5 flex items-start gap-2 sm:gap-4">
                     <div className="p-2.5 rounded-xl bg-destructive/10 shrink-0">
                         <AlertCircle className="h-5 w-5 text-destructive" />
                     </div>
-                    <div>
-                        <p className="body-small text-muted-foreground font-medium mb-1">Saldo em Aberto</p>
-                        <p className="heading-3 text-destructive leading-none">{formatCurrency(totalDebt)}</p>
+                    <div className="min-w-0">
+                        <p className="text-[10px] sm:body-small text-muted-foreground font-medium mb-1 truncate">Saldo em Aberto</p>
+                        <p className="text-sm sm:heading-3 font-bold text-destructive leading-none">{formatCurrency(totalDebt)}</p>
                     </div>
                 </div>
-                <div className="card-surface p-5 flex items-start gap-4">
+                <div className="card-surface p-3 sm:p-5 flex items-start gap-2 sm:gap-4">
                     <div className="p-2.5 rounded-xl bg-success/10 shrink-0">
                         <CheckCircle2 className="h-5 w-5 text-success" />
                     </div>
-                    <div>
-                        <p className="body-small text-muted-foreground font-medium mb-1">Total Pago</p>
-                        <p className="heading-3 text-success leading-none">{formatCurrency(totalPaid)}</p>
+                    <div className="min-w-0">
+                        <p className="text-[10px] sm:body-small text-muted-foreground font-medium mb-1 truncate">Total Pago</p>
+                        <p className="text-sm sm:heading-3 font-bold text-success leading-none">{formatCurrency(totalPaid)}</p>
                     </div>
                 </div>
-                <div className="card-surface p-5 flex items-start gap-4">
+                <div className="card-surface p-3 sm:p-5 flex items-start gap-2 sm:gap-4">
                     <div className="p-2.5 rounded-xl bg-primary/10 shrink-0">
                         <ClipboardList className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                        <p className="body-small text-muted-foreground font-medium mb-1">Total Orçado</p>
-                        <p className="heading-3 leading-none">{formatCurrency(totalBudgeted)}</p>
+                    <div className="min-w-0">
+                        <p className="text-[10px] sm:body-small text-muted-foreground font-medium mb-1 truncate">Total Orçado</p>
+                        <p className="text-sm sm:heading-3 font-bold leading-none">{formatCurrency(totalBudgeted)}</p>
                     </div>
                 </div>
             </div>
@@ -385,7 +385,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
                                         {/* Expanded Details */}
                                         {isExpanded && (
                                             <div className="border-t bg-muted/10 animate-in slide-in-from-top-2">
-                                                <div className="p-1">
+                                                <div className="p-1 overflow-x-auto">
                                                     <Table>
                                                         <TableHeader>
                                                             <TableRow className="border-border/40 hover:bg-transparent">

@@ -11,6 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Check, Loader2, History, Trash2, Edit2, ChevronRight, AlertCircle } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AnamnesisTabSkeleton } from '@/components/skeletons';
@@ -112,8 +119,34 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Sidebar List */}
-            <Card className="md:col-span-1 h-[600px] flex flex-col">
+            {/* Mobile: Select dropdown to pick record */}
+            <div className="md:hidden flex items-center gap-2">
+                <Select
+                    value={String(selectedId || records?.[0]?.id || '')}
+                    onValueChange={(val) => setSelectedId(Number(val))}
+                >
+                    <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Selecione uma anamnese..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {records && records.length > 0 ? (
+                            records.map((record: any) => (
+                                <SelectItem key={record.id} value={String(record.id)}>
+                                    {record.complaint || 'Sem queixa'}{record.createdAt ? ` — ${format(new Date(record.createdAt), 'dd/MM/yyyy')}` : ''}
+                                </SelectItem>
+                            ))
+                        ) : (
+                            <SelectItem value="none" disabled>Nenhum registro</SelectItem>
+                        )}
+                    </SelectContent>
+                </Select>
+                <Button size="icon" variant="outline" onClick={handleOpenCreate}>
+                    <Plus className="h-4 w-4" />
+                </Button>
+            </div>
+
+            {/* Sidebar List — desktop only */}
+            <Card className="hidden md:flex md:col-span-1 h-[600px] flex-col">
                 <CardHeader className="p-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-bold flex items-center gap-2">
@@ -153,7 +186,7 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
             </Card>
 
             {/* Main Detail View */}
-            <Card className="md:col-span-3 min-h-[600px]">
+            <Card className="col-span-1 md:col-span-3 min-h-[600px]">
                 {selectedRecord ? (
                     <>
                         <CardHeader className="flex flex-row items-center justify-between border-b pb-4">

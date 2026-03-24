@@ -23,7 +23,7 @@ export function PatientCard({ patient }: PatientCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="w-full mb-6">
+        <div className="w-full mb-3 sm:mb-6">
             <div
                 className={`bg-card text-card-foreground border border-border/40 shadow-sm rounded-lg transition-all duration-300 ${isExpanded ? 'pb-4' : ''}`}
             >

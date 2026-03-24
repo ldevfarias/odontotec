@@ -106,7 +106,7 @@ export const Tooth: React.FC<ToothProps> = ({
                 <svg
                     viewBox="0 0 100 100"
                     className={cn(
-                        'w-12 h-12 cursor-pointer transition-transform duration-200',
+                        'w-8 h-8 sm:w-12 sm:h-12 cursor-pointer transition-transform duration-200',
                         !isAbsent && 'hover:scale-110'
                     )}
                     onClick={() => onToothClick(number)}

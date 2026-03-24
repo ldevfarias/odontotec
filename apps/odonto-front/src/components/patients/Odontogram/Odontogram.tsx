@@ -33,7 +33,7 @@ export const Odontogram: React.FC<OdontogramProps> = ({
     const q3 = isPediatric ? pediatricQ3 : adultQ3;
 
     const renderToothGrid = (teeth: string[]) => (
-        <div className="flex gap-1 justify-center">
+        <div className="flex gap-0.5 sm:gap-1 justify-center">
             {teeth.map((num) => {
                 const toothProcs = (procedures as any[]).filter(
                     (p: any) => String(p.toothNumber) === num
@@ -65,17 +65,17 @@ export const Odontogram: React.FC<OdontogramProps> = ({
     );
 
     return (
-        <div className="min-w-[800px] flex flex-col gap-3 select-none bg-background p-6 rounded-xl border-2 border-dashed border-muted-foreground/20">
+        <div className="flex flex-col gap-2 sm:gap-3 select-none bg-background p-3 sm:p-6 rounded-xl border-2 border-dashed border-muted-foreground/20">
             {/* Upper Arch */}
-            <div className="flex justify-center gap-8">
+            <div className="flex justify-center gap-2 sm:gap-8">
                 <div className="flex flex-col gap-2">
-                    <span className="text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
+                    <span className="hidden sm:block text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
                         Superior Direito
                     </span>
                     {renderToothGrid(q1)}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <span className="text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
+                    <span className="hidden sm:block text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
                         Superior Esquerdo
                     </span>
                     {renderToothGrid(q2)}
@@ -89,15 +89,15 @@ export const Odontogram: React.FC<OdontogramProps> = ({
             </div>
 
             {/* Lower Arch */}
-            <div className="flex justify-center gap-8">
+            <div className="flex justify-center gap-2 sm:gap-8">
                 <div className="flex flex-col gap-2">
-                    <span className="text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
+                    <span className="hidden sm:block text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
                         Inferior Direito
                     </span>
                     {renderToothGrid(q4)}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <span className="text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
+                    <span className="hidden sm:block text-[10px] text-center text-muted-foreground uppercase tracking-[0.2em] font-bold">
                         Inferior Esquerdo
                     </span>
                     {renderToothGrid(q3)}

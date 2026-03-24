@@ -64,55 +64,55 @@ export default function PatientDetailPage() {
 
             <div className="w-full">
                 <Tabs defaultValue={isSecretary ? "budgets" : "anamnesis"} className="w-full">
-                    <div className="flex justify-start mb-6">
-                        <TabsList className="bg-muted/50 p-1 rounded-xl h-auto gap-1 border border-border/40">
+                    <div className="flex justify-start mb-4 sm:mb-6 overflow-x-auto">
+                        <TabsList className="bg-muted/50 p-1 rounded-xl h-auto gap-1 border border-border/40 min-w-max">
                             {!isSecretary && (
                                 <TabsTrigger
                                     value="anamnesis"
-                                    className="px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
+                                    className="px-2 sm:px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
                                 >
                                     <FileText className="h-4 w-4" />
-                                    Anamnese
+                                    <span className="hidden sm:inline">Anamnese</span>
                                 </TabsTrigger>
                             )}
                             <TabsTrigger
                                 value="budgets"
-                                className="px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
+                                className="px-2 sm:px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
                             >
                                 <Banknote className="h-4 w-4" />
-                                Orçamentos
+                                <span className="hidden sm:inline">Orçamentos</span>
                             </TabsTrigger>
                             {!isSecretary && (
                                 <TabsTrigger
                                     value="odontogram"
-                                    className="px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
+                                    className="px-2 sm:px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
                                 >
                                     <Calendar className="h-4 w-4" />
-                                    Odontograma
+                                    <span className="hidden sm:inline">Odontograma</span>
                                 </TabsTrigger>
                             )}
                             {!isSecretary && (
                                 <TabsTrigger
                                     value="exams"
-                                    className="px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
+                                    className="px-2 sm:px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
                                 >
                                     <FileText className="h-4 w-4" />
-                                    Exames
+                                    <span className="hidden sm:inline">Exames</span>
                                 </TabsTrigger>
                             )}
                             <TabsTrigger
                                 value="documents"
-                                className="px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
+                                className="px-2 sm:px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
                             >
                                 <FileText className="h-4 w-4" />
-                                Receituário
+                                <span className="hidden sm:inline">Receituário</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="payments"
-                                className="px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
+                                className="px-2 sm:px-4 py-2 rounded-lg cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-200 gap-2 font-semibold text-[0.85rem]"
                             >
                                 <CreditCard className="h-4 w-4" />
-                                Financeiro
+                                <span className="hidden sm:inline">Financeiro</span>
                             </TabsTrigger>
                         </TabsList>
                     </div>

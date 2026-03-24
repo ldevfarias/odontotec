@@ -108,7 +108,7 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                 </CardHeader>
                 <CardContent className="overflow-x-auto p-0 md:p-4">
                     <div className="flex flex-col items-center gap-3 py-3">
-                        <div className="min-w-[800px] w-full max-w-5xl">
+                        <div className="w-full max-w-5xl">
                             <Odontogram
                                 procedures={patientProcedures}
                                 isPediatric={isPediatric}
@@ -248,7 +248,7 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    className="h-7 w-7 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         handleDelete(item.id);
