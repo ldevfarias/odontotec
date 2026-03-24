@@ -88,6 +88,7 @@ interface DayViewProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onEditAppointment?: (originalAppointment: any) => void;
     onUpdateAppointmentStatus?: (id: string, newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT') => void;
+    onEventTap?: (event: CalendarEvent) => void;
 }
 
 const START_HOUR = 7;
@@ -95,7 +96,7 @@ const END_HOUR = 19;
 const HOUR_HEIGHT = 100; // px per hour
 const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => i + START_HOUR);
 
-export function DayView({ currentDate, events, categories, professionals, onEditAppointment, onUpdateAppointmentStatus }: DayViewProps) {
+export function DayView({ currentDate, events, categories, professionals, onEditAppointment, onUpdateAppointmentStatus, onEventTap }: DayViewProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [now, setNow] = useState(new Date());
 
@@ -122,7 +123,7 @@ export function DayView({ currentDate, events, categories, professionals, onEdit
         <div className="flex flex-col h-full bg-card overflow-hidden">
             {/* Header (Professionals) */}
             <div className="flex border-b border-border bg-card z-10 sticky top-0">
-                <div className="w-16 shrink-0 border-r border-border flex items-center justify-center bg-muted/20">
+                <div className="w-10 sm:w-16 shrink-0 border-r border-border flex items-center justify-center bg-muted/20">
                     <Activity className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="flex flex-1 overflow-x-auto">
@@ -134,19 +135,19 @@ export function DayView({ currentDate, events, categories, professionals, onEdit
                         professionals.map((pro) => (
                             <div
                                 key={pro.id}
-                                className="flex-1 min-w-[150px] border-r border-border p-3 text-center flex flex-col items-center justify-center bg-card"
+                                className="flex-1 min-w-[110px] sm:min-w-[150px] border-r border-border px-2 py-2 sm:p-3 text-center flex flex-col items-center justify-center bg-card"
                             >
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
                                     {pro.avatarUrl ? (
-                                        <img src={pro.avatarUrl} alt={pro.name} className="w-6 h-6 rounded-full object-cover" />
+                                        <img src={pro.avatarUrl} alt={pro.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />
                                     ) : (
-                                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                                             {pro.name.charAt(0)}
                                         </div>
                                     )}
-                                    <span className="text-sm font-semibold text-foreground truncate">{pro.name}</span>
+                                    <span className="text-xs sm:text-sm font-semibold text-foreground truncate max-w-[70px] sm:max-w-none">{pro.name}</span>
                                 </div>
-                                <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{pro.role}</span>
+                                <span className="hidden sm:block text-[10px] text-muted-foreground uppercase tracking-widest">{pro.role}</span>
                             </div>
                         ))
                     )}
@@ -157,14 +158,14 @@ export function DayView({ currentDate, events, categories, professionals, onEdit
             <div className="flex-1 overflow-y-auto relative bg-background" ref={scrollRef}>
                 <div className="flex min-w-max sm:min-w-0">
                     {/* Times column */}
-                    <div className="w-16 shrink-0 border-r border-border bg-card sticky left-0 z-10">
+                    <div className="w-10 sm:w-16 shrink-0 border-r border-border bg-card sticky left-0 z-10">
                         {HOURS.map((hour) => (
                             <div
                                 key={hour}
-                                className="border-b border-border text-xs text-muted-foreground p-2 text-right font-medium"
+                                className="border-b border-border text-[10px] sm:text-xs text-muted-foreground px-1 sm:p-2 text-right font-medium flex items-start justify-end pt-1"
                                 style={{ height: `${HOUR_HEIGHT}px` }}
                             >
-                                {hour.toString().padStart(2, '0')}:00
+                                {hour.toString().padStart(2, '0')}h
                             </div>
                         ))}
                     </div>
@@ -175,7 +176,7 @@ export function DayView({ currentDate, events, categories, professionals, onEdit
                             const proEvents = dayEvents.filter((e) => e.professionalId === pro.id);
 
                             return (
-                                <div key={pro.id} className="flex-1 min-w-[150px] border-r border-border relative">
+                                <div key={pro.id} className="flex-1 min-w-[110px] sm:min-w-[150px] border-r border-border relative">
                                     {/* Grid lines */}
                                     {HOURS.map((hour) => (
                                         <div key={hour} className="border-b border-border/50" style={{ height: `${HOUR_HEIGHT}px` }} />
@@ -234,6 +235,11 @@ export function DayView({ currentDate, events, categories, professionals, onEdit
                                                             width: `calc(${event.widthPct}% - 4px)`,
                                                             borderLeftColor: color,
                                                             boxShadow: `0 4px 6px -1px ${color}20, 0 2px 4px -1px ${color}10`,
+                                                        }}
+                                                        onClick={() => {
+                                                            if (window.matchMedia('(pointer: coarse)').matches) {
+                                                                onEventTap?.(event);
+                                                            }
                                                         }}
                                                     >
                                                         {/* Event Content Design */}

@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CalendarSidebar } from './CalendarSidebar';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarState, CalendarEvent, EventCategory, Professional } from './types';
 import { WeekView } from './views/WeekView';
 import { DayView } from './views/DayView';
 import { MonthView } from './views/MonthView';
+import { AgendaView } from './views/AgendaView';
+import { AppointmentDetailSheet } from './AppointmentDetailSheet';
 
 interface CalendarProps {
     events: CalendarEvent[];
@@ -22,9 +24,21 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
         selectedCategories: categories.map(c => c.id),
         selectedProfessionals: professionals.map(p => p.id),
     });
+    const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+    const [mobileSelectedEvent, setMobileSelectedEvent] = useState<CalendarEvent | null>(null);
+
+    useEffect(() => {
+        if (window.innerWidth < 640) {
+            setState(prev => ({ ...prev, view: 'agenda' }));
+        }
+    }, []);
 
     const handleStateChange = (updates: Partial<CalendarState>) => {
         setState(prev => ({ ...prev, ...updates }));
+    };
+
+    const handleDayTap = (date: Date) => {
+        handleStateChange({ currentDate: date, view: 'agenda' });
     };
 
     const filteredEvents = events.filter(
@@ -34,21 +48,33 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
     );
 
     return (
-        <div className="flex h-full w-full bg-background rounded-xl border border-border overflow-hidden shadow-sm">
+        <div className="flex h-full w-full bg-background rounded-xl border border-border overflow-hidden shadow-sm max-sm:rounded-none max-sm:border-0 max-sm:shadow-none">
             <CalendarSidebar
                 state={state}
                 onStateChange={handleStateChange}
                 categories={categories}
                 professionals={professionals}
                 events={events}
+                mobileOpen={mobileFilterOpen}
+                onMobileClose={() => setMobileFilterOpen(false)}
             />
             <div className="flex-1 flex flex-col min-w-0 bg-card">
                 <CalendarHeader
                     state={state}
                     onStateChange={handleStateChange}
                     onNewAppointment={onNewAppointment}
+                    onFilterOpen={() => setMobileFilterOpen(true)}
                 />
                 <div className="flex-1 overflow-hidden relative">
+                    {state.view === 'agenda' && (
+                        <AgendaView
+                            currentDate={state.currentDate}
+                            events={filteredEvents}
+                            categories={categories}
+                            professionals={professionals}
+                            onEventTap={(e) => setMobileSelectedEvent(e)}
+                        />
+                    )}
                     {state.view === 'week' && (
                         <WeekView
                             currentDate={state.currentDate}
@@ -57,6 +83,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             professionals={professionals}
                             onEditAppointment={onEditAppointment}
                             onUpdateAppointmentStatus={onUpdateAppointmentStatus}
+                            onEventTap={(e) => setMobileSelectedEvent(e)}
                         />
                     )}
                     {state.view === 'day' && (
@@ -67,6 +94,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             professionals={professionals.filter(p => state.selectedProfessionals.includes(p.id))}
                             onEditAppointment={onEditAppointment}
                             onUpdateAppointmentStatus={onUpdateAppointmentStatus}
+                            onEventTap={(e) => setMobileSelectedEvent(e)}
                         />
                     )}
                     {state.view === 'month' && (
@@ -77,10 +105,22 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             professionals={professionals}
                             onEditAppointment={onEditAppointment}
                             onUpdateAppointmentStatus={onUpdateAppointmentStatus}
+                            onEventTap={(e) => setMobileSelectedEvent(e)}
+                            onDayTap={handleDayTap}
                         />
                     )}
                 </div>
             </div>
+
+            <AppointmentDetailSheet
+                event={mobileSelectedEvent}
+                open={mobileSelectedEvent !== null}
+                onClose={() => setMobileSelectedEvent(null)}
+                categories={categories}
+                professionals={professionals}
+                onEditAppointment={onEditAppointment}
+                onUpdateAppointmentStatus={onUpdateAppointmentStatus}
+            />
         </div>
     );
 }

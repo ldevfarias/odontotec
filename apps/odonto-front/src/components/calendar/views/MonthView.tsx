@@ -29,6 +29,8 @@ interface MonthViewProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onEditAppointment?: (appointment: any) => void;
     onUpdateAppointmentStatus?: (id: string, newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT') => void;
+    onEventTap?: (event: CalendarEvent) => void;
+    onDayTap?: (date: Date) => void;
 }
 
 export function MonthView({
@@ -37,7 +39,9 @@ export function MonthView({
     categories,
     professionals = [],
     onEditAppointment,
-    onUpdateAppointmentStatus
+    onUpdateAppointmentStatus,
+    onEventTap,
+    onDayTap,
 }: MonthViewProps) {
     const days = useMemo(() => {
         const monthStart = startOfMonth(currentDate);
@@ -52,9 +56,10 @@ export function MonthView({
         <div className="flex flex-col h-full bg-background overflow-hidden">
             {/* Days of week header */}
             <div className="grid grid-cols-7 border-b border-border bg-card">
-                {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((day) => (
-                    <div key={day} className="py-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider border-r border-border last:border-r-0">
-                        {day}
+                {[['S', 'Seg'], ['T', 'Ter'], ['Q', 'Qua'], ['Q', 'Qui'], ['S', 'Sex'], ['S', 'Sáb'], ['D', 'Dom']].map(([short, full]) => (
+                    <div key={full} className="py-1.5 sm:py-2 text-center text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider border-r border-border last:border-r-0">
+                        <span className="sm:hidden">{short}</span>
+                        <span className="hidden sm:inline">{full}</span>
                     </div>
                 ))}
             </div>
@@ -74,9 +79,14 @@ export function MonthView({
                         <div
                             key={day.toISOString()}
                             className={cn(
-                                'min-h-[100px] border-r border-b border-border p-1.5 flex flex-col gap-1 transition-colors hover:bg-muted/30',
+                                'min-h-[100px] max-sm:min-h-[60px] border-r border-b border-border p-1.5 flex flex-col gap-1 transition-colors hover:bg-muted/30',
                                 !isCurrentMonth && 'bg-muted/10 opacity-60'
                             )}
+                            onClick={() => {
+                                if (window.matchMedia('(pointer: coarse)').matches) {
+                                    onDayTap?.(day);
+                                }
+                            }}
                         >
                             <div className="flex justify-between items-start mb-1 px-1">
                                 <span
@@ -89,7 +99,27 @@ export function MonthView({
                                 </span>
                             </div>
 
-                            <div className="flex flex-col gap-1 flex-1 overflow-hidden">
+                            {/* Mobile: color dots */}
+                            {dayEvents.length > 0 && (
+                                <div className="flex sm:hidden flex-wrap gap-1 mt-1 px-1">
+                                    {dayEvents.slice(0, 4).map((event) => {
+                                        const cat = categories.find((c) => c.id === event.categoryId);
+                                        return (
+                                            <div
+                                                key={event.id}
+                                                className="w-2 h-2 rounded-full shrink-0"
+                                                style={{ backgroundColor: cat?.color || '#3b82f6' }}
+                                            />
+                                        );
+                                    })}
+                                    {dayEvents.length > 4 && (
+                                        <div className="w-2 h-2 rounded-full shrink-0 bg-muted-foreground/40" />
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Desktop: event pills */}
+                            <div className="hidden sm:flex flex-col gap-1 flex-1 overflow-hidden">
                                 {displayEvents.map(event => {
                                     const category = categories.find(c => c.id === event.categoryId);
                                     const color = category?.color || '#3b82f6';
@@ -326,7 +356,7 @@ export function MonthView({
                                         +{remainingEvents} outros
                                     </div>
                                 )}
-                            </div>
+                            </div>{/* end desktop pills */}
                         </div>
                     );
                 })}

@@ -89,6 +89,7 @@ interface WeekViewProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onEditAppointment?: (originalAppointment: any) => void;
     onUpdateAppointmentStatus?: (id: string, newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT') => void;
+    onEventTap?: (event: CalendarEvent) => void;
 }
 
 const START_HOUR = 7;
@@ -96,7 +97,7 @@ const END_HOUR = 19;
 const HOUR_HEIGHT = 100; // px per hour
 const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => i + START_HOUR);
 
-export function WeekView({ currentDate, events, categories, professionals, onEditAppointment, onUpdateAppointmentStatus }: WeekViewProps) {
+export function WeekView({ currentDate, events, categories, professionals, onEditAppointment, onUpdateAppointmentStatus, onEventTap }: WeekViewProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [now, setNow] = useState(new Date());
 
@@ -130,6 +131,22 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
     const isCurrentWeek = weekDays.some(d => isSameDay(d, now));
     const todayIndex = weekDays.findIndex(d => isSameDay(d, now));
 
+    // Scroll horizontally to show today on mobile
+    const headerRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (!scrollRef.current || todayIndex < 0) return;
+        // Small delay to let layout settle
+        const t = setTimeout(() => {
+            const container = scrollRef.current;
+            if (!container) return;
+            // Each column is ~68px on mobile; scroll so today is near the start
+            const colWidth = container.scrollWidth / (weekDays.length + 1); // +1 for time col
+            container.scrollLeft = Math.max(0, todayIndex * colWidth - 8);
+        }, 50);
+        return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className="flex flex-col h-full bg-card overflow-hidden">
             <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
@@ -137,7 +154,7 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                     {/* Header (Days) */}
                     <div className="flex border-b border-border bg-card z-30 sticky top-0">
                         {/* Time column spacer */}
-                        <div className="w-16 shrink-0 border-r border-border bg-card sticky left-0 z-40" />
+                        <div className="w-10 sm:w-16 shrink-0 border-r border-border bg-card sticky left-0 z-40" />
                         {/* Days */}
                         <div className="flex flex-1">
                             {weekDays.map((day) => {
@@ -145,14 +162,15 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                                 return (
                                     <div
                                         key={day.toISOString()}
-                                        className="flex-1 min-w-[120px] border-r border-border p-2 text-center flex flex-col items-center justify-center bg-card"
+                                        className="flex-1 min-w-[68px] sm:min-w-[120px] border-r border-border p-1 sm:p-2 text-center flex flex-col items-center justify-center bg-card"
                                     >
-                                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-                                            {format(day, 'EEE', { locale: ptBR })}
+                                        <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                                            {format(day, 'EEEEE', { locale: ptBR })}
+                                            <span className="hidden sm:inline">{format(day, 'EE', { locale: ptBR }).slice(1)}</span>
                                         </span>
                                         <div
                                             className={cn(
-                                                'mt-0.5 h-7 w-7 rounded-full flex items-center justify-center text-sm font-bold',
+                                                'mt-0.5 h-6 w-6 sm:h-7 sm:w-7 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold',
                                                 isToday ? 'bg-primary text-primary-foreground shadow-sm' : 'text-foreground'
                                             )}
                                         >
@@ -167,14 +185,14 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                     {/* Grid */}
                     <div className="flex flex-1 relative">
                         {/* Times column */}
-                        <div className="w-16 shrink-0 border-r border-border bg-card sticky left-0 z-20">
+                        <div className="w-10 sm:w-16 shrink-0 border-r border-border bg-card sticky left-0 z-20">
                             {HOURS.map((hour) => (
                                 <div
                                     key={hour}
-                                    className="border-b border-border text-xs text-muted-foreground p-2 text-right font-medium"
+                                    className="border-b border-border text-[10px] sm:text-xs text-muted-foreground px-1 sm:p-2 text-right font-medium flex items-start justify-end pt-1"
                                     style={{ height: `${HOUR_HEIGHT}px` }}
                                 >
-                                    {hour.toString().padStart(2, '0')}:00
+                                    {hour.toString().padStart(2, '0')}h
                                 </div>
                             ))}
                         </div>
@@ -185,7 +203,7 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                                 const dayEvents = events.filter((e) => isSameDay(e.startTime, day));
 
                                 return (
-                                    <div key={day.toISOString()} className="flex-1 min-w-[120px] border-r border-border relative">
+                                    <div key={day.toISOString()} className="flex-1 min-w-[68px] sm:min-w-[120px] border-r border-border relative">
                                         {/* Grid lines */}
                                         {HOURS.map((hour) => (
                                             <div key={hour} className="border-b border-border/50" style={{ height: `${HOUR_HEIGHT}px` }} />
@@ -243,6 +261,11 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                                                                 width: `calc(${event.widthPct}% - 4px)`,
                                                                 borderLeftColor: color,
                                                                 boxShadow: `0 4px 6px -1px ${color}20, 0 2px 4px -1px ${color}10`,
+                                                            }}
+                                                            onClick={() => {
+                                                                if (window.matchMedia('(pointer: coarse)').matches) {
+                                                                    onEventTap?.(event);
+                                                                }
                                                             }}
                                                         >
                                                             <div className={cn("flex flex-col h-full", isTiny ? "gap-0" : "gap-0.5")}>

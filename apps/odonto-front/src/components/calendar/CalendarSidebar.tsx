@@ -2,6 +2,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarState, CalendarEvent, EventCategory, Professional } from './types';
 import { ProfessionalCard } from './ProfessionalCard';
 import { CategoryChip } from './CategoryChip';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Users, Tag } from 'lucide-react';
 
 interface CalendarSidebarProps {
@@ -10,6 +11,8 @@ interface CalendarSidebarProps {
     categories: EventCategory[];
     professionals: Professional[];
     events: CalendarEvent[];
+    mobileOpen?: boolean;
+    onMobileClose?: () => void;
 }
 
 export function CalendarSidebar({
@@ -18,6 +21,8 @@ export function CalendarSidebar({
     categories,
     professionals,
     events,
+    mobileOpen,
+    onMobileClose,
 }: CalendarSidebarProps) {
     const toggleCategory = (categoryId: string) => {
         const isSelected = state.selectedCategories.includes(categoryId);
@@ -35,8 +40,8 @@ export function CalendarSidebar({
         onStateChange({ selectedProfessionals: newProfessionals });
     };
 
-    return (
-        <div className="w-[272px] shrink-0 flex flex-col border-r border-border bg-card/50">
+    const sidebarContent = (
+        <>
             {/* Mini Calendar — Prominent Card */}
             <div className="p-3 shrink-0">
                 <div className="rounded-xl bg-white border border-border/60 p-1 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.04)]">
@@ -95,6 +100,30 @@ export function CalendarSidebar({
                     </div>
                 </div>
             </div>
-        </div>
+        </>
+    );
+
+    return (
+        <>
+            {/* Desktop sidebar */}
+            <div className="hidden sm:flex w-[272px] shrink-0 flex-col border-r border-border bg-card/50">
+                {sidebarContent}
+            </div>
+
+            {/* Mobile sidebar as bottom Sheet */}
+            <Sheet open={mobileOpen} onOpenChange={(o) => !o && onMobileClose?.()}>
+                <SheetContent
+                    side="bottom"
+                    className="sm:hidden max-h-[85vh] rounded-t-2xl p-0 flex flex-col"
+                >
+                    <SheetTitle className="sr-only">Filtros</SheetTitle>
+                    {/* Drag handle */}
+                    <div className="flex justify-center pt-3 pb-1 shrink-0">
+                        <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+                    </div>
+                    {sidebarContent}
+                </SheetContent>
+            </Sheet>
+        </>
     );
 }

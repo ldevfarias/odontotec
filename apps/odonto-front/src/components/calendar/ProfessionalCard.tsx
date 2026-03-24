@@ -1,4 +1,4 @@
-import { Professional, CalendarEvent } from './types';
+import { Professional, CalendarEvent, CalendarView } from './types';
 import { isSameDay, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -10,7 +10,7 @@ interface ProfessionalCardProps {
     events: CalendarEvent[];
     accentColor?: string;
     currentDate?: Date;
-    view?: 'day' | 'week' | 'month';
+    view?: CalendarView;
 }
 
 const ACCENT_COLORS = ['#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2'];
@@ -31,7 +31,7 @@ export function ProfessionalCard({
         return events.filter(e => {
             if (e.professionalId !== professional.id) return false;
 
-            if (currentView === 'day') {
+            if (currentView === 'day' || currentView === 'agenda') {
                 return isSameDay(e.startTime, date);
             } else if (currentView === 'week') {
                 const start = startOfWeek(date, { weekStartsOn: 1 });
