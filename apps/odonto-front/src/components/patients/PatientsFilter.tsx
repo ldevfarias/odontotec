@@ -9,9 +9,9 @@ interface PatientsFilterProps {
 
 export function PatientsFilter({ value, onChange }: PatientsFilterProps) {
     return (
-        <div className="bg-white p-4 rounded-xl shadow-md border border-border/50 mb-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
+        <div className="bg-white p-3 sm:p-4 rounded-xl shadow-md border border-border/50 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="hidden sm:flex items-center gap-2">
                     <div className="p-2 bg-primary/10 rounded-lg">
                         <Filter className="h-4 w-4 text-primary" />
                     </div>

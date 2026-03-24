@@ -36,11 +36,11 @@ export default function PatientsPage() {
     const selectedCount = Object.keys(rowSelection).filter(key => rowSelection[key]).length;
 
     return (
-        <div className={`w-full flex flex-col transition-all duration-300 ${selectedCount > 0 ? 'pb-28' : 'pb-8'}`}>
-            <div className="card-surface p-5 rounded-2xl w-full flex flex-col">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div className={`w-full flex flex-col transition-all duration-300 ${selectedCount > 0 ? 'pb-20 sm:pb-28' : 'pb-8'}`}>
+            <div className="card-surface p-3 sm:p-5 rounded-none sm:rounded-2xl w-full flex flex-col">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-3 sm:gap-4">
                     <div>
-                        <p className="body-regular text-muted-foreground mt-1">
+                        <p className="hidden sm:block body-regular text-muted-foreground mt-1">
                             Gerencie todos os pacientes da clínica
                         </p>
                     </div>
