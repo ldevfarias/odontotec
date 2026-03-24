@@ -44,7 +44,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { TableRowsSkeleton } from '@/components/skeletons';
@@ -60,7 +60,6 @@ import {
 import { useUsersControllerInvite } from '@/generated/hooks/useUsersControllerInvite';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { useUsersControllerFindAllInvitations } from '@/generated/hooks/useUsersControllerFindAllInvitations';
-import { usersControllerInviteMutationRequestSchema } from '@/generated/zod/usersControllerInviteSchema';
 
 import { api } from '@/lib/api';
 import { EditUserDialog } from './components/edit-user-dialog';
@@ -79,13 +78,11 @@ type InviteFormValues = z.infer<typeof localInviteSchema>;
 export default function ProfessionalsPage() {
     const [isInviteOpen, setIsInviteOpen] = useState(false);
 
-    // Edit & Delete State
     const [userToEdit, setUserToEdit] = useState<any>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<any>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-    // Hooks
     const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsersControllerFindAll();
     const { data: invitations = [], isLoading: isLoadingInvitations, refetch: refetchInvitations } = useUsersControllerFindAllInvitations();
     const { mutate: inviteUser, isPending: isInviting } = useUsersControllerInvite();
@@ -152,7 +149,6 @@ export default function ProfessionalsPage() {
         return <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">Pendente</Badge>;
     };
 
-
     const activeUsers = users.filter((u: any) => u.isActive);
     const inactiveUsers = users.filter((u: any) => !u.isActive);
 
@@ -167,21 +163,62 @@ export default function ProfessionalsPage() {
         }
     };
 
+    const userActionMenu = (user: any, isActive: boolean) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Abrir menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                {isActive ? (
+                    <>
+                        <DropdownMenuItem onClick={() => handleEdit(user)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                        </DropdownMenuItem>
+                        {user.role !== 'ADMIN' && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={() => handleDelete(user)}
+                                    className="text-red-600 focus:text-red-600"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Desativar
+                                </DropdownMenuItem>
+                            </>
+                        )}
+                    </>
+                ) : (
+                    <DropdownMenuItem onClick={() => handleActivate(user)}>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Reativar
+                    </DropdownMenuItem>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-4 sm:space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Profissionais</h1>
-                    <p className="text-muted-foreground">
+                    <h1 className="text-xl sm:text-3xl font-bold tracking-tight">Profissionais</h1>
+                    <p className="hidden sm:block text-muted-foreground">
                         Gerencie os dentistas e a equipe da sua clínica.
                     </p>
                 </div>
 
                 <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
                     <DialogTrigger asChild>
-                        <Button className="gap-2">
+                        <Button size="sm" className="gap-2 shrink-0">
                             <UserPlus className="h-4 w-4" />
-                            Convidar Profissional
+                            <span className="hidden sm:inline">Convidar Profissional</span>
+                            <span className="sm:hidden">Convidar</span>
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
@@ -258,14 +295,16 @@ export default function ProfessionalsPage() {
             </div>
 
             <Tabs defaultValue="active" className="w-full">
-                <TabsList className="grid w-full max-w-[600px] grid-cols-3">
+                <TabsList className="grid w-full grid-cols-3 sm:max-w-[600px]">
                     <TabsTrigger value="active">Equipe Ativa</TabsTrigger>
                     <TabsTrigger value="inactive">Inativos</TabsTrigger>
                     <TabsTrigger value="invitations">Convites</TabsTrigger>
                 </TabsList>
 
+                {/* TAB: Equipe Ativa */}
                 <TabsContent value="active" className="mt-4">
-                    <div className="rounded-md border bg-white">
+                    {/* Desktop table */}
+                    <div className="hidden sm:block rounded-md border bg-white">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -295,33 +334,7 @@ export default function ProfessionalsPage() {
                                                 <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Ativo</Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Abrir menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                        <DropdownMenuItem onClick={() => handleEdit(user)}>
-                                                            <Edit className="mr-2 h-4 w-4" />
-                                                            Editar
-                                                        </DropdownMenuItem>
-                                                        {user.role !== 'ADMIN' && (
-                                                            <>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handleDelete(user)}
-                                                                    className="text-red-600 focus:text-red-600"
-                                                                >
-                                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                                    Desativar
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                {userActionMenu(user, true)}
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -329,10 +342,50 @@ export default function ProfessionalsPage() {
                             </TableBody>
                         </Table>
                     </div>
+
+                    {/* Mobile card list */}
+                    <Card className="sm:hidden">
+                        {isLoadingUsers ? (
+                            <div className="divide-y">
+                                {Array.from({ length: 4 }).map((_, i) => (
+                                    <div key={i} className="h-16 bg-muted/30 animate-pulse mx-4 my-2 rounded-lg" />
+                                ))}
+                            </div>
+                        ) : activeUsers.length === 0 ? (
+                            <div className="py-10 text-center text-sm text-muted-foreground">
+                                Nenhum profissional ativo encontrado.
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-border">
+                                {activeUsers.map((user: any) => (
+                                    <div key={user.id} className="flex items-center gap-3 px-4 py-3">
+                                        <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold shrink-0">
+                                            {user.name?.charAt(0)?.toUpperCase() || '?'}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <Badge variant="secondary" className="text-[10px]">{getRoleLabel(user.role)}</Badge>
+                                                <Badge className="text-[10px] bg-green-50 text-green-700 border-green-200">Ativo</Badge>
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0">
+                                            {userActionMenu(user, true)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Card>
                 </TabsContent>
 
+                {/* TAB: Inativos */}
                 <TabsContent value="inactive" className="mt-4">
-                    <div className="rounded-md border bg-white">
+                    {/* Desktop table */}
+                    <div className="hidden sm:block rounded-md border bg-white">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -362,21 +415,7 @@ export default function ProfessionalsPage() {
                                                 <Badge variant="secondary">Inativo</Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Abrir menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                                        <DropdownMenuItem onClick={() => handleActivate(user)}>
-                                                            <UserPlus className="mr-2 h-4 w-4" />
-                                                            Reativar
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                {userActionMenu(user, false)}
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -384,10 +423,48 @@ export default function ProfessionalsPage() {
                             </TableBody>
                         </Table>
                     </div>
+
+                    {/* Mobile card list */}
+                    <Card className="sm:hidden">
+                        {isLoadingUsers ? (
+                            <div className="divide-y">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="h-16 bg-muted/30 animate-pulse mx-4 my-2 rounded-lg" />
+                                ))}
+                            </div>
+                        ) : inactiveUsers.length === 0 ? (
+                            <div className="py-10 text-center text-sm text-muted-foreground">
+                                Nenhum profissional inativo encontrado.
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-border">
+                                {inactiveUsers.map((user: any) => (
+                                    <div key={user.id} className="flex items-center gap-3 px-4 py-3 opacity-70">
+                                        <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-semibold shrink-0">
+                                            {user.name?.charAt(0)?.toUpperCase() || '?'}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-muted-foreground truncate">{user.name}</p>
+                                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <Badge variant="secondary" className="text-[10px]">{getRoleLabel(user.role)}</Badge>
+                                                <Badge variant="secondary" className="text-[10px]">Inativo</Badge>
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0">
+                                            {userActionMenu(user, false)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Card>
                 </TabsContent>
 
+                {/* TAB: Convites */}
                 <TabsContent value="invitations" className="mt-4">
-                    <div className="rounded-md border bg-white">
+                    {/* Desktop table */}
+                    <div className="hidden sm:block rounded-md border bg-white">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -419,6 +496,38 @@ export default function ProfessionalsPage() {
                             </TableBody>
                         </Table>
                     </div>
+
+                    {/* Mobile card list */}
+                    <Card className="sm:hidden">
+                        {isLoadingInvitations ? (
+                            <div className="divide-y">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="h-14 bg-muted/30 animate-pulse mx-4 my-2 rounded-lg" />
+                                ))}
+                            </div>
+                        ) : invitations.length === 0 ? (
+                            <div className="py-10 text-center text-sm text-muted-foreground">
+                                Nenhum convite pendente.
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-border">
+                                {invitations.map((inv: any) => (
+                                    <div key={inv.id} className="flex items-center gap-3 px-4 py-3">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-foreground truncate">{inv.email}</p>
+                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                <Badge variant="secondary" className="text-[10px]">{getRoleLabel(inv.role)}</Badge>
+                                                {getInvitationStatus(inv)}
+                                            </div>
+                                        </div>
+                                        <span className="text-xs text-muted-foreground shrink-0">
+                                            {format(new Date(inv.createdAt), "dd/MM/yy", { locale: ptBR })}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Card>
                 </TabsContent>
             </Tabs>
 
