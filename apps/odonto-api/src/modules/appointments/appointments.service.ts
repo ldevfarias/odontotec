@@ -186,7 +186,7 @@ export class AppointmentsService {
         if (before.patientId === after.patientId) return;
         const originalDate = new Date(before.date).toLocaleString('pt-BR');
         await this.notificationsService.create(
-            `O paciente do agendamento de ${originalDate} foi alterado para ${after.patient.name}.`,
+            `O paciente do agendamento de ${originalDate} foi alterado para ${after.patient?.name ?? 'Paciente'}.`,
             clinicId,
             'WARNING',
             after.dentistId,
