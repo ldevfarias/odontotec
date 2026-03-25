@@ -224,7 +224,14 @@ export class AppointmentsService {
     }
 
     private async notifyIfCancelled(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
-        // placeholder — implemented in Task 4
+        if (before.status === AppointmentStatus.CANCELLED || after.status !== AppointmentStatus.CANCELLED) return;
+        const dateStr = new Date(after.date).toLocaleString('pt-BR');
+        await this.notificationsService.create(
+            `O agendamento com ${after.patient?.name ?? 'Paciente'} em ${dateStr} foi cancelado.`,
+            clinicId,
+            'WARNING',
+            after.dentistId,
+        );
     }
 
     async checkAvailability(clinicId: number, dentistId: number, date: string, duration: number, excludeId?: number, patientId?: number): Promise<{ available: boolean }> {

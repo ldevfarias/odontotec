@@ -169,4 +169,47 @@ describe('AppointmentsService — update notifications', () => {
 
         expect(notifyCreate).not.toHaveBeenCalled();
     });
+
+    // ── notifyIfCancelled ──────────────────────────────────────────────────────
+
+    it('notifies dentist when appointment is cancelled via dashboard', async () => {
+        const before = makeAppointment({ status: AppointmentStatus.SCHEDULED });
+        const after = makeAppointment({ status: AppointmentStatus.CANCELLED });
+
+        findOneSpy
+            .mockResolvedValueOnce(before)
+            .mockResolvedValueOnce(after);
+
+        await service.update(10, { status: AppointmentStatus.CANCELLED }, CLINIC_ID);
+
+        expect(notifyCreate).toHaveBeenCalledTimes(1);
+        expect(notifyCreate).toHaveBeenCalledWith(
+            expect.stringContaining('cancelado'),
+            CLINIC_ID,
+            'WARNING',
+            after.dentistId,
+        );
+    });
+
+    it('does NOT notify when appointment was already cancelled', async () => {
+        const alreadyCancelled = makeAppointment({ status: AppointmentStatus.CANCELLED });
+        findOneSpy.mockResolvedValue(alreadyCancelled);
+
+        await service.update(10, { status: AppointmentStatus.CANCELLED }, CLINIC_ID);
+
+        expect(notifyCreate).not.toHaveBeenCalled();
+    });
+
+    it('does NOT notify when status changes to non-cancelled (e.g. CONFIRMED)', async () => {
+        const before = makeAppointment({ status: AppointmentStatus.SCHEDULED });
+        const after = makeAppointment({ status: AppointmentStatus.CONFIRMED });
+
+        findOneSpy
+            .mockResolvedValueOnce(before)
+            .mockResolvedValueOnce(after);
+
+        await service.update(10, { status: AppointmentStatus.CONFIRMED }, CLINIC_ID);
+
+        expect(notifyCreate).not.toHaveBeenCalled();
+    });
 });
