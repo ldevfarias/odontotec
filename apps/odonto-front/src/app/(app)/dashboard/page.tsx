@@ -33,7 +33,8 @@ const PERIOD_OPTIONS: { value: Period; label: string; badge?: string }[] = [
 export default function DashboardPage() {
     const { user } = useAuth();
 
-    if (user?.role === 'DENTIST') {
+    const role = user?.role?.toUpperCase();
+    if (role === 'DENTIST') {
         return <DentistDashboard />;
     }
 

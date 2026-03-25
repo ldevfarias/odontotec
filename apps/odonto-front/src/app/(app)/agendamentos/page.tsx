@@ -6,6 +6,7 @@ import { addMinutes, parseISO } from 'date-fns';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { useAppointmentsControllerFindAll } from '@/generated/hooks/useAppointmentsControllerFindAll';
 import { useMemo, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { AppointmentModal } from '@/components/appointments/AppointmentModal';
 import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,26 +28,31 @@ const PROFESSIONAL_COLORS = [
     '#0891b2', // Cyan
     '#ea580c', // Orange
 ];
-
 export default function AgendamentosPage() {
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
     const { mutate: updateAppointment } = useAppointmentsControllerUpdate();
-
-    // 1. Fetch Professionals (Dentists only)
+    const { user: currentUser } = useAuth();
     const { data: userData = [], isLoading: isLoadingUsers } = useUsersControllerFindAll({
         client: { params: { role: 'DENTIST' } } as any
     });
 
     const professionals = useMemo<Professional[]>(() => {
-        return (userData as any[]).map((user, index) => ({
+        let filteredUsers = userData as any[];
+        
+        // If the user is a dentist, only show themselves in the calendar
+        if (currentUser?.role?.toUpperCase() === 'DENTIST') {
+            filteredUsers = filteredUsers.filter(u => u.id === currentUser.id);
+        }
+
+        return filteredUsers.map((user, index) => ({
             id: user.id.toString(),
             name: user.name,
             role: user.role === 'DENTIST' ? 'Dentista' : user.role,
             color: PROFESSIONAL_COLORS[index % PROFESSIONAL_COLORS.length]
         }));
-    }, [userData]);
+    }, [userData, currentUser]);
 
     // 2. Fetch Appointments
     // Note: The Calendar component handles date filtering internally for the view, 

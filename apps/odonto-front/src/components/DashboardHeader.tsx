@@ -19,7 +19,7 @@ import { PatientSearchCMDK } from '@/components/patients/PatientSearchCMDK';
 import { Sidebar } from '@/components/Sidebar';
 
 export function DashboardHeader() {
-    const { user, logout } = useAuth();
+    const { user, logout, activeClinic } = useAuth();
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -102,13 +102,15 @@ export function DashboardHeader() {
                         </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-52 p-1.5" align="end">
-                        <button
-                            onClick={() => { setOpen(false); router.push('/settings'); }}
-                            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                        >
-                            <Settings className="h-4 w-4 text-muted-foreground" />
-                            Configurações
-                        </button>
+                        {activeClinic?.role !== 'DENTIST' && (
+                            <button
+                                onClick={() => { setOpen(false); router.push('/settings'); }}
+                                className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                            >
+                                <Settings className="h-4 w-4 text-muted-foreground" />
+                                Configurações
+                            </button>
+                        )}
                         <Separator className="my-1" />
                         <button
                             onClick={() => { setOpen(false); logout(); }}

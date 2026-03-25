@@ -125,7 +125,7 @@ export class UsersService {
         return invitation;
     }
 
-    async completeInvitation(token: string, name: string, password: string): Promise<User> {
+    async completeInvitation(token: string, name: string, password: string): Promise<{ user: User; invitation: UserInvitation }> {
         const invitation = await this.findInvitationByToken(token);
         if (!invitation) {
             throw new BadRequestException('Invalid or expired invitation token');
@@ -139,13 +139,14 @@ export class UsersService {
                 name: name,
                 password: password,
                 role: invitation.role,
+                isActive: true,
             });
         }
 
         invitation.acceptedAt = new Date();
         await this.invitationRepository.save(invitation);
 
-        return user;
+        return { user, invitation };
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<User> {

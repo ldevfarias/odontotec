@@ -28,19 +28,15 @@ export class AuthService {
     ) { }
 
     async registerByInvitation(registerDto: RegisterInvitationDto) {
-        const user = await this.usersService.completeInvitation(
+        const { user, invitation } = await this.usersService.completeInvitation(
             registerDto.token,
             registerDto.name,
             registerDto.password
         );
 
-        // Find the invitation to get the clinicId and create membership
-        const invitation = await this.usersService.findInvitationByToken(registerDto.token);
-        if (invitation) {
-            // Map UserRole to ClinicRole
-            const clinicRole = this.mapUserRoleToClinicRole(invitation.role);
-            await this.clinicsService.addMember(invitation.clinicId, user.id, clinicRole);
-        }
+        // Add user to the clinic using the invitation already returned by completeInvitation
+        const clinicRole = this.mapUserRoleToClinicRole(invitation.role);
+        await this.clinicsService.addMember(invitation.clinicId, user.id, clinicRole);
 
         const tokens = await this.getTokens(user.id, user.email, user.role, user.isActive);
         await this.updateRefreshToken(user.id, tokens.refresh_token);

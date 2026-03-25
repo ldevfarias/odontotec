@@ -113,9 +113,9 @@ OdontoTec uses **TypeORM migrations** for database schema management in producti
    - Review the generated migration in `apps/odonto-api/src/migrations/`
    - Commit both the entity and migration files
 
-**For Deployment (Railway):**
-- `railway.json` runs `npm run migration:run` during the build phase
-- This connects to the Railway database and applies all pending migrations
+**For Deployment (Fly.io):**
+- `fly.toml` defines the release command: `node dist/src/run-migrations.js`, which runs before the new version goes live
+- This connects to the Fly.io database and applies all pending migrations
 - Migrations are tracked in the `typeorm_migrations` table to prevent re-running
 
 ### Migration Commands
@@ -147,11 +147,16 @@ npm run migrate                                # Build + run migrations (used in
 ## Deployment
 
 - **Frontend**: Vercel (auto-deploy from `main`)
-- **API**: Railway (via GitHub Actions on `main` push)
-- **Database**: Railway PostgreSQL plugin
+- **API**: Fly.io — region `gru` (São Paulo), deploy via `flyctl deploy`
+- **Database**: Fly.io Postgres
 - **Storage**: Cloudflare R2 (documents/images)
 - **Email**: Resend
 - **Payments**: Stripe (webhook at `/subscription/webhook`)
 - **Analytics**: PostHog
 
-CI pipeline (`.github/workflows/deploy.yml`): lint → type-check → build API → build frontend → deploy to Railway.
+CI pipeline (`.github/workflows/deploy.yml`): lint → type-check → build API → build frontend → deploy to Fly.io.
+
+### Fly.io Deploy Notes
+- Config: `fly.toml` at repo root
+- Migrations run automatically via `release_command` before each deploy
+- `auto_stop_machines = "stop"` and `min_machines_running = 0` — machine sleeps when idle to stay in free tier (cold start ~1-3s)

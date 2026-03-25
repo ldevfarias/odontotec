@@ -88,7 +88,7 @@ interface AppointmentModalProps {
 export function AppointmentModal({ open, onOpenChange, initialDate, appointmentToEdit, initialPatientId }: AppointmentModalProps) {
     const queryClient = useQueryClient();
     const { user } = useAuth();
-    const isDentist = user?.role === 'DENTIST';
+    const isDentist = user?.role?.toUpperCase() === 'DENTIST';
 
     const [isPatientPopoverOpen, setIsPatientPopoverOpen] = useState(false);
     const [isDentistPopoverOpen, setIsDentistPopoverOpen] = useState(false);
@@ -102,7 +102,10 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
     const isPending = isCreating || isUpdating;
 
     const dentists = useMemo(() =>
-        (professionals as any[]).filter((u: any) => u.role === 'DENTIST' || u.role === 'ADMIN'),
+        (professionals as any[]).filter((u: any) => {
+            const role = u.role?.toUpperCase();
+            return role === 'DENTIST' || role === 'ADMIN';
+        }),
         [professionals]);
 
     const form = useForm<AppointmentFormValues>({

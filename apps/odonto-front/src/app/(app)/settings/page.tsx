@@ -37,7 +37,6 @@ const settingsOptions = [
         color: 'text-emerald-600',
         bgColor: 'bg-emerald-50'
     },
-    // More options can be added here later
 ];
 
 export default function SettingsPage() {

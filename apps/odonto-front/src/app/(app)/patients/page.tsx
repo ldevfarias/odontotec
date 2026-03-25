@@ -12,7 +12,8 @@ import { notificationService } from '@/services/notification.service';
 
 export default function PatientsPage() {
     const { user } = useAuth();
-    const canCreate = user?.role === 'ADMIN' || user?.role === 'DENTIST';
+    const userRole = user?.role?.toUpperCase();
+    const canCreate = userRole === 'ADMIN' || userRole === 'DENTIST';
 
     const { data: patients = [] } = usePatientsControllerFindAll();
     const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});

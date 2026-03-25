@@ -21,6 +21,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+import { useAuth } from '@/contexts/AuthContext';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
 import { useAppointmentsControllerCreate } from '@/generated/hooks/useAppointmentsControllerCreate';
@@ -274,9 +275,17 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
 }
 
 export function DentistQuickBook() {
+    const { user: currentUser } = useAuth();
     const { data: users = [] } = useUsersControllerFindAll();
     const { data: allPatients = [] } = usePatientsControllerFindAll();
-    const professionals = (users as any[]).filter(u => ['DENTIST', 'dentist', 'ADMIN', 'admin'].includes(u.role));
+    
+    let professionals = (users as any[]).filter(u => ['DENTIST', 'dentist', 'ADMIN', 'admin'].includes(u.role));
+
+    // If the user is a dentist, only show themselves
+    if (currentUser?.role?.toUpperCase() === 'DENTIST') {
+        professionals = professionals.filter(u => u.id === currentUser.id);
+    }
+
     const todayFormatted = format(new Date(), "EEEE, dd 'de' MMMM", { locale: ptBR });
 
     return (

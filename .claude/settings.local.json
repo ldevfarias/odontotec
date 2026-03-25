@@ -14,7 +14,9 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(npx jest:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(where gh:*)",
+      "Bash(winget list:*)"
     ]
   },
   "enabledPlugins": {

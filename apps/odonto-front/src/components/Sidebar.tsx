@@ -87,7 +87,10 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
         : '?';
 
     const filteredGroups = menuGroups.filter((group) => {
-        if (group.adminOnly && user?.role !== 'ADMIN') return false;
+        if (group.adminOnly) {
+            const isAdmin = user?.role === 'ADMIN' || activeClinic?.role === 'ADMIN' || activeClinic?.role === 'OWNER';
+            if (!isAdmin) return false;
+        }
         return true;
     });
 
