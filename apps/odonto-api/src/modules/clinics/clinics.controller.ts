@@ -64,7 +64,7 @@ export class ClinicsController {
         ) file: Express.Multer.File,
     ) {
         const clinicId = req.headers['x-clinic-id'];
-        const logoUrl = await this.storage.upload(file.buffer, file.originalname, file.mimetype, 'logos');
+        const logoUrl = await this.storage.upload(file.buffer, file.originalname, file.mimetype, `clinics/${clinicId}/logos`);
         return this.clinicsService.updateLogo(Number(clinicId), logoUrl);
     }
 }
