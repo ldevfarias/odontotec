@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, Request, Res } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Request, Res, HttpCode } from '@nestjs/common';
 import type { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
@@ -132,6 +132,7 @@ export class AuthController {
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Public()
     @Post('forgot-password')
+    @HttpCode(200)
     @ApiOperation({ summary: 'Request password reset email' })
     @ApiResponse({ status: 200, description: 'Email sent if user exists' })
     async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
@@ -141,6 +142,7 @@ export class AuthController {
     @Throttle({ default: { limit: 3, ttl: 60000 } })
     @Public()
     @Post('reset-password')
+    @HttpCode(200)
     @ApiOperation({ summary: 'Reset password using token' })
     @ApiResponse({ status: 200, description: 'Password reset successful' })
     async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
