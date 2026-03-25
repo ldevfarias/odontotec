@@ -16,6 +16,7 @@ export interface UserClinic {
     id: number;
     name: string;
     role: string;
+    avatarUrl?: string | null;
 }
 
 interface AuthContextType {
@@ -59,9 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         try { 
                             const parsed = JSON.parse(savedActiveClinic);
                             // ensure clinic is still valid
-                            if (response.data.clinics.find((c: UserClinic) => c.id === parsed.id)) {
-                                setActiveClinicState(parsed);
-                                api.defaults.headers.common['X-Clinic-Id'] = String(parsed.id);
+                            const freshClinic = response.data.clinics.find((c: UserClinic) => c.id === parsed.id);
+                            if (freshClinic) {
+                                setActiveClinicState(freshClinic);
+                                sessionStorage.setItem('activeClinic', JSON.stringify(freshClinic));
+                                api.defaults.headers.common['X-Clinic-Id'] = String(freshClinic.id);
                             } else if (response.data.clinics.length > 0) {
                                 setActiveClinicState(response.data.clinics[0]);
                                 api.defaults.headers.common['X-Clinic-Id'] = String(response.data.clinics[0].id);
