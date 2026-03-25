@@ -269,7 +269,9 @@ export class UsersService {
         if (membership.avatarUrl) {
             try {
                 await this.storageProvider.delete(membership.avatarUrl);
-            } catch { /* best-effort */ }
+            } catch (err) {
+                console.warn(`Failed to delete old avatar from R2: ${membership.avatarUrl}`, err);
+            }
         }
 
         const avatarUrl = await this.storageProvider.upload(
@@ -294,7 +296,9 @@ export class UsersService {
         if (membership.avatarUrl) {
             try {
                 await this.storageProvider.delete(membership.avatarUrl);
-            } catch { /* best-effort */ }
+            } catch (err) {
+                console.warn(`Failed to delete old avatar from R2: ${membership.avatarUrl}`, err);
+            }
         }
 
         await this.membershipRepository.update({ userId, clinicId }, { avatarUrl: null });

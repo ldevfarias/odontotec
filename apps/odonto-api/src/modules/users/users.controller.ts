@@ -33,6 +33,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Upload profile avatar for active clinic', operationId: 'usersControllerUploadAvatar' })
     @ApiConsumes('multipart/form-data')
     @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
+    @ApiResponse({ status: 200, schema: { type: 'object', properties: { avatarUrl: { type: 'string' } } } })
     uploadAvatar(
         @Request() req,
         @Tenant() clinicId: number,
@@ -52,6 +53,7 @@ export class UsersController {
     @Delete('me/avatar')
     @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
     @ApiOperation({ summary: 'Remove profile avatar for active clinic', operationId: 'usersControllerRemoveAvatar' })
+    @ApiResponse({ status: 200, schema: { type: 'object', properties: { avatarUrl: { type: 'string', nullable: true } } } })
     removeAvatar(@Request() req, @Tenant() clinicId: number) {
         const userId = req.user.sub || req.user.userId;
         return this.usersService.removeAvatar(userId, clinicId);
