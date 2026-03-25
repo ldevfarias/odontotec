@@ -26,6 +26,8 @@ COPY apps/odonto-api/package.json ./
 
 RUN npm install --omit=dev
 
+ENV TZ=America/Sao_Paulo
+
 EXPOSE 3000
 
 CMD ["node", "dist/src/main"]

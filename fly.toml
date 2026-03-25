@@ -1,6 +1,9 @@
 app = "odontotec"
 primary_region = "gru"
 
+[env]
+  TZ = "America/Sao_Paulo"
+
 [build]
   dockerfile = "apps/odonto-api/Dockerfile"
 
