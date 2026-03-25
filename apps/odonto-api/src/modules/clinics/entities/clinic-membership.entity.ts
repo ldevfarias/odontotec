@@ -25,6 +25,9 @@ export class ClinicMembership {
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
+    @Column({ name: 'avatar_url', type: 'varchar', nullable: true, default: null })
+    avatarUrl: string | null;
+
     @ManyToOne(() => User, (user) => user.memberships, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user: User;
