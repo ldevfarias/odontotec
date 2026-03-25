@@ -1,16 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "id": { "type": "number" },
-    "description": { "type": "string" },
-    "value": { "type": "number" },
-    "toothNumber": { "type": "number" },
-    "surface": { "type": "object" },
-    "status": {
-      "type": "string",
-      "enum": ["PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELED", "CANCELLED"]
-    }
-  },
-  "required": ["description", "value"],
-  "x-readme-ref-name": "TreatmentPlanItemDto"
-}
+{"type":"object","properties":{"id":{"type":"number"},"description":{"type":"string"},"value":{"type":"number"},"toothNumber":{"type":"number"},"surface":{"type":"object"},"status":{"type":"string","enum":["PLANNED","IN_PROGRESS","COMPLETED","CANCELED","CANCELLED"]}},"required":["description","value"],"x-readme-ref-name":"TreatmentPlanItemDto"}

@@ -1,16 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "date": { "type": "string" },
-    "duration": { "type": "number" },
-    "dentistId": { "type": "number" },
-    "patientId": { "type": "number" },
-    "status": {
-      "type": "string",
-      "enum": ["SCHEDULED", "CONFIRMED", "CANCELLED", "COMPLETED", "ABSENT"]
-    },
-    "cancelledBy": { "type": "string", "enum": ["PATIENT", "CLINIC"] },
-    "cancellationReason": { "type": "string" }
-  },
-  "x-readme-ref-name": "UpdateAppointmentDto"
-}
+{"type":"object","properties":{"date":{"type":"string"},"duration":{"type":"number"},"dentistId":{"type":"number"},"patientId":{"type":"number"},"status":{"type":"string","enum":["SCHEDULED","CONFIRMED","CANCELLED","COMPLETED","ABSENT"]},"cancelledBy":{"type":"string","enum":["PATIENT","CLINIC"]},"cancellationReason":{"type":"string"}},"x-readme-ref-name":"UpdateAppointmentDto"}

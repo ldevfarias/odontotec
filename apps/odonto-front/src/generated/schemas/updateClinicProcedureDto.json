@@ -1,13 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "name": { "type": "string", "example": "Limpeza e Profilaxia" },
-    "description": {
-      "type": "string",
-      "example": "Limpeza completa dos dentes"
-    },
-    "category": { "type": "string", "example": "Preventivo" },
-    "baseValue": { "type": "number", "example": 150 }
-  },
-  "x-readme-ref-name": "UpdateClinicProcedureDto"
-}
+{"type":"object","properties":{"name":{"type":"string","example":"Limpeza e Profilaxia"},"description":{"type":"string","example":"Limpeza completa dos dentes"},"category":{"type":"string","example":"Preventivo"},"baseValue":{"type":"number","example":150},"selectionMode":{"type":"string","example":"FACE","enum":["FACE","TOOTH","GENERAL"]}},"x-readme-ref-name":"UpdateClinicProcedureDto"}

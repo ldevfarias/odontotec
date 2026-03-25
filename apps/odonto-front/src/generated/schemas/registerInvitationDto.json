@@ -1,10 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "token": { "type": "string", "example": "uuid-token-here" },
-    "name": { "type": "string", "example": "John Doe" },
-    "password": { "type": "string", "example": "password123", "minLength": 6 }
-  },
-  "required": ["token", "name", "password"],
-  "x-readme-ref-name": "RegisterInvitationDto"
-}
+{"type":"object","properties":{"token":{"type":"string","example":"uuid-token-here"},"name":{"type":"string","example":"John Doe"},"password":{"type":"string","example":"password123","minLength":6}},"required":["token","name","password"],"x-readme-ref-name":"RegisterInvitationDto"}

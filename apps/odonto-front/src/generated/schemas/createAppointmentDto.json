@@ -1,11 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "date": { "type": "string", "example": "2026-01-20T10:00:00Z" },
-    "duration": { "type": "number", "example": 30 },
-    "dentistId": { "type": "number" },
-    "patientId": { "type": "number" }
-  },
-  "required": ["date", "duration", "dentistId", "patientId"],
-  "x-readme-ref-name": "CreateAppointmentDto"
-}
+{"type":"object","properties":{"date":{"type":"string","example":"2026-01-20T10:00:00Z"},"duration":{"type":"number","example":30},"dentistId":{"type":"number"},"patientId":{"type":"number"}},"required":["date","duration","dentistId","patientId"],"x-readme-ref-name":"CreateAppointmentDto"}

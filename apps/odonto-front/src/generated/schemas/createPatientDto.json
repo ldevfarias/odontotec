@@ -1,13 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "name": { "type": "string" },
-    "email": { "type": "string" },
-    "phone": { "type": "string" },
-    "birthDate": { "type": "string" },
-    "address": { "type": "string" },
-    "document": { "type": "string" }
-  },
-  "required": ["name"],
-  "x-readme-ref-name": "CreatePatientDto"
-}
+{"type":"object","properties":{"name":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"birthDate":{"type":"string"},"address":{"type":"string"},"document":{"type":"string"}},"required":["name"],"x-readme-ref-name":"CreatePatientDto"}

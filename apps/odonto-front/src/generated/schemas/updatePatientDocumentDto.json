@@ -1,8 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "title": { "type": "string" },
-    "content": { "type": "string" }
-  },
-  "x-readme-ref-name": "UpdatePatientDocumentDto"
-}
+{"type":"object","properties":{"title":{"type":"string"},"content":{"type":"string"}},"x-readme-ref-name":"UpdatePatientDocumentDto"}

@@ -22,6 +22,8 @@ export type { AppointmentsControllerRemoveMutationKey } from "./hooks/useAppoint
 export type { AppointmentsControllerUpdateMutationKey } from "./hooks/useAppointmentsControllerUpdate.ts";
 export type { AuthControllerCompleteClinicSetupMutationKey } from "./hooks/useAuthControllerCompleteClinicSetup.ts";
 export type { AuthControllerForgotPasswordMutationKey } from "./hooks/useAuthControllerForgotPassword.ts";
+export type { AuthControllerGetMeQueryKey } from "./hooks/useAuthControllerGetMe.ts";
+export type { AuthControllerGetMeSuspenseQueryKey } from "./hooks/useAuthControllerGetMeSuspense.ts";
 export type { AuthControllerInitiateRegistrationMutationKey } from "./hooks/useAuthControllerInitiateRegistration.ts";
 export type { AuthControllerLoginMutationKey } from "./hooks/useAuthControllerLogin.ts";
 export type { AuthControllerLogoutMutationKey } from "./hooks/useAuthControllerLogout.ts";
@@ -103,6 +105,7 @@ export type { TreatmentPlansControllerFindOneQueryKey } from "./hooks/useTreatme
 export type { TreatmentPlansControllerFindOneSuspenseQueryKey } from "./hooks/useTreatmentPlansControllerFindOneSuspense.ts";
 export type { TreatmentPlansControllerRemoveMutationKey } from "./hooks/useTreatmentPlansControllerRemove.ts";
 export type { TreatmentPlansControllerUpdateMutationKey } from "./hooks/useTreatmentPlansControllerUpdate.ts";
+export type { UsersControllerAcceptTermsMutationKey } from "./hooks/useUsersControllerAcceptTerms.ts";
 export type { UsersControllerFindAllQueryKey } from "./hooks/useUsersControllerFindAll.ts";
 export type { UsersControllerFindAllInvitationsQueryKey } from "./hooks/useUsersControllerFindAllInvitations.ts";
 export type { UsersControllerFindAllInvitationsSuspenseQueryKey } from "./hooks/useUsersControllerFindAllInvitationsSuspense.ts";
@@ -111,557 +114,129 @@ export type { UsersControllerFindInvitationQueryKey } from "./hooks/useUsersCont
 export type { UsersControllerFindInvitationSuspenseQueryKey } from "./hooks/useUsersControllerFindInvitationSuspense.ts";
 export type { UsersControllerInviteMutationKey } from "./hooks/useUsersControllerInvite.ts";
 export type { UsersControllerRemoveMutationKey } from "./hooks/useUsersControllerRemove.ts";
+export type { UsersControllerRemoveAvatarMutationKey } from "./hooks/useUsersControllerRemoveAvatar.ts";
 export type { UsersControllerUpdateMutationKey } from "./hooks/useUsersControllerUpdate.ts";
+export type { UsersControllerUploadAvatarMutationKey } from "./hooks/useUsersControllerUploadAvatar.ts";
 export type { AnamnesisAnswerDto } from "./ts/AnamnesisAnswerDto.ts";
-export type {
-  AnamnesisControllerCreate201,
-  AnamnesisControllerCreateMutationRequest,
-  AnamnesisControllerCreateMutationResponse,
-  AnamnesisControllerCreateMutation,
-} from "./ts/AnamnesisControllerCreate.ts";
-export type {
-  AnamnesisControllerFindAllByPatientPathParams,
-  AnamnesisControllerFindAllByPatient200,
-  AnamnesisControllerFindAllByPatientQueryResponse,
-  AnamnesisControllerFindAllByPatientQuery,
-} from "./ts/AnamnesisControllerFindAllByPatient.ts";
-export type {
-  AnamnesisControllerFindOnePathParams,
-  AnamnesisControllerFindOne200,
-  AnamnesisControllerFindOneQueryResponse,
-  AnamnesisControllerFindOneQuery,
-} from "./ts/AnamnesisControllerFindOne.ts";
-export type {
-  AnamnesisControllerRemovePathParams,
-  AnamnesisControllerRemove200,
-  AnamnesisControllerRemoveMutationResponse,
-  AnamnesisControllerRemoveMutation,
-} from "./ts/AnamnesisControllerRemove.ts";
-export type {
-  AnamnesisControllerUpdatePathParams,
-  AnamnesisControllerUpdate200,
-  AnamnesisControllerUpdateMutationRequest,
-  AnamnesisControllerUpdateMutationResponse,
-  AnamnesisControllerUpdateMutation,
-} from "./ts/AnamnesisControllerUpdate.ts";
+export type { AnamnesisControllerCreate201, AnamnesisControllerCreateMutation, AnamnesisControllerCreateMutationRequest, AnamnesisControllerCreateMutationResponse } from "./ts/AnamnesisControllerCreate.ts";
+export type { AnamnesisControllerFindAllByPatient200, AnamnesisControllerFindAllByPatientPathParams, AnamnesisControllerFindAllByPatientQuery, AnamnesisControllerFindAllByPatientQueryResponse } from "./ts/AnamnesisControllerFindAllByPatient.ts";
+export type { AnamnesisControllerFindOne200, AnamnesisControllerFindOnePathParams, AnamnesisControllerFindOneQuery, AnamnesisControllerFindOneQueryResponse } from "./ts/AnamnesisControllerFindOne.ts";
+export type { AnamnesisControllerRemove200, AnamnesisControllerRemoveMutation, AnamnesisControllerRemoveMutationResponse, AnamnesisControllerRemovePathParams } from "./ts/AnamnesisControllerRemove.ts";
+export type { AnamnesisControllerUpdate200, AnamnesisControllerUpdateMutation, AnamnesisControllerUpdateMutationRequest, AnamnesisControllerUpdateMutationResponse, AnamnesisControllerUpdatePathParams } from "./ts/AnamnesisControllerUpdate.ts";
 export type { AnamnesisDataDto } from "./ts/AnamnesisDataDto.ts";
-export type {
-  AppControllerGetHello200,
-  AppControllerGetHelloQueryResponse,
-  AppControllerGetHelloQuery,
-} from "./ts/AppControllerGetHello.ts";
-export type {
-  AppointmentsControllerCheckAvailabilityQueryParams,
-  AppointmentsControllerCheckAvailability200,
-  AppointmentsControllerCheckAvailabilityQueryResponse,
-  AppointmentsControllerCheckAvailabilityQuery,
-} from "./ts/AppointmentsControllerCheckAvailability.ts";
-export type {
-  AppointmentsControllerCreate201,
-  AppointmentsControllerCreate400,
-  AppointmentsControllerCreateMutationRequest,
-  AppointmentsControllerCreateMutationResponse,
-  AppointmentsControllerCreateMutation,
-} from "./ts/AppointmentsControllerCreate.ts";
-export type {
-  AppointmentsControllerFindAllQueryParams,
-  AppointmentsControllerFindAll200,
-  AppointmentsControllerFindAllQueryResponse,
-  AppointmentsControllerFindAllQuery,
-} from "./ts/AppointmentsControllerFindAll.ts";
-export type {
-  AppointmentsControllerFindOnePathParams,
-  AppointmentsControllerFindOne200,
-  AppointmentsControllerFindOneQueryResponse,
-  AppointmentsControllerFindOneQuery,
-} from "./ts/AppointmentsControllerFindOne.ts";
-export type {
-  AppointmentsControllerGetAvailableSlotsQueryParams,
-  AppointmentsControllerGetAvailableSlots200,
-  AppointmentsControllerGetAvailableSlotsQueryResponse,
-  AppointmentsControllerGetAvailableSlotsQuery,
-} from "./ts/AppointmentsControllerGetAvailableSlots.ts";
-export type {
-  AppointmentsControllerPublicCancelQueryParams,
-  AppointmentsControllerPublicCancel200,
-  AppointmentsControllerPublicCancelQueryResponse,
-  AppointmentsControllerPublicCancelQuery,
-} from "./ts/AppointmentsControllerPublicCancel.ts";
-export type {
-  AppointmentsControllerRemovePathParams,
-  AppointmentsControllerRemove200,
-  AppointmentsControllerRemoveMutationResponse,
-  AppointmentsControllerRemoveMutation,
-} from "./ts/AppointmentsControllerRemove.ts";
-export type {
-  AppointmentsControllerUpdatePathParams,
-  AppointmentsControllerUpdate200,
-  AppointmentsControllerUpdateMutationRequest,
-  AppointmentsControllerUpdateMutationResponse,
-  AppointmentsControllerUpdateMutation,
-} from "./ts/AppointmentsControllerUpdate.ts";
-export type {
-  AuthControllerCompleteClinicSetup201,
-  AuthControllerCompleteClinicSetupMutationRequest,
-  AuthControllerCompleteClinicSetupMutationResponse,
-  AuthControllerCompleteClinicSetupMutation,
-} from "./ts/AuthControllerCompleteClinicSetup.ts";
-export type {
-  AuthControllerForgotPassword200,
-  AuthControllerForgotPasswordMutationRequest,
-  AuthControllerForgotPasswordMutationResponse,
-  AuthControllerForgotPasswordMutation,
-} from "./ts/AuthControllerForgotPassword.ts";
-export type {
-  AuthControllerInitiateRegistration201,
-  AuthControllerInitiateRegistrationMutationRequest,
-  AuthControllerInitiateRegistrationMutationResponse,
-  AuthControllerInitiateRegistrationMutation,
-} from "./ts/AuthControllerInitiateRegistration.ts";
-export type {
-  AuthControllerLogin200,
-  AuthControllerLogin401,
-  AuthControllerLoginMutationRequest,
-  AuthControllerLoginMutationResponse,
-  AuthControllerLoginMutation,
-} from "./ts/AuthControllerLogin.ts";
-export type {
-  AuthControllerLogout200,
-  AuthControllerLogoutMutationResponse,
-  AuthControllerLogoutMutation,
-} from "./ts/AuthControllerLogout.ts";
-export type {
-  AuthControllerRefreshTokens200,
-  AuthControllerRefreshTokensMutationResponse,
-  AuthControllerRefreshTokensMutation,
-} from "./ts/AuthControllerRefreshTokens.ts";
-export type {
-  AuthControllerRegister201,
-  AuthControllerRegisterMutationRequest,
-  AuthControllerRegisterMutationResponse,
-  AuthControllerRegisterMutation,
-} from "./ts/AuthControllerRegister.ts";
-export type {
-  AuthControllerRegisterTenant201,
-  AuthControllerRegisterTenantMutationRequest,
-  AuthControllerRegisterTenantMutationResponse,
-  AuthControllerRegisterTenantMutation,
-} from "./ts/AuthControllerRegisterTenant.ts";
-export type {
-  AuthControllerResetPassword200,
-  AuthControllerResetPasswordMutationRequest,
-  AuthControllerResetPasswordMutationResponse,
-  AuthControllerResetPasswordMutation,
-} from "./ts/AuthControllerResetPassword.ts";
-export type {
-  AuthControllerVerifyEmail201,
-  AuthControllerVerifyEmailMutationRequest,
-  AuthControllerVerifyEmailMutationResponse,
-  AuthControllerVerifyEmailMutation,
-} from "./ts/AuthControllerVerifyEmail.ts";
-export type {
-  BudgetsControllerCreate201,
-  BudgetsControllerCreateMutationRequest,
-  BudgetsControllerCreateMutationResponse,
-  BudgetsControllerCreateMutation,
-} from "./ts/BudgetsControllerCreate.ts";
-export type {
-  BudgetsControllerFindAllByPatientPathParams,
-  BudgetsControllerFindAllByPatient200,
-  BudgetsControllerFindAllByPatientQueryResponse,
-  BudgetsControllerFindAllByPatientQuery,
-} from "./ts/BudgetsControllerFindAllByPatient.ts";
-export type {
-  BudgetsControllerFindOnePathParams,
-  BudgetsControllerFindOne200,
-  BudgetsControllerFindOneQueryResponse,
-  BudgetsControllerFindOneQuery,
-} from "./ts/BudgetsControllerFindOne.ts";
-export type {
-  BudgetsControllerRemovePathParams,
-  BudgetsControllerRemove200,
-  BudgetsControllerRemoveMutationResponse,
-  BudgetsControllerRemoveMutation,
-} from "./ts/BudgetsControllerRemove.ts";
-export type {
-  BudgetsControllerUpdatePathParams,
-  BudgetsControllerUpdate200,
-  BudgetsControllerUpdateMutationRequest,
-  BudgetsControllerUpdateMutationResponse,
-  BudgetsControllerUpdateMutation,
-} from "./ts/BudgetsControllerUpdate.ts";
-export type {
-  ClinicProceduresControllerCreate201,
-  ClinicProceduresControllerCreateMutationRequest,
-  ClinicProceduresControllerCreateMutationResponse,
-  ClinicProceduresControllerCreateMutation,
-} from "./ts/ClinicProceduresControllerCreate.ts";
-export type {
-  ClinicProceduresControllerFindAll200,
-  ClinicProceduresControllerFindAllQueryResponse,
-  ClinicProceduresControllerFindAllQuery,
-} from "./ts/ClinicProceduresControllerFindAll.ts";
-export type {
-  ClinicProceduresControllerFindOnePathParams,
-  ClinicProceduresControllerFindOne200,
-  ClinicProceduresControllerFindOneQueryResponse,
-  ClinicProceduresControllerFindOneQuery,
-} from "./ts/ClinicProceduresControllerFindOne.ts";
-export type {
-  ClinicProceduresControllerRemovePathParams,
-  ClinicProceduresControllerRemove200,
-  ClinicProceduresControllerRemoveMutationResponse,
-  ClinicProceduresControllerRemoveMutation,
-} from "./ts/ClinicProceduresControllerRemove.ts";
-export type {
-  ClinicProceduresControllerUpdatePathParams,
-  ClinicProceduresControllerUpdate200,
-  ClinicProceduresControllerUpdateMutationRequest,
-  ClinicProceduresControllerUpdateMutationResponse,
-  ClinicProceduresControllerUpdateMutation,
-} from "./ts/ClinicProceduresControllerUpdate.ts";
-export type {
-  ClinicsControllerCreate201,
-  ClinicsControllerCreateMutationRequest,
-  ClinicsControllerCreateMutationResponse,
-  ClinicsControllerCreateMutation,
-} from "./ts/ClinicsControllerCreate.ts";
-export type {
-  ClinicsControllerGetActive200,
-  ClinicsControllerGetActiveQueryResponse,
-  ClinicsControllerGetActiveQuery,
-} from "./ts/ClinicsControllerGetActive.ts";
-export type {
-  ClinicsControllerGetMyClinics200,
-  ClinicsControllerGetMyClinicsQueryResponse,
-  ClinicsControllerGetMyClinicsQuery,
-} from "./ts/ClinicsControllerGetMyClinics.ts";
-export type {
-  ClinicsControllerUpdateActive200,
-  ClinicsControllerUpdateActiveMutationRequest,
-  ClinicsControllerUpdateActiveMutationResponse,
-  ClinicsControllerUpdateActiveMutation,
-} from "./ts/ClinicsControllerUpdateActive.ts";
-export type {
-  ClinicsControllerUploadLogo200,
-  ClinicsControllerUploadLogoMutationResponse,
-  ClinicsControllerUploadLogoMutation,
-} from "./ts/ClinicsControllerUploadLogo.ts";
+export type { AppControllerGetHello200, AppControllerGetHelloQuery, AppControllerGetHelloQueryResponse } from "./ts/AppControllerGetHello.ts";
+export type { AppointmentsControllerCheckAvailability200, AppointmentsControllerCheckAvailabilityQuery, AppointmentsControllerCheckAvailabilityQueryParams, AppointmentsControllerCheckAvailabilityQueryResponse } from "./ts/AppointmentsControllerCheckAvailability.ts";
+export type { AppointmentsControllerCreate201, AppointmentsControllerCreate400, AppointmentsControllerCreateMutation, AppointmentsControllerCreateMutationRequest, AppointmentsControllerCreateMutationResponse } from "./ts/AppointmentsControllerCreate.ts";
+export type { AppointmentsControllerFindAll200, AppointmentsControllerFindAllQuery, AppointmentsControllerFindAllQueryParams, AppointmentsControllerFindAllQueryResponse } from "./ts/AppointmentsControllerFindAll.ts";
+export type { AppointmentsControllerFindOne200, AppointmentsControllerFindOnePathParams, AppointmentsControllerFindOneQuery, AppointmentsControllerFindOneQueryResponse } from "./ts/AppointmentsControllerFindOne.ts";
+export type { AppointmentsControllerGetAvailableSlots200, AppointmentsControllerGetAvailableSlotsQuery, AppointmentsControllerGetAvailableSlotsQueryParams, AppointmentsControllerGetAvailableSlotsQueryResponse } from "./ts/AppointmentsControllerGetAvailableSlots.ts";
+export type { AppointmentsControllerPublicCancel200, AppointmentsControllerPublicCancelQuery, AppointmentsControllerPublicCancelQueryParams, AppointmentsControllerPublicCancelQueryResponse } from "./ts/AppointmentsControllerPublicCancel.ts";
+export type { AppointmentsControllerRemove200, AppointmentsControllerRemoveMutation, AppointmentsControllerRemoveMutationResponse, AppointmentsControllerRemovePathParams } from "./ts/AppointmentsControllerRemove.ts";
+export type { AppointmentsControllerUpdate200, AppointmentsControllerUpdateMutation, AppointmentsControllerUpdateMutationRequest, AppointmentsControllerUpdateMutationResponse, AppointmentsControllerUpdatePathParams } from "./ts/AppointmentsControllerUpdate.ts";
+export type { AuthControllerCompleteClinicSetup201, AuthControllerCompleteClinicSetupMutation, AuthControllerCompleteClinicSetupMutationRequest, AuthControllerCompleteClinicSetupMutationResponse } from "./ts/AuthControllerCompleteClinicSetup.ts";
+export type { AuthControllerForgotPassword200, AuthControllerForgotPasswordMutation, AuthControllerForgotPasswordMutationRequest, AuthControllerForgotPasswordMutationResponse } from "./ts/AuthControllerForgotPassword.ts";
+export type { AuthControllerGetMe200, AuthControllerGetMeQuery, AuthControllerGetMeQueryResponse } from "./ts/AuthControllerGetMe.ts";
+export type { AuthControllerInitiateRegistration201, AuthControllerInitiateRegistrationMutation, AuthControllerInitiateRegistrationMutationRequest, AuthControllerInitiateRegistrationMutationResponse } from "./ts/AuthControllerInitiateRegistration.ts";
+export type { AuthControllerLogin200, AuthControllerLogin401, AuthControllerLoginMutation, AuthControllerLoginMutationRequest, AuthControllerLoginMutationResponse } from "./ts/AuthControllerLogin.ts";
+export type { AuthControllerLogout200, AuthControllerLogoutMutation, AuthControllerLogoutMutationResponse } from "./ts/AuthControllerLogout.ts";
+export type { AuthControllerRefreshTokens200, AuthControllerRefreshTokensMutation, AuthControllerRefreshTokensMutationResponse } from "./ts/AuthControllerRefreshTokens.ts";
+export type { AuthControllerRegister201, AuthControllerRegisterMutation, AuthControllerRegisterMutationRequest, AuthControllerRegisterMutationResponse } from "./ts/AuthControllerRegister.ts";
+export type { AuthControllerRegisterTenant201, AuthControllerRegisterTenantMutation, AuthControllerRegisterTenantMutationRequest, AuthControllerRegisterTenantMutationResponse } from "./ts/AuthControllerRegisterTenant.ts";
+export type { AuthControllerResetPassword200, AuthControllerResetPasswordMutation, AuthControllerResetPasswordMutationRequest, AuthControllerResetPasswordMutationResponse } from "./ts/AuthControllerResetPassword.ts";
+export type { AuthControllerVerifyEmail201, AuthControllerVerifyEmailMutation, AuthControllerVerifyEmailMutationRequest, AuthControllerVerifyEmailMutationResponse } from "./ts/AuthControllerVerifyEmail.ts";
+export type { BudgetsControllerCreate201, BudgetsControllerCreateMutation, BudgetsControllerCreateMutationRequest, BudgetsControllerCreateMutationResponse } from "./ts/BudgetsControllerCreate.ts";
+export type { BudgetsControllerFindAllByPatient200, BudgetsControllerFindAllByPatientPathParams, BudgetsControllerFindAllByPatientQuery, BudgetsControllerFindAllByPatientQueryResponse } from "./ts/BudgetsControllerFindAllByPatient.ts";
+export type { BudgetsControllerFindOne200, BudgetsControllerFindOnePathParams, BudgetsControllerFindOneQuery, BudgetsControllerFindOneQueryResponse } from "./ts/BudgetsControllerFindOne.ts";
+export type { BudgetsControllerRemove200, BudgetsControllerRemoveMutation, BudgetsControllerRemoveMutationResponse, BudgetsControllerRemovePathParams } from "./ts/BudgetsControllerRemove.ts";
+export type { BudgetsControllerUpdate200, BudgetsControllerUpdateMutation, BudgetsControllerUpdateMutationRequest, BudgetsControllerUpdateMutationResponse, BudgetsControllerUpdatePathParams } from "./ts/BudgetsControllerUpdate.ts";
+export type { ClinicProceduresControllerCreate201, ClinicProceduresControllerCreateMutation, ClinicProceduresControllerCreateMutationRequest, ClinicProceduresControllerCreateMutationResponse } from "./ts/ClinicProceduresControllerCreate.ts";
+export type { ClinicProceduresControllerFindAll200, ClinicProceduresControllerFindAllQuery, ClinicProceduresControllerFindAllQueryResponse } from "./ts/ClinicProceduresControllerFindAll.ts";
+export type { ClinicProceduresControllerFindOne200, ClinicProceduresControllerFindOnePathParams, ClinicProceduresControllerFindOneQuery, ClinicProceduresControllerFindOneQueryResponse } from "./ts/ClinicProceduresControllerFindOne.ts";
+export type { ClinicProceduresControllerRemove200, ClinicProceduresControllerRemoveMutation, ClinicProceduresControllerRemoveMutationResponse, ClinicProceduresControllerRemovePathParams } from "./ts/ClinicProceduresControllerRemove.ts";
+export type { ClinicProceduresControllerUpdate200, ClinicProceduresControllerUpdateMutation, ClinicProceduresControllerUpdateMutationRequest, ClinicProceduresControllerUpdateMutationResponse, ClinicProceduresControllerUpdatePathParams } from "./ts/ClinicProceduresControllerUpdate.ts";
+export type { ClinicUserDto } from "./ts/ClinicUserDto.ts";
+export type { ClinicsControllerCreate201, ClinicsControllerCreateMutation, ClinicsControllerCreateMutationRequest, ClinicsControllerCreateMutationResponse } from "./ts/ClinicsControllerCreate.ts";
+export type { ClinicsControllerGetActive200, ClinicsControllerGetActiveQuery, ClinicsControllerGetActiveQueryResponse } from "./ts/ClinicsControllerGetActive.ts";
+export type { ClinicsControllerGetMyClinics200, ClinicsControllerGetMyClinicsQuery, ClinicsControllerGetMyClinicsQueryResponse } from "./ts/ClinicsControllerGetMyClinics.ts";
+export type { ClinicsControllerUpdateActive200, ClinicsControllerUpdateActiveMutation, ClinicsControllerUpdateActiveMutationRequest, ClinicsControllerUpdateActiveMutationResponse } from "./ts/ClinicsControllerUpdateActive.ts";
+export type { ClinicsControllerUploadLogo200, ClinicsControllerUploadLogoMutation, ClinicsControllerUploadLogoMutationResponse } from "./ts/ClinicsControllerUploadLogo.ts";
 export type { CompleteClinicDto } from "./ts/CompleteClinicDto.ts";
 export type { CreateAnamnesisDto } from "./ts/CreateAnamnesisDto.ts";
 export type { CreateAppointmentDto } from "./ts/CreateAppointmentDto.ts";
 export type { CreateBudgetDto } from "./ts/CreateBudgetDto.ts";
 export type { CreateClinicDto } from "./ts/CreateClinicDto.ts";
-export type { CreateClinicProcedureDto } from "./ts/CreateClinicProcedureDto.ts";
-export type {
-  CreatePatientDocumentDtoTypeEnumKey,
-  CreatePatientDocumentDto,
-} from "./ts/CreatePatientDocumentDto.ts";
+export type { CreateClinicProcedureDto, CreateClinicProcedureDtoSelectionModeEnumKey } from "./ts/CreateClinicProcedureDto.ts";
+export type { CreatePatientDocumentDto, CreatePatientDocumentDtoTypeEnumKey } from "./ts/CreatePatientDocumentDto.ts";
 export type { CreatePatientDto } from "./ts/CreatePatientDto.ts";
-export type {
-  CreatePaymentDtoMethodEnumKey,
-  CreatePaymentDtoStatusEnumKey,
-  CreatePaymentDto,
-} from "./ts/CreatePaymentDto.ts";
+export type { CreatePaymentDto, CreatePaymentDtoMethodEnumKey, CreatePaymentDtoStatusEnumKey } from "./ts/CreatePaymentDto.ts";
 export type { CreateProcedureDto } from "./ts/CreateProcedureDto.ts";
-export type {
-  CreateTreatmentPlanDtoStatusEnumKey,
-  CreateTreatmentPlanDto,
-} from "./ts/CreateTreatmentPlanDto.ts";
-export type {
-  DashboardControllerGetRevenueHistoryQueryParams,
-  DashboardControllerGetRevenueHistory200,
-  DashboardControllerGetRevenueHistoryQueryResponse,
-  DashboardControllerGetRevenueHistoryQuery,
-} from "./ts/DashboardControllerGetRevenueHistory.ts";
-export type {
-  DashboardControllerGetStats200,
-  DashboardControllerGetStatsQueryResponse,
-  DashboardControllerGetStatsQuery,
-} from "./ts/DashboardControllerGetStats.ts";
-export type {
-  DocumentsControllerCreate201,
-  DocumentsControllerCreateMutationRequest,
-  DocumentsControllerCreateMutationResponse,
-  DocumentsControllerCreateMutation,
-} from "./ts/DocumentsControllerCreate.ts";
-export type {
-  DocumentsControllerFindAllQueryParams,
-  DocumentsControllerFindAll200,
-  DocumentsControllerFindAllQueryResponse,
-  DocumentsControllerFindAllQuery,
-} from "./ts/DocumentsControllerFindAll.ts";
-export type {
-  DocumentsControllerFindOnePathParams,
-  DocumentsControllerFindOne200,
-  DocumentsControllerFindOneQueryResponse,
-  DocumentsControllerFindOneQuery,
-} from "./ts/DocumentsControllerFindOne.ts";
-export type {
-  DocumentsControllerRemovePathParams,
-  DocumentsControllerRemove200,
-  DocumentsControllerRemoveMutationResponse,
-  DocumentsControllerRemoveMutation,
-} from "./ts/DocumentsControllerRemove.ts";
-export type {
-  DocumentsControllerUpdatePathParams,
-  DocumentsControllerUpdate200,
-  DocumentsControllerUpdateMutationRequest,
-  DocumentsControllerUpdateMutationResponse,
-  DocumentsControllerUpdateMutation,
-} from "./ts/DocumentsControllerUpdate.ts";
-export type {
-  ExamsControllerFindAllByPatientPathParams,
-  ExamsControllerFindAllByPatient200,
-  ExamsControllerFindAllByPatientQueryResponse,
-  ExamsControllerFindAllByPatientQuery,
-} from "./ts/ExamsControllerFindAllByPatient.ts";
-export type {
-  ExamsControllerRemovePathParams,
-  ExamsControllerRemove200,
-  ExamsControllerRemoveMutationResponse,
-  ExamsControllerRemoveMutation,
-} from "./ts/ExamsControllerRemove.ts";
-export type {
-  ExamsControllerUpload201,
-  ExamsControllerUploadMutationRequest,
-  ExamsControllerUploadMutationResponse,
-  ExamsControllerUploadMutation,
-} from "./ts/ExamsControllerUpload.ts";
+export type { CreateTreatmentPlanDto, CreateTreatmentPlanDtoStatusEnumKey } from "./ts/CreateTreatmentPlanDto.ts";
+export type { DashboardControllerGetRevenueHistory200, DashboardControllerGetRevenueHistoryQuery, DashboardControllerGetRevenueHistoryQueryParams, DashboardControllerGetRevenueHistoryQueryResponse } from "./ts/DashboardControllerGetRevenueHistory.ts";
+export type { DashboardControllerGetStats200, DashboardControllerGetStatsQuery, DashboardControllerGetStatsQueryResponse } from "./ts/DashboardControllerGetStats.ts";
+export type { DocumentsControllerCreate201, DocumentsControllerCreateMutation, DocumentsControllerCreateMutationRequest, DocumentsControllerCreateMutationResponse } from "./ts/DocumentsControllerCreate.ts";
+export type { DocumentsControllerFindAll200, DocumentsControllerFindAllQuery, DocumentsControllerFindAllQueryParams, DocumentsControllerFindAllQueryResponse } from "./ts/DocumentsControllerFindAll.ts";
+export type { DocumentsControllerFindOne200, DocumentsControllerFindOnePathParams, DocumentsControllerFindOneQuery, DocumentsControllerFindOneQueryResponse } from "./ts/DocumentsControllerFindOne.ts";
+export type { DocumentsControllerRemove200, DocumentsControllerRemoveMutation, DocumentsControllerRemoveMutationResponse, DocumentsControllerRemovePathParams } from "./ts/DocumentsControllerRemove.ts";
+export type { DocumentsControllerUpdate200, DocumentsControllerUpdateMutation, DocumentsControllerUpdateMutationRequest, DocumentsControllerUpdateMutationResponse, DocumentsControllerUpdatePathParams } from "./ts/DocumentsControllerUpdate.ts";
+export type { ExamsControllerFindAllByPatient200, ExamsControllerFindAllByPatientPathParams, ExamsControllerFindAllByPatientQuery, ExamsControllerFindAllByPatientQueryResponse } from "./ts/ExamsControllerFindAllByPatient.ts";
+export type { ExamsControllerRemove200, ExamsControllerRemoveMutation, ExamsControllerRemoveMutationResponse, ExamsControllerRemovePathParams } from "./ts/ExamsControllerRemove.ts";
+export type { ExamsControllerUpload201, ExamsControllerUploadMutation, ExamsControllerUploadMutationRequest, ExamsControllerUploadMutationResponse } from "./ts/ExamsControllerUpload.ts";
 export type { ForgotPasswordDto } from "./ts/ForgotPasswordDto.ts";
 export type { InitiateRegistrationDto } from "./ts/InitiateRegistrationDto.ts";
-export type {
-  InviteUserDtoRoleEnumKey,
-  InviteUserDto,
-} from "./ts/InviteUserDto.ts";
+export type { InviteUserDto, InviteUserDtoRoleEnumKey } from "./ts/InviteUserDto.ts";
 export type { LoginDto } from "./ts/LoginDto.ts";
-export type {
-  NotificationsControllerFindAll200,
-  NotificationsControllerFindAllQueryResponse,
-  NotificationsControllerFindAllQuery,
-} from "./ts/NotificationsControllerFindAll.ts";
-export type {
-  NotificationsControllerMarkAllAsRead200,
-  NotificationsControllerMarkAllAsReadMutationResponse,
-  NotificationsControllerMarkAllAsReadMutation,
-} from "./ts/NotificationsControllerMarkAllAsRead.ts";
-export type {
-  NotificationsControllerMarkAsReadPathParams,
-  NotificationsControllerMarkAsRead200,
-  NotificationsControllerMarkAsReadMutationResponse,
-  NotificationsControllerMarkAsReadMutation,
-} from "./ts/NotificationsControllerMarkAsRead.ts";
+export type { NotificationsControllerFindAll200, NotificationsControllerFindAllQuery, NotificationsControllerFindAllQueryResponse } from "./ts/NotificationsControllerFindAll.ts";
+export type { NotificationsControllerMarkAllAsRead200, NotificationsControllerMarkAllAsReadMutation, NotificationsControllerMarkAllAsReadMutationResponse } from "./ts/NotificationsControllerMarkAllAsRead.ts";
+export type { NotificationsControllerMarkAsRead200, NotificationsControllerMarkAsReadMutation, NotificationsControllerMarkAsReadMutationResponse, NotificationsControllerMarkAsReadPathParams } from "./ts/NotificationsControllerMarkAsRead.ts";
 export type { PatientResponseDto } from "./ts/PatientResponseDto.ts";
-export type {
-  PatientsControllerCreate201,
-  PatientsControllerCreateMutationRequest,
-  PatientsControllerCreateMutationResponse,
-  PatientsControllerCreateMutation,
-} from "./ts/PatientsControllerCreate.ts";
-export type {
-  PatientsControllerFindAll200,
-  PatientsControllerFindAllQueryResponse,
-  PatientsControllerFindAllQuery,
-} from "./ts/PatientsControllerFindAll.ts";
-export type {
-  PatientsControllerFindOnePathParams,
-  PatientsControllerFindOne200,
-  PatientsControllerFindOneQueryResponse,
-  PatientsControllerFindOneQuery,
-} from "./ts/PatientsControllerFindOne.ts";
-export type {
-  PatientsControllerRemovePathParams,
-  PatientsControllerRemove200,
-  PatientsControllerRemoveMutationResponse,
-  PatientsControllerRemoveMutation,
-} from "./ts/PatientsControllerRemove.ts";
-export type {
-  PatientsControllerUpdatePathParams,
-  PatientsControllerUpdate200,
-  PatientsControllerUpdateMutationRequest,
-  PatientsControllerUpdateMutationResponse,
-  PatientsControllerUpdateMutation,
-} from "./ts/PatientsControllerUpdate.ts";
-export type {
-  PaymentsControllerCreate201,
-  PaymentsControllerCreateMutationRequest,
-  PaymentsControllerCreateMutationResponse,
-  PaymentsControllerCreateMutation,
-} from "./ts/PaymentsControllerCreate.ts";
-export type {
-  PaymentsControllerFindAllByPatientPathParams,
-  PaymentsControllerFindAllByPatient200,
-  PaymentsControllerFindAllByPatientQueryResponse,
-  PaymentsControllerFindAllByPatientQuery,
-} from "./ts/PaymentsControllerFindAllByPatient.ts";
-export type {
-  PaymentsControllerFindOnePathParams,
-  PaymentsControllerFindOne200,
-  PaymentsControllerFindOneQueryResponse,
-  PaymentsControllerFindOneQuery,
-} from "./ts/PaymentsControllerFindOne.ts";
-export type {
-  PaymentsControllerRemovePathParams,
-  PaymentsControllerRemove200,
-  PaymentsControllerRemoveMutationResponse,
-  PaymentsControllerRemoveMutation,
-} from "./ts/PaymentsControllerRemove.ts";
-export type {
-  PaymentsControllerUpdatePathParams,
-  PaymentsControllerUpdate200,
-  PaymentsControllerUpdateMutationRequest,
-  PaymentsControllerUpdateMutationResponse,
-  PaymentsControllerUpdateMutation,
-} from "./ts/PaymentsControllerUpdate.ts";
-export type {
-  ProceduresControllerCreate201,
-  ProceduresControllerCreateMutationRequest,
-  ProceduresControllerCreateMutationResponse,
-  ProceduresControllerCreateMutation,
-} from "./ts/ProceduresControllerCreate.ts";
-export type {
-  ProceduresControllerFindAllByPatientPathParams,
-  ProceduresControllerFindAllByPatient200,
-  ProceduresControllerFindAllByPatientQueryResponse,
-  ProceduresControllerFindAllByPatientQuery,
-} from "./ts/ProceduresControllerFindAllByPatient.ts";
-export type {
-  ProceduresControllerFindOnePathParams,
-  ProceduresControllerFindOne200,
-  ProceduresControllerFindOneQueryResponse,
-  ProceduresControllerFindOneQuery,
-} from "./ts/ProceduresControllerFindOne.ts";
-export type {
-  ProceduresControllerRemovePathParams,
-  ProceduresControllerRemove200,
-  ProceduresControllerRemoveMutationResponse,
-  ProceduresControllerRemoveMutation,
-} from "./ts/ProceduresControllerRemove.ts";
-export type {
-  ProceduresControllerUpdatePathParams,
-  ProceduresControllerUpdate200,
-  ProceduresControllerUpdateMutationRequest,
-  ProceduresControllerUpdateMutationResponse,
-  ProceduresControllerUpdateMutation,
-} from "./ts/ProceduresControllerUpdate.ts";
+export type { PatientsControllerCreate201, PatientsControllerCreateMutation, PatientsControllerCreateMutationRequest, PatientsControllerCreateMutationResponse } from "./ts/PatientsControllerCreate.ts";
+export type { PatientsControllerFindAll200, PatientsControllerFindAllQuery, PatientsControllerFindAllQueryResponse } from "./ts/PatientsControllerFindAll.ts";
+export type { PatientsControllerFindOne200, PatientsControllerFindOnePathParams, PatientsControllerFindOneQuery, PatientsControllerFindOneQueryResponse } from "./ts/PatientsControllerFindOne.ts";
+export type { PatientsControllerRemove200, PatientsControllerRemoveMutation, PatientsControllerRemoveMutationResponse, PatientsControllerRemovePathParams } from "./ts/PatientsControllerRemove.ts";
+export type { PatientsControllerUpdate200, PatientsControllerUpdateMutation, PatientsControllerUpdateMutationRequest, PatientsControllerUpdateMutationResponse, PatientsControllerUpdatePathParams } from "./ts/PatientsControllerUpdate.ts";
+export type { PaymentsControllerCreate201, PaymentsControllerCreateMutation, PaymentsControllerCreateMutationRequest, PaymentsControllerCreateMutationResponse } from "./ts/PaymentsControllerCreate.ts";
+export type { PaymentsControllerFindAllByPatient200, PaymentsControllerFindAllByPatientPathParams, PaymentsControllerFindAllByPatientQuery, PaymentsControllerFindAllByPatientQueryResponse } from "./ts/PaymentsControllerFindAllByPatient.ts";
+export type { PaymentsControllerFindOne200, PaymentsControllerFindOnePathParams, PaymentsControllerFindOneQuery, PaymentsControllerFindOneQueryResponse } from "./ts/PaymentsControllerFindOne.ts";
+export type { PaymentsControllerRemove200, PaymentsControllerRemoveMutation, PaymentsControllerRemoveMutationResponse, PaymentsControllerRemovePathParams } from "./ts/PaymentsControllerRemove.ts";
+export type { PaymentsControllerUpdate200, PaymentsControllerUpdateMutation, PaymentsControllerUpdateMutationRequest, PaymentsControllerUpdateMutationResponse, PaymentsControllerUpdatePathParams } from "./ts/PaymentsControllerUpdate.ts";
+export type { ProceduresControllerCreate201, ProceduresControllerCreateMutation, ProceduresControllerCreateMutationRequest, ProceduresControllerCreateMutationResponse } from "./ts/ProceduresControllerCreate.ts";
+export type { ProceduresControllerFindAllByPatient200, ProceduresControllerFindAllByPatientPathParams, ProceduresControllerFindAllByPatientQuery, ProceduresControllerFindAllByPatientQueryResponse } from "./ts/ProceduresControllerFindAllByPatient.ts";
+export type { ProceduresControllerFindOne200, ProceduresControllerFindOnePathParams, ProceduresControllerFindOneQuery, ProceduresControllerFindOneQueryResponse } from "./ts/ProceduresControllerFindOne.ts";
+export type { ProceduresControllerRemove200, ProceduresControllerRemoveMutation, ProceduresControllerRemoveMutationResponse, ProceduresControllerRemovePathParams } from "./ts/ProceduresControllerRemove.ts";
+export type { ProceduresControllerUpdate200, ProceduresControllerUpdateMutation, ProceduresControllerUpdateMutationRequest, ProceduresControllerUpdateMutationResponse, ProceduresControllerUpdatePathParams } from "./ts/ProceduresControllerUpdate.ts";
 export type { RegisterInvitationDto } from "./ts/RegisterInvitationDto.ts";
 export type { RegisterTenantDto } from "./ts/RegisterTenantDto.ts";
 export type { ResetPasswordDto } from "./ts/ResetPasswordDto.ts";
-export type {
-  StripeWebhookControllerHandleWebhookHeaderParams,
-  StripeWebhookControllerHandleWebhook201,
-  StripeWebhookControllerHandleWebhookMutationResponse,
-  StripeWebhookControllerHandleWebhookMutation,
-} from "./ts/StripeWebhookControllerHandleWebhook.ts";
-export type {
-  SubscriptionControllerCreateCheckoutSession201,
-  SubscriptionControllerCreateCheckoutSessionMutationResponse,
-  SubscriptionControllerCreateCheckoutSessionMutation,
-} from "./ts/SubscriptionControllerCreateCheckoutSession.ts";
-export type {
-  SubscriptionControllerCreatePortalSession201,
-  SubscriptionControllerCreatePortalSessionMutationResponse,
-  SubscriptionControllerCreatePortalSessionMutation,
-} from "./ts/SubscriptionControllerCreatePortalSession.ts";
-export type {
-  SubscriptionControllerGetStatus200,
-  SubscriptionControllerGetStatusQueryResponse,
-  SubscriptionControllerGetStatusQuery,
-} from "./ts/SubscriptionControllerGetStatus.ts";
-export type {
-  TreatmentPlanItemDtoStatusEnumKey,
-  TreatmentPlanItemDto,
-} from "./ts/TreatmentPlanItemDto.ts";
-export type {
-  TreatmentPlansControllerCreate201,
-  TreatmentPlansControllerCreateMutationRequest,
-  TreatmentPlansControllerCreateMutationResponse,
-  TreatmentPlansControllerCreateMutation,
-} from "./ts/TreatmentPlansControllerCreate.ts";
-export type {
-  TreatmentPlansControllerFindAll200,
-  TreatmentPlansControllerFindAllQueryResponse,
-  TreatmentPlansControllerFindAllQuery,
-} from "./ts/TreatmentPlansControllerFindAll.ts";
-export type {
-  TreatmentPlansControllerFindOnePathParams,
-  TreatmentPlansControllerFindOne200,
-  TreatmentPlansControllerFindOneQueryResponse,
-  TreatmentPlansControllerFindOneQuery,
-} from "./ts/TreatmentPlansControllerFindOne.ts";
-export type {
-  TreatmentPlansControllerRemovePathParams,
-  TreatmentPlansControllerRemove200,
-  TreatmentPlansControllerRemoveMutationResponse,
-  TreatmentPlansControllerRemoveMutation,
-} from "./ts/TreatmentPlansControllerRemove.ts";
-export type {
-  TreatmentPlansControllerUpdatePathParams,
-  TreatmentPlansControllerUpdate200,
-  TreatmentPlansControllerUpdateMutationRequest,
-  TreatmentPlansControllerUpdateMutationResponse,
-  TreatmentPlansControllerUpdateMutation,
-} from "./ts/TreatmentPlansControllerUpdate.ts";
+export type { StripeWebhookControllerHandleWebhook201, StripeWebhookControllerHandleWebhookHeaderParams, StripeWebhookControllerHandleWebhookMutation, StripeWebhookControllerHandleWebhookMutationResponse } from "./ts/StripeWebhookControllerHandleWebhook.ts";
+export type { SubscriptionControllerCreateCheckoutSession201, SubscriptionControllerCreateCheckoutSessionMutation, SubscriptionControllerCreateCheckoutSessionMutationResponse } from "./ts/SubscriptionControllerCreateCheckoutSession.ts";
+export type { SubscriptionControllerCreatePortalSession201, SubscriptionControllerCreatePortalSessionMutation, SubscriptionControllerCreatePortalSessionMutationResponse } from "./ts/SubscriptionControllerCreatePortalSession.ts";
+export type { SubscriptionControllerGetStatus200, SubscriptionControllerGetStatusQuery, SubscriptionControllerGetStatusQueryResponse } from "./ts/SubscriptionControllerGetStatus.ts";
+export type { TreatmentPlanItemDto, TreatmentPlanItemDtoStatusEnumKey } from "./ts/TreatmentPlanItemDto.ts";
+export type { TreatmentPlansControllerCreate201, TreatmentPlansControllerCreateMutation, TreatmentPlansControllerCreateMutationRequest, TreatmentPlansControllerCreateMutationResponse } from "./ts/TreatmentPlansControllerCreate.ts";
+export type { TreatmentPlansControllerFindAll200, TreatmentPlansControllerFindAllQuery, TreatmentPlansControllerFindAllQueryResponse } from "./ts/TreatmentPlansControllerFindAll.ts";
+export type { TreatmentPlansControllerFindOne200, TreatmentPlansControllerFindOnePathParams, TreatmentPlansControllerFindOneQuery, TreatmentPlansControllerFindOneQueryResponse } from "./ts/TreatmentPlansControllerFindOne.ts";
+export type { TreatmentPlansControllerRemove200, TreatmentPlansControllerRemoveMutation, TreatmentPlansControllerRemoveMutationResponse, TreatmentPlansControllerRemovePathParams } from "./ts/TreatmentPlansControllerRemove.ts";
+export type { TreatmentPlansControllerUpdate200, TreatmentPlansControllerUpdateMutation, TreatmentPlansControllerUpdateMutationRequest, TreatmentPlansControllerUpdateMutationResponse, TreatmentPlansControllerUpdatePathParams } from "./ts/TreatmentPlansControllerUpdate.ts";
 export type { UpdateAnamnesisDto } from "./ts/UpdateAnamnesisDto.ts";
-export type {
-  UpdateAppointmentDtoStatusEnumKey,
-  UpdateAppointmentDtoCancelledByEnumKey,
-  UpdateAppointmentDto,
-} from "./ts/UpdateAppointmentDto.ts";
+export type { UpdateAppointmentDto, UpdateAppointmentDtoCancelledByEnumKey, UpdateAppointmentDtoStatusEnumKey } from "./ts/UpdateAppointmentDto.ts";
 export type { UpdateBudgetDto } from "./ts/UpdateBudgetDto.ts";
 export type { UpdateClinicDto } from "./ts/UpdateClinicDto.ts";
-export type { UpdateClinicProcedureDto } from "./ts/UpdateClinicProcedureDto.ts";
+export type { UpdateClinicProcedureDto, UpdateClinicProcedureDtoSelectionModeEnumKey } from "./ts/UpdateClinicProcedureDto.ts";
 export type { UpdatePatientDocumentDto } from "./ts/UpdatePatientDocumentDto.ts";
 export type { UpdatePatientDto } from "./ts/UpdatePatientDto.ts";
-export type {
-  UpdatePaymentDtoMethodEnumKey,
-  UpdatePaymentDtoStatusEnumKey,
-  UpdatePaymentDto,
-} from "./ts/UpdatePaymentDto.ts";
+export type { UpdatePaymentDto, UpdatePaymentDtoMethodEnumKey, UpdatePaymentDtoStatusEnumKey } from "./ts/UpdatePaymentDto.ts";
 export type { UpdateProcedureDto } from "./ts/UpdateProcedureDto.ts";
-export type {
-  UpdateTreatmentPlanDtoStatusEnumKey,
-  UpdateTreatmentPlanDto,
-} from "./ts/UpdateTreatmentPlanDto.ts";
-export type {
-  UpdateUserDtoRoleEnumKey,
-  UpdateUserDto,
-} from "./ts/UpdateUserDto.ts";
-export type {
-  UsersControllerFindAll200,
-  UsersControllerFindAllQueryResponse,
-  UsersControllerFindAllQuery,
-} from "./ts/UsersControllerFindAll.ts";
-export type {
-  UsersControllerFindAllInvitations200,
-  UsersControllerFindAllInvitationsQueryResponse,
-  UsersControllerFindAllInvitationsQuery,
-} from "./ts/UsersControllerFindAllInvitations.ts";
-export type {
-  UsersControllerFindInvitationPathParams,
-  UsersControllerFindInvitation200,
-  UsersControllerFindInvitationQueryResponse,
-  UsersControllerFindInvitationQuery,
-} from "./ts/UsersControllerFindInvitation.ts";
-export type {
-  UsersControllerInvite201,
-  UsersControllerInviteMutationRequest,
-  UsersControllerInviteMutationResponse,
-  UsersControllerInviteMutation,
-} from "./ts/UsersControllerInvite.ts";
-export type {
-  UsersControllerRemovePathParams,
-  UsersControllerRemove200,
-  UsersControllerRemoveMutationResponse,
-  UsersControllerRemoveMutation,
-} from "./ts/UsersControllerRemove.ts";
-export type {
-  UsersControllerUpdatePathParams,
-  UsersControllerUpdate200,
-  UsersControllerUpdateMutationRequest,
-  UsersControllerUpdateMutationResponse,
-  UsersControllerUpdateMutation,
-} from "./ts/UsersControllerUpdate.ts";
+export type { UpdateTreatmentPlanDto, UpdateTreatmentPlanDtoStatusEnumKey } from "./ts/UpdateTreatmentPlanDto.ts";
+export type { UpdateUserDto, UpdateUserDtoRoleEnumKey } from "./ts/UpdateUserDto.ts";
+export type { UsersControllerAcceptTerms201, UsersControllerAcceptTermsMutation, UsersControllerAcceptTermsMutationResponse } from "./ts/UsersControllerAcceptTerms.ts";
+export type { UsersControllerFindAll200, UsersControllerFindAllQuery, UsersControllerFindAllQueryResponse } from "./ts/UsersControllerFindAll.ts";
+export type { UsersControllerFindAllInvitations200, UsersControllerFindAllInvitationsQuery, UsersControllerFindAllInvitationsQueryResponse } from "./ts/UsersControllerFindAllInvitations.ts";
+export type { UsersControllerFindInvitation200, UsersControllerFindInvitationPathParams, UsersControllerFindInvitationQuery, UsersControllerFindInvitationQueryResponse } from "./ts/UsersControllerFindInvitation.ts";
+export type { UsersControllerInvite201, UsersControllerInviteMutation, UsersControllerInviteMutationRequest, UsersControllerInviteMutationResponse } from "./ts/UsersControllerInvite.ts";
+export type { UsersControllerRemove200, UsersControllerRemoveMutation, UsersControllerRemoveMutationResponse, UsersControllerRemovePathParams } from "./ts/UsersControllerRemove.ts";
+export type { UsersControllerRemoveAvatar200, UsersControllerRemoveAvatarMutation, UsersControllerRemoveAvatarMutationResponse } from "./ts/UsersControllerRemoveAvatar.ts";
+export type { UsersControllerUpdate200, UsersControllerUpdateMutation, UsersControllerUpdateMutationRequest, UsersControllerUpdateMutationResponse, UsersControllerUpdatePathParams } from "./ts/UsersControllerUpdate.ts";
+export type { UsersControllerUploadAvatar200, UsersControllerUploadAvatarMutation, UsersControllerUploadAvatarMutationRequest, UsersControllerUploadAvatarMutationResponse } from "./ts/UsersControllerUploadAvatar.ts";
 export type { VerifyEmailDto } from "./ts/VerifyEmailDto.ts";
 export { anamnesisControllerCreate } from "./clients/anamnesisControllerCreate.ts";
 export { anamnesisControllerFindAllByPatient } from "./clients/anamnesisControllerFindAllByPatient.ts";
@@ -679,6 +254,7 @@ export { appointmentsControllerRemove } from "./clients/appointmentsControllerRe
 export { appointmentsControllerUpdate } from "./clients/appointmentsControllerUpdate.ts";
 export { authControllerCompleteClinicSetup } from "./clients/authControllerCompleteClinicSetup.ts";
 export { authControllerForgotPassword } from "./clients/authControllerForgotPassword.ts";
+export { authControllerGetMe } from "./clients/authControllerGetMe.ts";
 export { authControllerInitiateRegistration } from "./clients/authControllerInitiateRegistration.ts";
 export { authControllerLogin } from "./clients/authControllerLogin.ts";
 export { authControllerLogout } from "./clients/authControllerLogout.ts";
@@ -739,12 +315,15 @@ export { treatmentPlansControllerFindAll } from "./clients/treatmentPlansControl
 export { treatmentPlansControllerFindOne } from "./clients/treatmentPlansControllerFindOne.ts";
 export { treatmentPlansControllerRemove } from "./clients/treatmentPlansControllerRemove.ts";
 export { treatmentPlansControllerUpdate } from "./clients/treatmentPlansControllerUpdate.ts";
+export { usersControllerAcceptTerms } from "./clients/usersControllerAcceptTerms.ts";
 export { usersControllerFindAll } from "./clients/usersControllerFindAll.ts";
 export { usersControllerFindAllInvitations } from "./clients/usersControllerFindAllInvitations.ts";
 export { usersControllerFindInvitation } from "./clients/usersControllerFindInvitation.ts";
 export { usersControllerInvite } from "./clients/usersControllerInvite.ts";
 export { usersControllerRemove } from "./clients/usersControllerRemove.ts";
+export { usersControllerRemoveAvatar } from "./clients/usersControllerRemoveAvatar.ts";
 export { usersControllerUpdate } from "./clients/usersControllerUpdate.ts";
+export { usersControllerUploadAvatar } from "./clients/usersControllerUploadAvatar.ts";
 export { anamnesisControllerCreateMutationKey } from "./hooks/useAnamnesisControllerCreate.ts";
 export { anamnesisControllerCreateMutationOptions } from "./hooks/useAnamnesisControllerCreate.ts";
 export { useAnamnesisControllerCreate } from "./hooks/useAnamnesisControllerCreate.ts";
@@ -817,6 +396,12 @@ export { useAuthControllerCompleteClinicSetup } from "./hooks/useAuthControllerC
 export { authControllerForgotPasswordMutationKey } from "./hooks/useAuthControllerForgotPassword.ts";
 export { authControllerForgotPasswordMutationOptions } from "./hooks/useAuthControllerForgotPassword.ts";
 export { useAuthControllerForgotPassword } from "./hooks/useAuthControllerForgotPassword.ts";
+export { authControllerGetMeQueryKey } from "./hooks/useAuthControllerGetMe.ts";
+export { authControllerGetMeQueryOptions } from "./hooks/useAuthControllerGetMe.ts";
+export { useAuthControllerGetMe } from "./hooks/useAuthControllerGetMe.ts";
+export { authControllerGetMeSuspenseQueryKey } from "./hooks/useAuthControllerGetMeSuspense.ts";
+export { authControllerGetMeSuspenseQueryOptions } from "./hooks/useAuthControllerGetMeSuspense.ts";
+export { useAuthControllerGetMeSuspense } from "./hooks/useAuthControllerGetMeSuspense.ts";
 export { authControllerInitiateRegistrationMutationKey } from "./hooks/useAuthControllerInitiateRegistration.ts";
 export { authControllerInitiateRegistrationMutationOptions } from "./hooks/useAuthControllerInitiateRegistration.ts";
 export { useAuthControllerInitiateRegistration } from "./hooks/useAuthControllerInitiateRegistration.ts";
@@ -1060,241 +645,99 @@ export { useTreatmentPlansControllerRemove } from "./hooks/useTreatmentPlansCont
 export { treatmentPlansControllerUpdateMutationKey } from "./hooks/useTreatmentPlansControllerUpdate.ts";
 export { treatmentPlansControllerUpdateMutationOptions } from "./hooks/useTreatmentPlansControllerUpdate.ts";
 export { useTreatmentPlansControllerUpdate } from "./hooks/useTreatmentPlansControllerUpdate.ts";
+export { useUsersControllerAcceptTerms } from "./hooks/useUsersControllerAcceptTerms.ts";
+export { usersControllerAcceptTermsMutationKey } from "./hooks/useUsersControllerAcceptTerms.ts";
+export { usersControllerAcceptTermsMutationOptions } from "./hooks/useUsersControllerAcceptTerms.ts";
+export { useUsersControllerFindAll } from "./hooks/useUsersControllerFindAll.ts";
 export { usersControllerFindAllQueryKey } from "./hooks/useUsersControllerFindAll.ts";
 export { usersControllerFindAllQueryOptions } from "./hooks/useUsersControllerFindAll.ts";
-export { useUsersControllerFindAll } from "./hooks/useUsersControllerFindAll.ts";
+export { useUsersControllerFindAllInvitations } from "./hooks/useUsersControllerFindAllInvitations.ts";
 export { usersControllerFindAllInvitationsQueryKey } from "./hooks/useUsersControllerFindAllInvitations.ts";
 export { usersControllerFindAllInvitationsQueryOptions } from "./hooks/useUsersControllerFindAllInvitations.ts";
-export { useUsersControllerFindAllInvitations } from "./hooks/useUsersControllerFindAllInvitations.ts";
+export { useUsersControllerFindAllInvitationsSuspense } from "./hooks/useUsersControllerFindAllInvitationsSuspense.ts";
 export { usersControllerFindAllInvitationsSuspenseQueryKey } from "./hooks/useUsersControllerFindAllInvitationsSuspense.ts";
 export { usersControllerFindAllInvitationsSuspenseQueryOptions } from "./hooks/useUsersControllerFindAllInvitationsSuspense.ts";
-export { useUsersControllerFindAllInvitationsSuspense } from "./hooks/useUsersControllerFindAllInvitationsSuspense.ts";
+export { useUsersControllerFindAllSuspense } from "./hooks/useUsersControllerFindAllSuspense.ts";
 export { usersControllerFindAllSuspenseQueryKey } from "./hooks/useUsersControllerFindAllSuspense.ts";
 export { usersControllerFindAllSuspenseQueryOptions } from "./hooks/useUsersControllerFindAllSuspense.ts";
-export { useUsersControllerFindAllSuspense } from "./hooks/useUsersControllerFindAllSuspense.ts";
+export { useUsersControllerFindInvitation } from "./hooks/useUsersControllerFindInvitation.ts";
 export { usersControllerFindInvitationQueryKey } from "./hooks/useUsersControllerFindInvitation.ts";
 export { usersControllerFindInvitationQueryOptions } from "./hooks/useUsersControllerFindInvitation.ts";
-export { useUsersControllerFindInvitation } from "./hooks/useUsersControllerFindInvitation.ts";
+export { useUsersControllerFindInvitationSuspense } from "./hooks/useUsersControllerFindInvitationSuspense.ts";
 export { usersControllerFindInvitationSuspenseQueryKey } from "./hooks/useUsersControllerFindInvitationSuspense.ts";
 export { usersControllerFindInvitationSuspenseQueryOptions } from "./hooks/useUsersControllerFindInvitationSuspense.ts";
-export { useUsersControllerFindInvitationSuspense } from "./hooks/useUsersControllerFindInvitationSuspense.ts";
+export { useUsersControllerInvite } from "./hooks/useUsersControllerInvite.ts";
 export { usersControllerInviteMutationKey } from "./hooks/useUsersControllerInvite.ts";
 export { usersControllerInviteMutationOptions } from "./hooks/useUsersControllerInvite.ts";
-export { useUsersControllerInvite } from "./hooks/useUsersControllerInvite.ts";
+export { useUsersControllerRemove } from "./hooks/useUsersControllerRemove.ts";
 export { usersControllerRemoveMutationKey } from "./hooks/useUsersControllerRemove.ts";
 export { usersControllerRemoveMutationOptions } from "./hooks/useUsersControllerRemove.ts";
-export { useUsersControllerRemove } from "./hooks/useUsersControllerRemove.ts";
+export { useUsersControllerRemoveAvatar } from "./hooks/useUsersControllerRemoveAvatar.ts";
+export { usersControllerRemoveAvatarMutationKey } from "./hooks/useUsersControllerRemoveAvatar.ts";
+export { usersControllerRemoveAvatarMutationOptions } from "./hooks/useUsersControllerRemoveAvatar.ts";
+export { useUsersControllerUpdate } from "./hooks/useUsersControllerUpdate.ts";
 export { usersControllerUpdateMutationKey } from "./hooks/useUsersControllerUpdate.ts";
 export { usersControllerUpdateMutationOptions } from "./hooks/useUsersControllerUpdate.ts";
-export { useUsersControllerUpdate } from "./hooks/useUsersControllerUpdate.ts";
+export { useUsersControllerUploadAvatar } from "./hooks/useUsersControllerUploadAvatar.ts";
+export { usersControllerUploadAvatarMutationKey } from "./hooks/useUsersControllerUploadAvatar.ts";
+export { usersControllerUploadAvatarMutationOptions } from "./hooks/useUsersControllerUploadAvatar.ts";
+export { createClinicProcedureDtoSelectionModeEnum } from "./ts/CreateClinicProcedureDto.ts";
 export { createPatientDocumentDtoTypeEnum } from "./ts/CreatePatientDocumentDto.ts";
 export { createPaymentDtoMethodEnum } from "./ts/CreatePaymentDto.ts";
 export { createPaymentDtoStatusEnum } from "./ts/CreatePaymentDto.ts";
 export { createTreatmentPlanDtoStatusEnum } from "./ts/CreateTreatmentPlanDto.ts";
 export { inviteUserDtoRoleEnum } from "./ts/InviteUserDto.ts";
 export { treatmentPlanItemDtoStatusEnum } from "./ts/TreatmentPlanItemDto.ts";
-export { updateAppointmentDtoStatusEnum } from "./ts/UpdateAppointmentDto.ts";
 export { updateAppointmentDtoCancelledByEnum } from "./ts/UpdateAppointmentDto.ts";
+export { updateAppointmentDtoStatusEnum } from "./ts/UpdateAppointmentDto.ts";
+export { updateClinicProcedureDtoSelectionModeEnum } from "./ts/UpdateClinicProcedureDto.ts";
 export { updatePaymentDtoMethodEnum } from "./ts/UpdatePaymentDto.ts";
 export { updatePaymentDtoStatusEnum } from "./ts/UpdatePaymentDto.ts";
 export { updateTreatmentPlanDtoStatusEnum } from "./ts/UpdateTreatmentPlanDto.ts";
 export { updateUserDtoRoleEnum } from "./ts/UpdateUserDto.ts";
 export { anamnesisAnswerDtoSchema } from "./zod/anamnesisAnswerDtoSchema.ts";
-export {
-  anamnesisControllerCreate201Schema,
-  anamnesisControllerCreateMutationRequestSchema,
-  anamnesisControllerCreateMutationResponseSchema,
-} from "./zod/anamnesisControllerCreateSchema.ts";
-export {
-  anamnesisControllerFindAllByPatientPathParamsSchema,
-  anamnesisControllerFindAllByPatient200Schema,
-  anamnesisControllerFindAllByPatientQueryResponseSchema,
-} from "./zod/anamnesisControllerFindAllByPatientSchema.ts";
-export {
-  anamnesisControllerFindOnePathParamsSchema,
-  anamnesisControllerFindOne200Schema,
-  anamnesisControllerFindOneQueryResponseSchema,
-} from "./zod/anamnesisControllerFindOneSchema.ts";
-export {
-  anamnesisControllerRemovePathParamsSchema,
-  anamnesisControllerRemove200Schema,
-  anamnesisControllerRemoveMutationResponseSchema,
-} from "./zod/anamnesisControllerRemoveSchema.ts";
-export {
-  anamnesisControllerUpdatePathParamsSchema,
-  anamnesisControllerUpdate200Schema,
-  anamnesisControllerUpdateMutationRequestSchema,
-  anamnesisControllerUpdateMutationResponseSchema,
-} from "./zod/anamnesisControllerUpdateSchema.ts";
+export { anamnesisControllerCreate201Schema, anamnesisControllerCreateMutationRequestSchema, anamnesisControllerCreateMutationResponseSchema } from "./zod/anamnesisControllerCreateSchema.ts";
+export { anamnesisControllerFindAllByPatient200Schema, anamnesisControllerFindAllByPatientPathParamsSchema, anamnesisControllerFindAllByPatientQueryResponseSchema } from "./zod/anamnesisControllerFindAllByPatientSchema.ts";
+export { anamnesisControllerFindOne200Schema, anamnesisControllerFindOnePathParamsSchema, anamnesisControllerFindOneQueryResponseSchema } from "./zod/anamnesisControllerFindOneSchema.ts";
+export { anamnesisControllerRemove200Schema, anamnesisControllerRemoveMutationResponseSchema, anamnesisControllerRemovePathParamsSchema } from "./zod/anamnesisControllerRemoveSchema.ts";
+export { anamnesisControllerUpdate200Schema, anamnesisControllerUpdateMutationRequestSchema, anamnesisControllerUpdateMutationResponseSchema, anamnesisControllerUpdatePathParamsSchema } from "./zod/anamnesisControllerUpdateSchema.ts";
 export { anamnesisDataDtoSchema } from "./zod/anamnesisDataDtoSchema.ts";
-export {
-  appControllerGetHello200Schema,
-  appControllerGetHelloQueryResponseSchema,
-} from "./zod/appControllerGetHelloSchema.ts";
-export {
-  appointmentsControllerCheckAvailabilityQueryParamsSchema,
-  appointmentsControllerCheckAvailability200Schema,
-  appointmentsControllerCheckAvailabilityQueryResponseSchema,
-} from "./zod/appointmentsControllerCheckAvailabilitySchema.ts";
-export {
-  appointmentsControllerCreate201Schema,
-  appointmentsControllerCreate400Schema,
-  appointmentsControllerCreateMutationRequestSchema,
-  appointmentsControllerCreateMutationResponseSchema,
-} from "./zod/appointmentsControllerCreateSchema.ts";
-export {
-  appointmentsControllerFindAllQueryParamsSchema,
-  appointmentsControllerFindAll200Schema,
-  appointmentsControllerFindAllQueryResponseSchema,
-} from "./zod/appointmentsControllerFindAllSchema.ts";
-export {
-  appointmentsControllerFindOnePathParamsSchema,
-  appointmentsControllerFindOne200Schema,
-  appointmentsControllerFindOneQueryResponseSchema,
-} from "./zod/appointmentsControllerFindOneSchema.ts";
-export {
-  appointmentsControllerGetAvailableSlotsQueryParamsSchema,
-  appointmentsControllerGetAvailableSlots200Schema,
-  appointmentsControllerGetAvailableSlotsQueryResponseSchema,
-} from "./zod/appointmentsControllerGetAvailableSlotsSchema.ts";
-export {
-  appointmentsControllerPublicCancelQueryParamsSchema,
-  appointmentsControllerPublicCancel200Schema,
-  appointmentsControllerPublicCancelQueryResponseSchema,
-} from "./zod/appointmentsControllerPublicCancelSchema.ts";
-export {
-  appointmentsControllerRemovePathParamsSchema,
-  appointmentsControllerRemove200Schema,
-  appointmentsControllerRemoveMutationResponseSchema,
-} from "./zod/appointmentsControllerRemoveSchema.ts";
-export {
-  appointmentsControllerUpdatePathParamsSchema,
-  appointmentsControllerUpdate200Schema,
-  appointmentsControllerUpdateMutationRequestSchema,
-  appointmentsControllerUpdateMutationResponseSchema,
-} from "./zod/appointmentsControllerUpdateSchema.ts";
-export {
-  authControllerCompleteClinicSetup201Schema,
-  authControllerCompleteClinicSetupMutationRequestSchema,
-  authControllerCompleteClinicSetupMutationResponseSchema,
-} from "./zod/authControllerCompleteClinicSetupSchema.ts";
-export {
-  authControllerForgotPassword200Schema,
-  authControllerForgotPasswordMutationRequestSchema,
-  authControllerForgotPasswordMutationResponseSchema,
-} from "./zod/authControllerForgotPasswordSchema.ts";
-export {
-  authControllerInitiateRegistration201Schema,
-  authControllerInitiateRegistrationMutationRequestSchema,
-  authControllerInitiateRegistrationMutationResponseSchema,
-} from "./zod/authControllerInitiateRegistrationSchema.ts";
-export {
-  authControllerLogin200Schema,
-  authControllerLogin401Schema,
-  authControllerLoginMutationRequestSchema,
-  authControllerLoginMutationResponseSchema,
-} from "./zod/authControllerLoginSchema.ts";
-export {
-  authControllerLogout200Schema,
-  authControllerLogoutMutationResponseSchema,
-} from "./zod/authControllerLogoutSchema.ts";
-export {
-  authControllerRefreshTokens200Schema,
-  authControllerRefreshTokensMutationResponseSchema,
-} from "./zod/authControllerRefreshTokensSchema.ts";
-export {
-  authControllerRegister201Schema,
-  authControllerRegisterMutationRequestSchema,
-  authControllerRegisterMutationResponseSchema,
-} from "./zod/authControllerRegisterSchema.ts";
-export {
-  authControllerRegisterTenant201Schema,
-  authControllerRegisterTenantMutationRequestSchema,
-  authControllerRegisterTenantMutationResponseSchema,
-} from "./zod/authControllerRegisterTenantSchema.ts";
-export {
-  authControllerResetPassword200Schema,
-  authControllerResetPasswordMutationRequestSchema,
-  authControllerResetPasswordMutationResponseSchema,
-} from "./zod/authControllerResetPasswordSchema.ts";
-export {
-  authControllerVerifyEmail201Schema,
-  authControllerVerifyEmailMutationRequestSchema,
-  authControllerVerifyEmailMutationResponseSchema,
-} from "./zod/authControllerVerifyEmailSchema.ts";
-export {
-  budgetsControllerCreate201Schema,
-  budgetsControllerCreateMutationRequestSchema,
-  budgetsControllerCreateMutationResponseSchema,
-} from "./zod/budgetsControllerCreateSchema.ts";
-export {
-  budgetsControllerFindAllByPatientPathParamsSchema,
-  budgetsControllerFindAllByPatient200Schema,
-  budgetsControllerFindAllByPatientQueryResponseSchema,
-} from "./zod/budgetsControllerFindAllByPatientSchema.ts";
-export {
-  budgetsControllerFindOnePathParamsSchema,
-  budgetsControllerFindOne200Schema,
-  budgetsControllerFindOneQueryResponseSchema,
-} from "./zod/budgetsControllerFindOneSchema.ts";
-export {
-  budgetsControllerRemovePathParamsSchema,
-  budgetsControllerRemove200Schema,
-  budgetsControllerRemoveMutationResponseSchema,
-} from "./zod/budgetsControllerRemoveSchema.ts";
-export {
-  budgetsControllerUpdatePathParamsSchema,
-  budgetsControllerUpdate200Schema,
-  budgetsControllerUpdateMutationRequestSchema,
-  budgetsControllerUpdateMutationResponseSchema,
-} from "./zod/budgetsControllerUpdateSchema.ts";
-export {
-  clinicProceduresControllerCreate201Schema,
-  clinicProceduresControllerCreateMutationRequestSchema,
-  clinicProceduresControllerCreateMutationResponseSchema,
-} from "./zod/clinicProceduresControllerCreateSchema.ts";
-export {
-  clinicProceduresControllerFindAll200Schema,
-  clinicProceduresControllerFindAllQueryResponseSchema,
-} from "./zod/clinicProceduresControllerFindAllSchema.ts";
-export {
-  clinicProceduresControllerFindOnePathParamsSchema,
-  clinicProceduresControllerFindOne200Schema,
-  clinicProceduresControllerFindOneQueryResponseSchema,
-} from "./zod/clinicProceduresControllerFindOneSchema.ts";
-export {
-  clinicProceduresControllerRemovePathParamsSchema,
-  clinicProceduresControllerRemove200Schema,
-  clinicProceduresControllerRemoveMutationResponseSchema,
-} from "./zod/clinicProceduresControllerRemoveSchema.ts";
-export {
-  clinicProceduresControllerUpdatePathParamsSchema,
-  clinicProceduresControllerUpdate200Schema,
-  clinicProceduresControllerUpdateMutationRequestSchema,
-  clinicProceduresControllerUpdateMutationResponseSchema,
-} from "./zod/clinicProceduresControllerUpdateSchema.ts";
-export {
-  clinicsControllerCreate201Schema,
-  clinicsControllerCreateMutationRequestSchema,
-  clinicsControllerCreateMutationResponseSchema,
-} from "./zod/clinicsControllerCreateSchema.ts";
-export {
-  clinicsControllerGetActive200Schema,
-  clinicsControllerGetActiveQueryResponseSchema,
-} from "./zod/clinicsControllerGetActiveSchema.ts";
-export {
-  clinicsControllerGetMyClinics200Schema,
-  clinicsControllerGetMyClinicsQueryResponseSchema,
-} from "./zod/clinicsControllerGetMyClinicsSchema.ts";
-export {
-  clinicsControllerUpdateActive200Schema,
-  clinicsControllerUpdateActiveMutationRequestSchema,
-  clinicsControllerUpdateActiveMutationResponseSchema,
-} from "./zod/clinicsControllerUpdateActiveSchema.ts";
-export {
-  clinicsControllerUploadLogo200Schema,
-  clinicsControllerUploadLogoMutationResponseSchema,
-} from "./zod/clinicsControllerUploadLogoSchema.ts";
+export { appControllerGetHello200Schema, appControllerGetHelloQueryResponseSchema } from "./zod/appControllerGetHelloSchema.ts";
+export { appointmentsControllerCheckAvailability200Schema, appointmentsControllerCheckAvailabilityQueryParamsSchema, appointmentsControllerCheckAvailabilityQueryResponseSchema } from "./zod/appointmentsControllerCheckAvailabilitySchema.ts";
+export { appointmentsControllerCreate201Schema, appointmentsControllerCreate400Schema, appointmentsControllerCreateMutationRequestSchema, appointmentsControllerCreateMutationResponseSchema } from "./zod/appointmentsControllerCreateSchema.ts";
+export { appointmentsControllerFindAll200Schema, appointmentsControllerFindAllQueryParamsSchema, appointmentsControllerFindAllQueryResponseSchema } from "./zod/appointmentsControllerFindAllSchema.ts";
+export { appointmentsControllerFindOne200Schema, appointmentsControllerFindOnePathParamsSchema, appointmentsControllerFindOneQueryResponseSchema } from "./zod/appointmentsControllerFindOneSchema.ts";
+export { appointmentsControllerGetAvailableSlots200Schema, appointmentsControllerGetAvailableSlotsQueryParamsSchema, appointmentsControllerGetAvailableSlotsQueryResponseSchema } from "./zod/appointmentsControllerGetAvailableSlotsSchema.ts";
+export { appointmentsControllerPublicCancel200Schema, appointmentsControllerPublicCancelQueryParamsSchema, appointmentsControllerPublicCancelQueryResponseSchema } from "./zod/appointmentsControllerPublicCancelSchema.ts";
+export { appointmentsControllerRemove200Schema, appointmentsControllerRemoveMutationResponseSchema, appointmentsControllerRemovePathParamsSchema } from "./zod/appointmentsControllerRemoveSchema.ts";
+export { appointmentsControllerUpdate200Schema, appointmentsControllerUpdateMutationRequestSchema, appointmentsControllerUpdateMutationResponseSchema, appointmentsControllerUpdatePathParamsSchema } from "./zod/appointmentsControllerUpdateSchema.ts";
+export { authControllerCompleteClinicSetup201Schema, authControllerCompleteClinicSetupMutationRequestSchema, authControllerCompleteClinicSetupMutationResponseSchema } from "./zod/authControllerCompleteClinicSetupSchema.ts";
+export { authControllerForgotPassword200Schema, authControllerForgotPasswordMutationRequestSchema, authControllerForgotPasswordMutationResponseSchema } from "./zod/authControllerForgotPasswordSchema.ts";
+export { authControllerGetMe200Schema, authControllerGetMeQueryResponseSchema } from "./zod/authControllerGetMeSchema.ts";
+export { authControllerInitiateRegistration201Schema, authControllerInitiateRegistrationMutationRequestSchema, authControllerInitiateRegistrationMutationResponseSchema } from "./zod/authControllerInitiateRegistrationSchema.ts";
+export { authControllerLogin200Schema, authControllerLogin401Schema, authControllerLoginMutationRequestSchema, authControllerLoginMutationResponseSchema } from "./zod/authControllerLoginSchema.ts";
+export { authControllerLogout200Schema, authControllerLogoutMutationResponseSchema } from "./zod/authControllerLogoutSchema.ts";
+export { authControllerRefreshTokens200Schema, authControllerRefreshTokensMutationResponseSchema } from "./zod/authControllerRefreshTokensSchema.ts";
+export { authControllerRegister201Schema, authControllerRegisterMutationRequestSchema, authControllerRegisterMutationResponseSchema } from "./zod/authControllerRegisterSchema.ts";
+export { authControllerRegisterTenant201Schema, authControllerRegisterTenantMutationRequestSchema, authControllerRegisterTenantMutationResponseSchema } from "./zod/authControllerRegisterTenantSchema.ts";
+export { authControllerResetPassword200Schema, authControllerResetPasswordMutationRequestSchema, authControllerResetPasswordMutationResponseSchema } from "./zod/authControllerResetPasswordSchema.ts";
+export { authControllerVerifyEmail201Schema, authControllerVerifyEmailMutationRequestSchema, authControllerVerifyEmailMutationResponseSchema } from "./zod/authControllerVerifyEmailSchema.ts";
+export { budgetsControllerCreate201Schema, budgetsControllerCreateMutationRequestSchema, budgetsControllerCreateMutationResponseSchema } from "./zod/budgetsControllerCreateSchema.ts";
+export { budgetsControllerFindAllByPatient200Schema, budgetsControllerFindAllByPatientPathParamsSchema, budgetsControllerFindAllByPatientQueryResponseSchema } from "./zod/budgetsControllerFindAllByPatientSchema.ts";
+export { budgetsControllerFindOne200Schema, budgetsControllerFindOnePathParamsSchema, budgetsControllerFindOneQueryResponseSchema } from "./zod/budgetsControllerFindOneSchema.ts";
+export { budgetsControllerRemove200Schema, budgetsControllerRemoveMutationResponseSchema, budgetsControllerRemovePathParamsSchema } from "./zod/budgetsControllerRemoveSchema.ts";
+export { budgetsControllerUpdate200Schema, budgetsControllerUpdateMutationRequestSchema, budgetsControllerUpdateMutationResponseSchema, budgetsControllerUpdatePathParamsSchema } from "./zod/budgetsControllerUpdateSchema.ts";
+export { clinicProceduresControllerCreate201Schema, clinicProceduresControllerCreateMutationRequestSchema, clinicProceduresControllerCreateMutationResponseSchema } from "./zod/clinicProceduresControllerCreateSchema.ts";
+export { clinicProceduresControllerFindAll200Schema, clinicProceduresControllerFindAllQueryResponseSchema } from "./zod/clinicProceduresControllerFindAllSchema.ts";
+export { clinicProceduresControllerFindOne200Schema, clinicProceduresControllerFindOnePathParamsSchema, clinicProceduresControllerFindOneQueryResponseSchema } from "./zod/clinicProceduresControllerFindOneSchema.ts";
+export { clinicProceduresControllerRemove200Schema, clinicProceduresControllerRemoveMutationResponseSchema, clinicProceduresControllerRemovePathParamsSchema } from "./zod/clinicProceduresControllerRemoveSchema.ts";
+export { clinicProceduresControllerUpdate200Schema, clinicProceduresControllerUpdateMutationRequestSchema, clinicProceduresControllerUpdateMutationResponseSchema, clinicProceduresControllerUpdatePathParamsSchema } from "./zod/clinicProceduresControllerUpdateSchema.ts";
+export { clinicUserDtoSchema } from "./zod/clinicUserDtoSchema.ts";
+export { clinicsControllerCreate201Schema, clinicsControllerCreateMutationRequestSchema, clinicsControllerCreateMutationResponseSchema } from "./zod/clinicsControllerCreateSchema.ts";
+export { clinicsControllerGetActive200Schema, clinicsControllerGetActiveQueryResponseSchema } from "./zod/clinicsControllerGetActiveSchema.ts";
+export { clinicsControllerGetMyClinics200Schema, clinicsControllerGetMyClinicsQueryResponseSchema } from "./zod/clinicsControllerGetMyClinicsSchema.ts";
+export { clinicsControllerUpdateActive200Schema, clinicsControllerUpdateActiveMutationRequestSchema, clinicsControllerUpdateActiveMutationResponseSchema } from "./zod/clinicsControllerUpdateActiveSchema.ts";
+export { clinicsControllerUploadLogo200Schema, clinicsControllerUploadLogoMutationResponseSchema } from "./zod/clinicsControllerUploadLogoSchema.ts";
 export { completeClinicDtoSchema } from "./zod/completeClinicDtoSchema.ts";
 export { createAnamnesisDtoSchema } from "./zod/createAnamnesisDtoSchema.ts";
 export { createAppointmentDtoSchema } from "./zod/createAppointmentDtoSchema.ts";
@@ -1306,197 +749,52 @@ export { createPatientDtoSchema } from "./zod/createPatientDtoSchema.ts";
 export { createPaymentDtoSchema } from "./zod/createPaymentDtoSchema.ts";
 export { createProcedureDtoSchema } from "./zod/createProcedureDtoSchema.ts";
 export { createTreatmentPlanDtoSchema } from "./zod/createTreatmentPlanDtoSchema.ts";
-export {
-  dashboardControllerGetRevenueHistoryQueryParamsSchema,
-  dashboardControllerGetRevenueHistory200Schema,
-  dashboardControllerGetRevenueHistoryQueryResponseSchema,
-} from "./zod/dashboardControllerGetRevenueHistorySchema.ts";
-export {
-  dashboardControllerGetStats200Schema,
-  dashboardControllerGetStatsQueryResponseSchema,
-} from "./zod/dashboardControllerGetStatsSchema.ts";
-export {
-  documentsControllerCreate201Schema,
-  documentsControllerCreateMutationRequestSchema,
-  documentsControllerCreateMutationResponseSchema,
-} from "./zod/documentsControllerCreateSchema.ts";
-export {
-  documentsControllerFindAllQueryParamsSchema,
-  documentsControllerFindAll200Schema,
-  documentsControllerFindAllQueryResponseSchema,
-} from "./zod/documentsControllerFindAllSchema.ts";
-export {
-  documentsControllerFindOnePathParamsSchema,
-  documentsControllerFindOne200Schema,
-  documentsControllerFindOneQueryResponseSchema,
-} from "./zod/documentsControllerFindOneSchema.ts";
-export {
-  documentsControllerRemovePathParamsSchema,
-  documentsControllerRemove200Schema,
-  documentsControllerRemoveMutationResponseSchema,
-} from "./zod/documentsControllerRemoveSchema.ts";
-export {
-  documentsControllerUpdatePathParamsSchema,
-  documentsControllerUpdate200Schema,
-  documentsControllerUpdateMutationRequestSchema,
-  documentsControllerUpdateMutationResponseSchema,
-} from "./zod/documentsControllerUpdateSchema.ts";
-export {
-  examsControllerFindAllByPatientPathParamsSchema,
-  examsControllerFindAllByPatient200Schema,
-  examsControllerFindAllByPatientQueryResponseSchema,
-} from "./zod/examsControllerFindAllByPatientSchema.ts";
-export {
-  examsControllerRemovePathParamsSchema,
-  examsControllerRemove200Schema,
-  examsControllerRemoveMutationResponseSchema,
-} from "./zod/examsControllerRemoveSchema.ts";
-export {
-  examsControllerUpload201Schema,
-  examsControllerUploadMutationRequestSchema,
-  examsControllerUploadMutationResponseSchema,
-} from "./zod/examsControllerUploadSchema.ts";
+export { dashboardControllerGetRevenueHistory200Schema, dashboardControllerGetRevenueHistoryQueryParamsSchema, dashboardControllerGetRevenueHistoryQueryResponseSchema } from "./zod/dashboardControllerGetRevenueHistorySchema.ts";
+export { dashboardControllerGetStats200Schema, dashboardControllerGetStatsQueryResponseSchema } from "./zod/dashboardControllerGetStatsSchema.ts";
+export { documentsControllerCreate201Schema, documentsControllerCreateMutationRequestSchema, documentsControllerCreateMutationResponseSchema } from "./zod/documentsControllerCreateSchema.ts";
+export { documentsControllerFindAll200Schema, documentsControllerFindAllQueryParamsSchema, documentsControllerFindAllQueryResponseSchema } from "./zod/documentsControllerFindAllSchema.ts";
+export { documentsControllerFindOne200Schema, documentsControllerFindOnePathParamsSchema, documentsControllerFindOneQueryResponseSchema } from "./zod/documentsControllerFindOneSchema.ts";
+export { documentsControllerRemove200Schema, documentsControllerRemoveMutationResponseSchema, documentsControllerRemovePathParamsSchema } from "./zod/documentsControllerRemoveSchema.ts";
+export { documentsControllerUpdate200Schema, documentsControllerUpdateMutationRequestSchema, documentsControllerUpdateMutationResponseSchema, documentsControllerUpdatePathParamsSchema } from "./zod/documentsControllerUpdateSchema.ts";
+export { examsControllerFindAllByPatient200Schema, examsControllerFindAllByPatientPathParamsSchema, examsControllerFindAllByPatientQueryResponseSchema } from "./zod/examsControllerFindAllByPatientSchema.ts";
+export { examsControllerRemove200Schema, examsControllerRemoveMutationResponseSchema, examsControllerRemovePathParamsSchema } from "./zod/examsControllerRemoveSchema.ts";
+export { examsControllerUpload201Schema, examsControllerUploadMutationRequestSchema, examsControllerUploadMutationResponseSchema } from "./zod/examsControllerUploadSchema.ts";
 export { forgotPasswordDtoSchema } from "./zod/forgotPasswordDtoSchema.ts";
 export { initiateRegistrationDtoSchema } from "./zod/initiateRegistrationDtoSchema.ts";
 export { inviteUserDtoSchema } from "./zod/inviteUserDtoSchema.ts";
 export { loginDtoSchema } from "./zod/loginDtoSchema.ts";
-export {
-  notificationsControllerFindAll200Schema,
-  notificationsControllerFindAllQueryResponseSchema,
-} from "./zod/notificationsControllerFindAllSchema.ts";
-export {
-  notificationsControllerMarkAllAsRead200Schema,
-  notificationsControllerMarkAllAsReadMutationResponseSchema,
-} from "./zod/notificationsControllerMarkAllAsReadSchema.ts";
-export {
-  notificationsControllerMarkAsReadPathParamsSchema,
-  notificationsControllerMarkAsRead200Schema,
-  notificationsControllerMarkAsReadMutationResponseSchema,
-} from "./zod/notificationsControllerMarkAsReadSchema.ts";
+export { notificationsControllerFindAll200Schema, notificationsControllerFindAllQueryResponseSchema } from "./zod/notificationsControllerFindAllSchema.ts";
+export { notificationsControllerMarkAllAsRead200Schema, notificationsControllerMarkAllAsReadMutationResponseSchema } from "./zod/notificationsControllerMarkAllAsReadSchema.ts";
+export { notificationsControllerMarkAsRead200Schema, notificationsControllerMarkAsReadMutationResponseSchema, notificationsControllerMarkAsReadPathParamsSchema } from "./zod/notificationsControllerMarkAsReadSchema.ts";
 export { patientResponseDtoSchema } from "./zod/patientResponseDtoSchema.ts";
-export {
-  patientsControllerCreate201Schema,
-  patientsControllerCreateMutationRequestSchema,
-  patientsControllerCreateMutationResponseSchema,
-} from "./zod/patientsControllerCreateSchema.ts";
-export {
-  patientsControllerFindAll200Schema,
-  patientsControllerFindAllQueryResponseSchema,
-} from "./zod/patientsControllerFindAllSchema.ts";
-export {
-  patientsControllerFindOnePathParamsSchema,
-  patientsControllerFindOne200Schema,
-  patientsControllerFindOneQueryResponseSchema,
-} from "./zod/patientsControllerFindOneSchema.ts";
-export {
-  patientsControllerRemovePathParamsSchema,
-  patientsControllerRemove200Schema,
-  patientsControllerRemoveMutationResponseSchema,
-} from "./zod/patientsControllerRemoveSchema.ts";
-export {
-  patientsControllerUpdatePathParamsSchema,
-  patientsControllerUpdate200Schema,
-  patientsControllerUpdateMutationRequestSchema,
-  patientsControllerUpdateMutationResponseSchema,
-} from "./zod/patientsControllerUpdateSchema.ts";
-export {
-  paymentsControllerCreate201Schema,
-  paymentsControllerCreateMutationRequestSchema,
-  paymentsControllerCreateMutationResponseSchema,
-} from "./zod/paymentsControllerCreateSchema.ts";
-export {
-  paymentsControllerFindAllByPatientPathParamsSchema,
-  paymentsControllerFindAllByPatient200Schema,
-  paymentsControllerFindAllByPatientQueryResponseSchema,
-} from "./zod/paymentsControllerFindAllByPatientSchema.ts";
-export {
-  paymentsControllerFindOnePathParamsSchema,
-  paymentsControllerFindOne200Schema,
-  paymentsControllerFindOneQueryResponseSchema,
-} from "./zod/paymentsControllerFindOneSchema.ts";
-export {
-  paymentsControllerRemovePathParamsSchema,
-  paymentsControllerRemove200Schema,
-  paymentsControllerRemoveMutationResponseSchema,
-} from "./zod/paymentsControllerRemoveSchema.ts";
-export {
-  paymentsControllerUpdatePathParamsSchema,
-  paymentsControllerUpdate200Schema,
-  paymentsControllerUpdateMutationRequestSchema,
-  paymentsControllerUpdateMutationResponseSchema,
-} from "./zod/paymentsControllerUpdateSchema.ts";
-export {
-  proceduresControllerCreate201Schema,
-  proceduresControllerCreateMutationRequestSchema,
-  proceduresControllerCreateMutationResponseSchema,
-} from "./zod/proceduresControllerCreateSchema.ts";
-export {
-  proceduresControllerFindAllByPatientPathParamsSchema,
-  proceduresControllerFindAllByPatient200Schema,
-  proceduresControllerFindAllByPatientQueryResponseSchema,
-} from "./zod/proceduresControllerFindAllByPatientSchema.ts";
-export {
-  proceduresControllerFindOnePathParamsSchema,
-  proceduresControllerFindOne200Schema,
-  proceduresControllerFindOneQueryResponseSchema,
-} from "./zod/proceduresControllerFindOneSchema.ts";
-export {
-  proceduresControllerRemovePathParamsSchema,
-  proceduresControllerRemove200Schema,
-  proceduresControllerRemoveMutationResponseSchema,
-} from "./zod/proceduresControllerRemoveSchema.ts";
-export {
-  proceduresControllerUpdatePathParamsSchema,
-  proceduresControllerUpdate200Schema,
-  proceduresControllerUpdateMutationRequestSchema,
-  proceduresControllerUpdateMutationResponseSchema,
-} from "./zod/proceduresControllerUpdateSchema.ts";
+export { patientsControllerCreate201Schema, patientsControllerCreateMutationRequestSchema, patientsControllerCreateMutationResponseSchema } from "./zod/patientsControllerCreateSchema.ts";
+export { patientsControllerFindAll200Schema, patientsControllerFindAllQueryResponseSchema } from "./zod/patientsControllerFindAllSchema.ts";
+export { patientsControllerFindOne200Schema, patientsControllerFindOnePathParamsSchema, patientsControllerFindOneQueryResponseSchema } from "./zod/patientsControllerFindOneSchema.ts";
+export { patientsControllerRemove200Schema, patientsControllerRemoveMutationResponseSchema, patientsControllerRemovePathParamsSchema } from "./zod/patientsControllerRemoveSchema.ts";
+export { patientsControllerUpdate200Schema, patientsControllerUpdateMutationRequestSchema, patientsControllerUpdateMutationResponseSchema, patientsControllerUpdatePathParamsSchema } from "./zod/patientsControllerUpdateSchema.ts";
+export { paymentsControllerCreate201Schema, paymentsControllerCreateMutationRequestSchema, paymentsControllerCreateMutationResponseSchema } from "./zod/paymentsControllerCreateSchema.ts";
+export { paymentsControllerFindAllByPatient200Schema, paymentsControllerFindAllByPatientPathParamsSchema, paymentsControllerFindAllByPatientQueryResponseSchema } from "./zod/paymentsControllerFindAllByPatientSchema.ts";
+export { paymentsControllerFindOne200Schema, paymentsControllerFindOnePathParamsSchema, paymentsControllerFindOneQueryResponseSchema } from "./zod/paymentsControllerFindOneSchema.ts";
+export { paymentsControllerRemove200Schema, paymentsControllerRemoveMutationResponseSchema, paymentsControllerRemovePathParamsSchema } from "./zod/paymentsControllerRemoveSchema.ts";
+export { paymentsControllerUpdate200Schema, paymentsControllerUpdateMutationRequestSchema, paymentsControllerUpdateMutationResponseSchema, paymentsControllerUpdatePathParamsSchema } from "./zod/paymentsControllerUpdateSchema.ts";
+export { proceduresControllerCreate201Schema, proceduresControllerCreateMutationRequestSchema, proceduresControllerCreateMutationResponseSchema } from "./zod/proceduresControllerCreateSchema.ts";
+export { proceduresControllerFindAllByPatient200Schema, proceduresControllerFindAllByPatientPathParamsSchema, proceduresControllerFindAllByPatientQueryResponseSchema } from "./zod/proceduresControllerFindAllByPatientSchema.ts";
+export { proceduresControllerFindOne200Schema, proceduresControllerFindOnePathParamsSchema, proceduresControllerFindOneQueryResponseSchema } from "./zod/proceduresControllerFindOneSchema.ts";
+export { proceduresControllerRemove200Schema, proceduresControllerRemoveMutationResponseSchema, proceduresControllerRemovePathParamsSchema } from "./zod/proceduresControllerRemoveSchema.ts";
+export { proceduresControllerUpdate200Schema, proceduresControllerUpdateMutationRequestSchema, proceduresControllerUpdateMutationResponseSchema, proceduresControllerUpdatePathParamsSchema } from "./zod/proceduresControllerUpdateSchema.ts";
 export { registerInvitationDtoSchema } from "./zod/registerInvitationDtoSchema.ts";
 export { registerTenantDtoSchema } from "./zod/registerTenantDtoSchema.ts";
 export { resetPasswordDtoSchema } from "./zod/resetPasswordDtoSchema.ts";
-export {
-  stripeWebhookControllerHandleWebhookHeaderParamsSchema,
-  stripeWebhookControllerHandleWebhook201Schema,
-  stripeWebhookControllerHandleWebhookMutationResponseSchema,
-} from "./zod/stripeWebhookControllerHandleWebhookSchema.ts";
-export {
-  subscriptionControllerCreateCheckoutSession201Schema,
-  subscriptionControllerCreateCheckoutSessionMutationResponseSchema,
-} from "./zod/subscriptionControllerCreateCheckoutSessionSchema.ts";
-export {
-  subscriptionControllerCreatePortalSession201Schema,
-  subscriptionControllerCreatePortalSessionMutationResponseSchema,
-} from "./zod/subscriptionControllerCreatePortalSessionSchema.ts";
-export {
-  subscriptionControllerGetStatus200Schema,
-  subscriptionControllerGetStatusQueryResponseSchema,
-} from "./zod/subscriptionControllerGetStatusSchema.ts";
+export { stripeWebhookControllerHandleWebhook201Schema, stripeWebhookControllerHandleWebhookHeaderParamsSchema, stripeWebhookControllerHandleWebhookMutationResponseSchema } from "./zod/stripeWebhookControllerHandleWebhookSchema.ts";
+export { subscriptionControllerCreateCheckoutSession201Schema, subscriptionControllerCreateCheckoutSessionMutationResponseSchema } from "./zod/subscriptionControllerCreateCheckoutSessionSchema.ts";
+export { subscriptionControllerCreatePortalSession201Schema, subscriptionControllerCreatePortalSessionMutationResponseSchema } from "./zod/subscriptionControllerCreatePortalSessionSchema.ts";
+export { subscriptionControllerGetStatus200Schema, subscriptionControllerGetStatusQueryResponseSchema } from "./zod/subscriptionControllerGetStatusSchema.ts";
 export { treatmentPlanItemDtoSchema } from "./zod/treatmentPlanItemDtoSchema.ts";
-export {
-  treatmentPlansControllerCreate201Schema,
-  treatmentPlansControllerCreateMutationRequestSchema,
-  treatmentPlansControllerCreateMutationResponseSchema,
-} from "./zod/treatmentPlansControllerCreateSchema.ts";
-export {
-  treatmentPlansControllerFindAll200Schema,
-  treatmentPlansControllerFindAllQueryResponseSchema,
-} from "./zod/treatmentPlansControllerFindAllSchema.ts";
-export {
-  treatmentPlansControllerFindOnePathParamsSchema,
-  treatmentPlansControllerFindOne200Schema,
-  treatmentPlansControllerFindOneQueryResponseSchema,
-} from "./zod/treatmentPlansControllerFindOneSchema.ts";
-export {
-  treatmentPlansControllerRemovePathParamsSchema,
-  treatmentPlansControllerRemove200Schema,
-  treatmentPlansControllerRemoveMutationResponseSchema,
-} from "./zod/treatmentPlansControllerRemoveSchema.ts";
-export {
-  treatmentPlansControllerUpdatePathParamsSchema,
-  treatmentPlansControllerUpdate200Schema,
-  treatmentPlansControllerUpdateMutationRequestSchema,
-  treatmentPlansControllerUpdateMutationResponseSchema,
-} from "./zod/treatmentPlansControllerUpdateSchema.ts";
+export { treatmentPlansControllerCreate201Schema, treatmentPlansControllerCreateMutationRequestSchema, treatmentPlansControllerCreateMutationResponseSchema } from "./zod/treatmentPlansControllerCreateSchema.ts";
+export { treatmentPlansControllerFindAll200Schema, treatmentPlansControllerFindAllQueryResponseSchema } from "./zod/treatmentPlansControllerFindAllSchema.ts";
+export { treatmentPlansControllerFindOne200Schema, treatmentPlansControllerFindOnePathParamsSchema, treatmentPlansControllerFindOneQueryResponseSchema } from "./zod/treatmentPlansControllerFindOneSchema.ts";
+export { treatmentPlansControllerRemove200Schema, treatmentPlansControllerRemoveMutationResponseSchema, treatmentPlansControllerRemovePathParamsSchema } from "./zod/treatmentPlansControllerRemoveSchema.ts";
+export { treatmentPlansControllerUpdate200Schema, treatmentPlansControllerUpdateMutationRequestSchema, treatmentPlansControllerUpdateMutationResponseSchema, treatmentPlansControllerUpdatePathParamsSchema } from "./zod/treatmentPlansControllerUpdateSchema.ts";
 export { updateAnamnesisDtoSchema } from "./zod/updateAnamnesisDtoSchema.ts";
 export { updateAppointmentDtoSchema } from "./zod/updateAppointmentDtoSchema.ts";
 export { updateBudgetDtoSchema } from "./zod/updateBudgetDtoSchema.ts";
@@ -1508,33 +806,13 @@ export { updatePaymentDtoSchema } from "./zod/updatePaymentDtoSchema.ts";
 export { updateProcedureDtoSchema } from "./zod/updateProcedureDtoSchema.ts";
 export { updateTreatmentPlanDtoSchema } from "./zod/updateTreatmentPlanDtoSchema.ts";
 export { updateUserDtoSchema } from "./zod/updateUserDtoSchema.ts";
-export {
-  usersControllerFindAllInvitations200Schema,
-  usersControllerFindAllInvitationsQueryResponseSchema,
-} from "./zod/usersControllerFindAllInvitationsSchema.ts";
-export {
-  usersControllerFindAll200Schema,
-  usersControllerFindAllQueryResponseSchema,
-} from "./zod/usersControllerFindAllSchema.ts";
-export {
-  usersControllerFindInvitationPathParamsSchema,
-  usersControllerFindInvitation200Schema,
-  usersControllerFindInvitationQueryResponseSchema,
-} from "./zod/usersControllerFindInvitationSchema.ts";
-export {
-  usersControllerInvite201Schema,
-  usersControllerInviteMutationRequestSchema,
-  usersControllerInviteMutationResponseSchema,
-} from "./zod/usersControllerInviteSchema.ts";
-export {
-  usersControllerRemovePathParamsSchema,
-  usersControllerRemove200Schema,
-  usersControllerRemoveMutationResponseSchema,
-} from "./zod/usersControllerRemoveSchema.ts";
-export {
-  usersControllerUpdatePathParamsSchema,
-  usersControllerUpdate200Schema,
-  usersControllerUpdateMutationRequestSchema,
-  usersControllerUpdateMutationResponseSchema,
-} from "./zod/usersControllerUpdateSchema.ts";
+export { usersControllerAcceptTerms201Schema, usersControllerAcceptTermsMutationResponseSchema } from "./zod/usersControllerAcceptTermsSchema.ts";
+export { usersControllerFindAllInvitations200Schema, usersControllerFindAllInvitationsQueryResponseSchema } from "./zod/usersControllerFindAllInvitationsSchema.ts";
+export { usersControllerFindAll200Schema, usersControllerFindAllQueryResponseSchema } from "./zod/usersControllerFindAllSchema.ts";
+export { usersControllerFindInvitation200Schema, usersControllerFindInvitationPathParamsSchema, usersControllerFindInvitationQueryResponseSchema } from "./zod/usersControllerFindInvitationSchema.ts";
+export { usersControllerInvite201Schema, usersControllerInviteMutationRequestSchema, usersControllerInviteMutationResponseSchema } from "./zod/usersControllerInviteSchema.ts";
+export { usersControllerRemoveAvatar200Schema, usersControllerRemoveAvatarMutationResponseSchema } from "./zod/usersControllerRemoveAvatarSchema.ts";
+export { usersControllerRemove200Schema, usersControllerRemoveMutationResponseSchema, usersControllerRemovePathParamsSchema } from "./zod/usersControllerRemoveSchema.ts";
+export { usersControllerUpdate200Schema, usersControllerUpdateMutationRequestSchema, usersControllerUpdateMutationResponseSchema, usersControllerUpdatePathParamsSchema } from "./zod/usersControllerUpdateSchema.ts";
+export { usersControllerUploadAvatar200Schema, usersControllerUploadAvatarMutationRequestSchema, usersControllerUploadAvatarMutationResponseSchema } from "./zod/usersControllerUploadAvatarSchema.ts";
 export { verifyEmailDtoSchema } from "./zod/verifyEmailDtoSchema.ts";

@@ -1,14 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "email": { "type": "string", "example": "professional@example.com" },
-    "cpf": { "type": "string", "example": "123.456.789-00" },
-    "role": {
-      "type": "string",
-      "enum": ["ADMIN", "SIMPLE", "DENTIST"],
-      "example": "DENTIST"
-    }
-  },
-  "required": ["email", "cpf", "role"],
-  "x-readme-ref-name": "InviteUserDto"
-}
+{"type":"object","properties":{"email":{"type":"string","example":"professional@example.com"},"cpf":{"type":"string","example":"123.456.789-00"},"role":{"type":"string","enum":["ADMIN","SIMPLE","DENTIST"],"example":"DENTIST"}},"required":["email","cpf","role"],"x-readme-ref-name":"InviteUserDto"}

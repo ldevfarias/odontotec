@@ -14,6 +14,7 @@ export { appointmentsControllerRemove } from "./appointmentsControllerRemove.ts"
 export { appointmentsControllerUpdate } from "./appointmentsControllerUpdate.ts";
 export { authControllerCompleteClinicSetup } from "./authControllerCompleteClinicSetup.ts";
 export { authControllerForgotPassword } from "./authControllerForgotPassword.ts";
+export { authControllerGetMe } from "./authControllerGetMe.ts";
 export { authControllerInitiateRegistration } from "./authControllerInitiateRegistration.ts";
 export { authControllerLogin } from "./authControllerLogin.ts";
 export { authControllerLogout } from "./authControllerLogout.ts";
@@ -74,9 +75,12 @@ export { treatmentPlansControllerFindAll } from "./treatmentPlansControllerFindA
 export { treatmentPlansControllerFindOne } from "./treatmentPlansControllerFindOne.ts";
 export { treatmentPlansControllerRemove } from "./treatmentPlansControllerRemove.ts";
 export { treatmentPlansControllerUpdate } from "./treatmentPlansControllerUpdate.ts";
+export { usersControllerAcceptTerms } from "./usersControllerAcceptTerms.ts";
 export { usersControllerFindAll } from "./usersControllerFindAll.ts";
 export { usersControllerFindAllInvitations } from "./usersControllerFindAllInvitations.ts";
 export { usersControllerFindInvitation } from "./usersControllerFindInvitation.ts";
 export { usersControllerInvite } from "./usersControllerInvite.ts";
 export { usersControllerRemove } from "./usersControllerRemove.ts";
+export { usersControllerRemoveAvatar } from "./usersControllerRemoveAvatar.ts";
 export { usersControllerUpdate } from "./usersControllerUpdate.ts";
+export { usersControllerUploadAvatar } from "./usersControllerUploadAvatar.ts";

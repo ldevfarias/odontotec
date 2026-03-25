@@ -1,12 +1,1 @@
-{
-  "type": "object",
-  "properties": {
-    "type": { "type": "string", "enum": ["ATESTADO", "RECEITA", "OUTRO"] },
-    "title": { "type": "string" },
-    "content": { "type": "string" },
-    "patientId": { "type": "number" },
-    "dentistId": { "type": "number" }
-  },
-  "required": ["type", "title", "content", "patientId", "dentistId"],
-  "x-readme-ref-name": "CreatePatientDocumentDto"
-}
+{"type":"object","properties":{"type":{"type":"string","enum":["ATESTADO","RECEITA","OUTRO"]},"title":{"type":"string"},"content":{"type":"string"},"patientId":{"type":"number"},"dentistId":{"type":"number"}},"required":["type","title","content","patientId","dentistId"],"x-readme-ref-name":"CreatePatientDocumentDto"}
