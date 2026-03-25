@@ -26,7 +26,7 @@ export class ExamsService {
             file.buffer,
             file.originalname,
             file.mimetype,
-            `clinics/${clinicId}/exams`
+            `clinics/${clinicId}/patients/${createExamDto.patientId}/exams`
         );
 
         const exam = this.examsRepository.create({
