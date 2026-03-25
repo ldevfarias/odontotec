@@ -205,7 +205,22 @@ export class AppointmentsService {
     }
 
     private async notifyIfDentistChanged(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
-        // placeholder — implemented in Task 3
+        if (before.dentistId === after.dentistId) return;
+        const dateStr = new Date(after.date).toLocaleString('pt-BR');
+        await Promise.all([
+            this.notificationsService.create(
+                `O agendamento com ${after.patient?.name ?? 'Paciente'} em ${dateStr} foi transferido para outro profissional.`,
+                clinicId,
+                'WARNING',
+                before.dentistId,
+            ),
+            this.notificationsService.create(
+                `Você recebeu um novo agendamento com ${after.patient?.name ?? 'Paciente'} em ${dateStr}.`,
+                clinicId,
+                'INFO',
+                after.dentistId,
+            ),
+        ]);
     }
 
     private async notifyIfCancelled(before: Appointment, after: Appointment, clinicId: number): Promise<void> {

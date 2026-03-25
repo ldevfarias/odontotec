@@ -131,4 +131,42 @@ describe('AppointmentsService — update notifications', () => {
 
         expect(notifyCreate).not.toHaveBeenCalled();
     });
+
+    // ── notifyIfDentistChanged ─────────────────────────────────────────────────
+
+    it('notifies both old and new dentist when dentist changes', async () => {
+        const before = makeAppointment({ dentistId: 5 });
+        const after = makeAppointment({ dentistId: 7 });
+
+        findOneSpy
+            .mockResolvedValueOnce(before)
+            .mockResolvedValueOnce(after);
+
+        await service.update(10, { dentistId: 7 }, CLINIC_ID);
+
+        expect(notifyCreate).toHaveBeenCalledTimes(2);
+
+        expect(notifyCreate).toHaveBeenCalledWith(
+            expect.stringContaining('transferido'),
+            CLINIC_ID,
+            'WARNING',
+            5, // before.dentistId — old dentist
+        );
+        expect(notifyCreate).toHaveBeenCalledWith(
+            expect.stringContaining('novo agendamento'),
+            CLINIC_ID,
+            'INFO',
+            7, // after.dentistId — new dentist
+        );
+    });
+
+    it('does NOT notify when dentist is unchanged', async () => {
+        // Use same dentistId in DTO to specifically verify the guard condition.
+        const appointment = makeAppointment({ dentistId: 5 });
+        findOneSpy.mockResolvedValue(appointment);
+
+        await service.update(10, { dentistId: 5 }, CLINIC_ID);
+
+        expect(notifyCreate).not.toHaveBeenCalled();
+    });
 });
