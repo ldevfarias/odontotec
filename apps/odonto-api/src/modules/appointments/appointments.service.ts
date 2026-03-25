@@ -194,7 +194,14 @@ export class AppointmentsService {
     }
 
     private async notifyIfRescheduled(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
-        // placeholder — implemented in Task 2
+        if (new Date(before.date).toISOString() === new Date(after.date).toISOString()) return;
+        const newDate = new Date(after.date).toLocaleString('pt-BR');
+        await this.notificationsService.create(
+            `O agendamento com ${after.patient?.name ?? 'Paciente'} foi reagendado para ${newDate}.`,
+            clinicId,
+            'WARNING',
+            after.dentistId,
+        );
     }
 
     private async notifyIfDentistChanged(before: Appointment, after: Appointment, clinicId: number): Promise<void> {

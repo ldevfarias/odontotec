@@ -101,4 +101,34 @@ describe('AppointmentsService — update notifications', () => {
 
         expect(notifyCreate).not.toHaveBeenCalled();
     });
+
+    // ── notifyIfRescheduled ────────────────────────────────────────────────────
+
+    it('notifies dentist when date changes', async () => {
+        const before = makeAppointment({ date: new Date('2026-04-01T10:00:00.000Z') });
+        const after = makeAppointment({ date: new Date('2026-04-02T14:00:00.000Z') });
+
+        findOneSpy
+            .mockResolvedValueOnce(before)
+            .mockResolvedValueOnce(after);
+
+        await service.update(10, { date: '2026-04-02T14:00:00.000Z' }, CLINIC_ID);
+
+        expect(notifyCreate).toHaveBeenCalledTimes(1);
+        expect(notifyCreate).toHaveBeenCalledWith(
+            expect.stringContaining('reagendado'),
+            CLINIC_ID,
+            'WARNING',
+            after.dentistId,
+        );
+    });
+
+    it('does NOT notify when date is unchanged', async () => {
+        const appointment = makeAppointment();
+        findOneSpy.mockResolvedValue(appointment);
+
+        await service.update(10, { duration: 45 }, CLINIC_ID);
+
+        expect(notifyCreate).not.toHaveBeenCalled();
+    });
 });
