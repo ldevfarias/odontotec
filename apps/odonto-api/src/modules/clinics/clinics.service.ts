@@ -48,12 +48,12 @@ export class ClinicsService {
         return savedClinic;
     }
 
-    async findAllByUser(userId: number): Promise<{ clinic: Clinic; role: ClinicRole }[]> {
+    async findAllByUser(userId: number): Promise<{ clinic: Clinic; role: ClinicRole; avatarUrl: string | null }[]> {
         const memberships = await this.membershipRepository.find({
             where: { userId, isActive: true },
             relations: ['clinic'],
         });
-        return memberships.map(m => ({ clinic: m.clinic, role: m.role }));
+        return memberships.map(m => ({ clinic: m.clinic, role: m.role, avatarUrl: m.avatarUrl ?? null }));
     }
 
     async addMember(clinicId: number, userId: number, role: ClinicRole): Promise<ClinicMembership> {

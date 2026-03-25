@@ -51,7 +51,7 @@ export class AuthService {
                 email: user.email,
                 role: user.role,
             },
-            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role })),
+            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role, avatarUrl: c.avatarUrl ?? null })),
         };
     }
 
@@ -159,7 +159,7 @@ export class AuthService {
         return {
             message: 'Clinic setup completed successfully',
             ...tokens,
-            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role })),
+            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role, avatarUrl: c.avatarUrl ?? null })),
         };
     }
 
@@ -235,7 +235,7 @@ export class AuthService {
                 email: user.email,
                 role: user.role,
             },
-            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role })),
+            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role, avatarUrl: c.avatarUrl ?? null })),
         };
     }
 
@@ -254,7 +254,7 @@ export class AuthService {
                 email: user.email,
                 role: user.role,
             },
-            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role })),
+            clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role, avatarUrl: c.avatarUrl ?? null })),
         };
     }
 
