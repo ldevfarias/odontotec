@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -7,9 +7,13 @@ import { User } from './entities/user.entity';
 import { UserInvitation } from './entities/user-invitation.entity';
 import { PendingRegistration } from './entities/pending-registration.entity';
 import { Clinic } from '../clinics/entities/clinic.entity';
+import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
+import { ClinicUserDto } from './dto/clinic-user.dto';
 import { EmailService } from '../email/email.service';
+import { STORAGE_PROVIDER } from '../../common/providers/storage/storage.provider.interface';
+import type { IStorageProvider } from '../../common/providers/storage/storage.provider.interface';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +26,10 @@ export class UsersService {
         private pendingRegistrationRepository: Repository<PendingRegistration>,
         @InjectRepository(Clinic)
         private clinicRepository: Repository<Clinic>,
+        @InjectRepository(ClinicMembership)
+        private membershipRepository: Repository<ClinicMembership>,
+        @Inject(STORAGE_PROVIDER)
+        private storageProvider: IStorageProvider,
         private emailService: EmailService,
     ) { }
 
@@ -175,15 +183,21 @@ export class UsersService {
         return this.createUser(createUserDto);
     }
 
-    async findAllByClinic(clinicId: number): Promise<User[]> {
-        // Returns users that have a membership in this clinic
-        const result = await this.usersRepository
-            .createQueryBuilder('user')
-            .innerJoin('clinic_memberships', 'cm', 'cm.user_id = user.id')
-            .where('cm.clinic_id = :clinicId', { clinicId })
-            .andWhere('cm.is_active = true')
-            .getMany();
-        return result;
+    async findAllByClinic(clinicId: number): Promise<ClinicUserDto[]> {
+        const memberships = await this.membershipRepository.find({
+            where: { clinicId, isActive: true },
+            relations: ['user'],
+        });
+        return memberships
+            .filter(m => m.user)
+            .map(m => ({
+                id: m.user.id,
+                name: m.user.name,
+                email: m.user.email,
+                role: m.user.role,
+                isActive: m.user.isActive,
+                avatarUrl: m.avatarUrl ?? null,
+            }));
     }
 
     async update(id: number, updateUserDto: UpdateUserDto | Partial<User>): Promise<User | null> {

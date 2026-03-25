@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagg
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/user.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
+import { ClinicUserDto } from './dto/clinic-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -53,7 +54,8 @@ export class UsersController {
     @Get()
     @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
     @ApiOperation({ summary: 'List all clinic users' })
-    findAll(@Tenant() clinicId: number) {
+    @ApiResponse({ status: 200, type: [ClinicUserDto] })
+    findAll(@Tenant() clinicId: number): Promise<ClinicUserDto[]> {
         return this.usersService.findAllByClinic(clinicId);
     }
 
