@@ -194,7 +194,7 @@ export class UsersService {
                 id: m.user.id,
                 name: m.user.name,
                 email: m.user.email,
-                role: m.user.role,
+                role: m.role,
                 isActive: m.user.isActive,
                 avatarUrl: m.avatarUrl ?? null,
             }));

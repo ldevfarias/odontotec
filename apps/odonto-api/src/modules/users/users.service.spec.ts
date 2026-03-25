@@ -45,11 +45,13 @@ describe('UsersService - findAllByClinic', () => {
     it('returns users with avatarUrl from membership', async () => {
         mockMembershipRepo.find.mockResolvedValue([
             {
-                user: { id: 1, name: 'Ana', email: 'ana@test.com', role: 'DENTIST', isActive: true },
+                role: 'DENTIST',
+                user: { id: 1, name: 'Ana', email: 'ana@test.com', isActive: true },
                 avatarUrl: 'https://cdn.example.com/clinics/5/avatars/uuid.jpg',
             },
             {
-                user: { id: 2, name: 'Bob', email: 'bob@test.com', role: 'SIMPLE', isActive: true },
+                role: 'RECEPTIONIST',
+                user: { id: 2, name: 'Bob', email: 'bob@test.com', isActive: true },
                 avatarUrl: null,
             },
         ]);
@@ -58,7 +60,7 @@ describe('UsersService - findAllByClinic', () => {
 
         expect(result).toEqual([
             { id: 1, name: 'Ana', email: 'ana@test.com', role: 'DENTIST', isActive: true, avatarUrl: 'https://cdn.example.com/clinics/5/avatars/uuid.jpg' },
-            { id: 2, name: 'Bob', email: 'bob@test.com', role: 'SIMPLE', isActive: true, avatarUrl: null },
+            { id: 2, name: 'Bob', email: 'bob@test.com', role: 'RECEPTIONIST', isActive: true, avatarUrl: null },
         ]);
     });
 });
