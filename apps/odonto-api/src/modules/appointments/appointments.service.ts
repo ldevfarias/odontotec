@@ -157,19 +157,52 @@ export class AppointmentsService {
     }
 
     async update(id: number, updateAppointmentDto: UpdateAppointmentDto, clinicId: number): Promise<Appointment> {
-        const appointment = await this.findOne(id, clinicId);
+        const before = await this.findOne(id, clinicId);
 
         if (updateAppointmentDto.date || updateAppointmentDto.duration || updateAppointmentDto.dentistId) {
-            const date = updateAppointmentDto.date ? new Date(updateAppointmentDto.date) : appointment.date;
-            const duration = updateAppointmentDto.duration ?? appointment.duration;
-            const dentistId = updateAppointmentDto.dentistId ?? appointment.dentistId;
-            const patientId = updateAppointmentDto.patientId ?? appointment.patientId;
+            const date = updateAppointmentDto.date ? new Date(updateAppointmentDto.date) : before.date;
+            const duration = updateAppointmentDto.duration ?? before.duration;
+            const dentistId = updateAppointmentDto.dentistId ?? before.dentistId;
+            const patientId = updateAppointmentDto.patientId ?? before.patientId;
 
             await this.checkConflict(date, duration, clinicId, dentistId, patientId, id);
         }
 
         await this.appointmentsRepository.update({ id, clinicId }, updateAppointmentDto);
-        return this.findOne(id, clinicId);
+        const after = await this.findOne(id, clinicId);
+
+        await this.notifyAppointmentChanges(before, after, clinicId);
+        return after;
+    }
+
+    private async notifyAppointmentChanges(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
+        await this.notifyIfPatientChanged(before, after, clinicId);
+        await this.notifyIfRescheduled(before, after, clinicId);
+        await this.notifyIfDentistChanged(before, after, clinicId);
+        await this.notifyIfCancelled(before, after, clinicId);
+    }
+
+    private async notifyIfPatientChanged(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
+        if (before.patientId === after.patientId) return;
+        const originalDate = new Date(before.date).toLocaleString('pt-BR');
+        await this.notificationsService.create(
+            `O paciente do agendamento de ${originalDate} foi alterado para ${after.patient.name}.`,
+            clinicId,
+            'WARNING',
+            after.dentistId,
+        );
+    }
+
+    private async notifyIfRescheduled(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
+        // placeholder — implemented in Task 2
+    }
+
+    private async notifyIfDentistChanged(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
+        // placeholder — implemented in Task 3
+    }
+
+    private async notifyIfCancelled(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
+        // placeholder — implemented in Task 4
     }
 
     async checkAvailability(clinicId: number, dentistId: number, date: string, duration: number, excludeId?: number, patientId?: number): Promise<{ available: boolean }> {
