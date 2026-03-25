@@ -1,3 +1,13 @@
+/**
+ * Kubb CLI workaround for Node 20.11.x compatibility.
+ *
+ * The @kubb/cli package requires Node >=20.12 (uses util.styleText which was
+ * introduced in 20.12). Until the project upgrades Node, we invoke Kubb's
+ * build API directly, bypassing the CLI entry point.
+ *
+ * To retire this workaround: upgrade Node to >=20.12, restore `"kubb": "kubb"`
+ * in package.json scripts, and delete this file.
+ */
 import { build } from '../../node_modules/@kubb/core/dist/index.js';
 import { pluginOas } from '../../node_modules/@kubb/plugin-oas/dist/index.js';
 import { pluginTs } from '../../node_modules/@kubb/plugin-ts/dist/index.js';
