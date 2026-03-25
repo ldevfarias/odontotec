@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, NotFoundException, Request } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, ParseIntPipe, NotFoundException, Request, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/user.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
@@ -23,6 +25,36 @@ export class UsersController {
     @ApiOperation({ summary: 'Accept terms of use for the logged in user' })
     acceptTerms(@Request() req) {
         return this.usersService.acceptTerms(req.user.sub || req.user.userId);
+    }
+
+    @Put('me/avatar')
+    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
+    @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+    @ApiOperation({ summary: 'Upload profile avatar for active clinic', operationId: 'usersControllerUploadAvatar' })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
+    uploadAvatar(
+        @Request() req,
+        @Tenant() clinicId: number,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+                    new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp)$/ }),
+                ],
+            }),
+        ) file: Express.Multer.File,
+    ) {
+        const userId = req.user.sub || req.user.userId;
+        return this.usersService.uploadAvatar(userId, clinicId, file);
+    }
+
+    @Delete('me/avatar')
+    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
+    @ApiOperation({ summary: 'Remove profile avatar for active clinic', operationId: 'usersControllerRemoveAvatar' })
+    removeAvatar(@Request() req, @Tenant() clinicId: number) {
+        const userId = req.user.sub || req.user.userId;
+        return this.usersService.removeAvatar(userId, clinicId);
     }
 
     @Public()

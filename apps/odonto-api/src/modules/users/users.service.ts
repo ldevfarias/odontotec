@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -255,5 +255,49 @@ export class UsersService {
             where: { id },
             select: ['id', 'email', 'role', 'isActive', 'resetPasswordToken', 'resetPasswordExpires'],
         });
+    }
+
+    async uploadAvatar(userId: number, clinicId: number, file: Express.Multer.File): Promise<{ avatarUrl: string }> {
+        const membership = await this.membershipRepository.findOne({
+            where: { userId, clinicId, isActive: true },
+        });
+        if (!membership) {
+            throw new NotFoundException('Membership not found for this clinic');
+        }
+
+        // Delete old avatar (best-effort — proceed even if R2 delete fails)
+        if (membership.avatarUrl) {
+            try {
+                await this.storageProvider.delete(membership.avatarUrl);
+            } catch { /* best-effort */ }
+        }
+
+        const avatarUrl = await this.storageProvider.upload(
+            file.buffer,
+            file.originalname,
+            file.mimetype,
+            `clinics/${clinicId}/avatars`,
+        );
+
+        await this.membershipRepository.update({ userId, clinicId }, { avatarUrl });
+        return { avatarUrl };
+    }
+
+    async removeAvatar(userId: number, clinicId: number): Promise<{ avatarUrl: null }> {
+        const membership = await this.membershipRepository.findOne({
+            where: { userId, clinicId, isActive: true },
+        });
+        if (!membership) {
+            throw new NotFoundException('Membership not found for this clinic');
+        }
+
+        if (membership.avatarUrl) {
+            try {
+                await this.storageProvider.delete(membership.avatarUrl);
+            } catch { /* best-effort */ }
+        }
+
+        await this.membershipRepository.update({ userId, clinicId }, { avatarUrl: null });
+        return { avatarUrl: null };
     }
 }
