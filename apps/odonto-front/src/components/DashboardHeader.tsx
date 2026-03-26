@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { NotificationBell } from './notifications/NotificationBell';
-import { Search, Settings, LogOut, ChevronDown, Target, Menu } from 'lucide-react';
+import { Search, Settings, LogOut, ChevronDown, Menu, Camera } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -17,12 +17,14 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PatientSearchCMDK } from '@/components/patients/PatientSearchCMDK';
 import { Sidebar } from '@/components/Sidebar';
+import { AvatarUploadModal } from '@/components/profile/AvatarUploadModal';
 
 export function DashboardHeader() {
     const { user, logout, activeClinic } = useAuth();
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
     const initials = user?.name
         ? user.name.split(' ').slice(0, 2).map((n) => n[0].toUpperCase()).join('')
@@ -73,9 +75,7 @@ export function DashboardHeader() {
 
             {/* Actions */}
             <div className="flex items-center gap-3 shrink-0">
-                {/* Notification Bell - rendered directly, no wrapper div */}
                 <NotificationBell />
-
                 <div className="w-[1px] h-8 bg-gray-200 hidden sm:block" />
 
                 {/* User Profile Popover */}
@@ -83,7 +83,10 @@ export function DashboardHeader() {
                     <PopoverTrigger asChild>
                         <button className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-gray-50 transition-colors cursor-pointer group outline-none">
                             <div className="h-9 w-9 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center text-sm font-bold text-primary shadow-sm border border-primary/20 shrink-0">
-                                {initials}
+                                {activeClinic?.avatarUrl
+                                    ? <img src={activeClinic.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                                    : initials
+                                }
                             </div>
                             <div className="flex flex-col items-start hidden sm:flex">
                                 {user?.name ? (
@@ -102,6 +105,14 @@ export function DashboardHeader() {
                         </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-52 p-1.5" align="end">
+                        <button
+                            onClick={() => { setOpen(false); setAvatarModalOpen(true); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                        >
+                            <Camera className="h-4 w-4 text-muted-foreground" />
+                            Alterar foto
+                        </button>
+                        <Separator className="my-1" />
                         {activeClinic?.role !== 'DENTIST' && (
                             <button
                                 onClick={() => { setOpen(false); router.push('/settings'); }}
@@ -121,6 +132,9 @@ export function DashboardHeader() {
                         </button>
                     </PopoverContent>
                 </Popover>
+
+                {/* Avatar upload modal — rendered outside Popover to avoid nesting issues */}
+                <AvatarUploadModal open={avatarModalOpen} onOpenChange={setAvatarModalOpen} />
             </div>
 
             {/* CMDK Search Palette */}
