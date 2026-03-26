@@ -84,6 +84,7 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         setPreviewUrl(null);
         setSelectedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
         onOpenChange(false);
     };
 
