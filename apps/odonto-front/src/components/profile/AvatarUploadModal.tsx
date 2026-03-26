@@ -24,7 +24,7 @@ interface AvatarUploadModalProps {
 }
 
 export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps) {
-    const { activeClinic, user } = useAuth();
+    const { activeClinic, user, setActiveClinic } = useAuth();
     const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -60,7 +60,11 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
     const handleSave = async () => {
         if (!selectedFile) return;
         try {
-            await uploadMutation.mutateAsync({ data: { file: selectedFile } });
+            const result = await uploadMutation.mutateAsync({ data: { file: selectedFile } });
+            // Update AuthContext directly so the header avatar updates immediately
+            if (activeClinic && result?.avatarUrl) {
+                setActiveClinic({ ...activeClinic, avatarUrl: result.avatarUrl });
+            }
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto atualizada com sucesso!');
             handleClose();
@@ -72,6 +76,10 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
     const handleRemove = async () => {
         try {
             await removeMutation.mutateAsync();
+            // Update AuthContext directly so the header avatar updates immediately
+            if (activeClinic) {
+                setActiveClinic({ ...activeClinic, avatarUrl: null });
+            }
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto removida.');
             handleClose();
