@@ -67,11 +67,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 api.defaults.headers.common['X-Clinic-Id'] = String(freshClinic.id);
                             } else if (response.data.clinics.length > 0) {
                                 setActiveClinicState(response.data.clinics[0]);
+                                sessionStorage.setItem('activeClinic', JSON.stringify(response.data.clinics[0]));
                                 api.defaults.headers.common['X-Clinic-Id'] = String(response.data.clinics[0].id);
                             }
                         } catch { /* ignore */ }
                     } else if (response.data.clinics.length > 0) {
                         setActiveClinicState(response.data.clinics[0]);
+                        sessionStorage.setItem('activeClinic', JSON.stringify(response.data.clinics[0]));
                         api.defaults.headers.common['X-Clinic-Id'] = String(response.data.clinics[0].id);
                     }
                 }
