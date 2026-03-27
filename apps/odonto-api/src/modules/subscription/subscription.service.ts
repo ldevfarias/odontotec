@@ -148,10 +148,7 @@ export class SubscriptionService {
             }
         });
 
-        const isEarlyAdopter = activeSubscriptionsCount < 200;
-        const priceId = isEarlyAdopter
-            ? this.configService.get<string>('STRIPE_PRICE_ID_EARLY_ADOPTER')
-            : this.configService.get<string>('STRIPE_PRICE_ID_PROFESSIONAL');
+        const priceId = this.configService.get<string>('STRIPE_PRICE_ID');
 
         if (!priceId) {
             throw new BadRequestException('Stripe Price IDs are not configured properly');

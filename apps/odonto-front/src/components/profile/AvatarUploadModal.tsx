@@ -14,6 +14,8 @@ import { notificationService } from '@/services/notification.service';
 import { useUsersControllerUploadAvatar } from '@/generated/hooks/useUsersControllerUploadAvatar';
 import { useUsersControllerRemoveAvatar } from '@/generated/hooks/useUsersControllerRemoveAvatar';
 import { authControllerGetMeQueryKey } from '@/generated/hooks/useAuthControllerGetMe';
+import { usersControllerFindAllQueryKey } from '@/generated/hooks/useUsersControllerFindAll';
+import { ClinicUserDto } from '@/generated/ts/ClinicUserDto';
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -65,6 +67,15 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
             if (activeClinic && result?.avatarUrl) {
                 setActiveClinic({ ...activeClinic, avatarUrl: result.avatarUrl });
             }
+
+            // Update users list cache for immediate UI feedback in dashboard
+            if (user?.id) {
+                queryClient.setQueryData(usersControllerFindAllQueryKey(), (oldData: ClinicUserDto[] | undefined) => {
+                    if (!oldData) return oldData;
+                    return oldData.map(u => u.id === user.id ? { ...u, avatarUrl: result.avatarUrl } : u);
+                });
+            }
+
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto atualizada com sucesso!');
             handleClose();
@@ -80,6 +91,15 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
             if (activeClinic) {
                 setActiveClinic({ ...activeClinic, avatarUrl: null });
             }
+
+            // Update users list cache for immediate UI feedback in dashboard
+            if (user?.id) {
+                queryClient.setQueryData(usersControllerFindAllQueryKey(), (oldData: ClinicUserDto[] | undefined) => {
+                    if (!oldData) return oldData;
+                    return oldData.map(u => u.id === user.id ? { ...u, avatarUrl: null } : u);
+                });
+            }
+
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto removida.');
             handleClose();
