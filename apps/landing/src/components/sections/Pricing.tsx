@@ -96,14 +96,14 @@ export function Pricing() {
 
                                 <div className="text-center mb-3">
                                     <span className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full border border-primary/20">
-                                        ✨ 14 dias gratuitos para testar
+                                        ✨ 7 dias gratuitos para testar
                                     </span>
                                 </div>
                                 <a
                                     href={`${APP_URL}/register`}
                                     className="fill-button w-full justify-center group cursor-pointer shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 flex items-center"
                                 >
-                                    Começar meus 14 dias grátis
+                                    Começar meus 7 dias grátis
                                     <ArrowRightIcon className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform inline-block" />
                                 </a>
                                 <p className="text-center text-xs text-muted-foreground mt-4">

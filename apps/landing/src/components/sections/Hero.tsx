@@ -59,7 +59,7 @@ export function Hero() {
                                 href={`${APP_URL}/register`}
                                 className="fill-button w-full sm:w-auto group shadow-lg shadow-primary/20 flex items-center justify-center cursor-pointer"
                             >
-                                Testar grátis por 14 dias
+                                Testar grátis por 7 dias
                                 <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>

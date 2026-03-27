@@ -28,7 +28,7 @@ export class SubscriptionService {
         }
 
         const now = new Date();
-        const trialEnd = clinic.trialEndsAt || new Date(clinic.createdAt.getTime() + 14 * 24 * 60 * 60 * 1000);
+        const trialEnd = clinic.trialEndsAt || new Date(clinic.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000);
 
         let status = clinic.subscriptionStatus;
 
