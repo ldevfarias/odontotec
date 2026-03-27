@@ -179,8 +179,7 @@ export class SubscriptionService {
                     return {};
                 })()),
                 metadata: {
-                    clinicId: clinic.id.toString(),
-                    isEarlyAdopter: isEarlyAdopter ? 'true' : 'false'
+                    clinicId: clinic.id.toString()
                 }
             },
             metadata: {
