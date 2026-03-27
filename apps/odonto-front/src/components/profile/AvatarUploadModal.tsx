@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
     Dialog,
@@ -35,6 +35,18 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
     const uploadMutation = useUsersControllerUploadAvatar();
     const removeMutation = useUsersControllerRemoveAvatar();
 
+    useEffect(() => {
+        return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
+    }, [previewUrl]);
+
+    const updateAvatarCache = (avatarUrl: string | null) => {
+        if (!user?.id) return;
+        queryClient.setQueryData(usersControllerFindAllQueryKey(), (oldData: ClinicUserDto[] | undefined) => {
+            if (!oldData) return oldData;
+            return oldData.map(u => u.id === user.id ? { ...u, avatarUrl } : u);
+        });
+    };
+
     const initials = user?.name
         ? user.name.split(' ').slice(0, 2).map((n) => n[0].toUpperCase()).join('')
         : '?';
@@ -67,15 +79,7 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
             if (activeClinic && result?.avatarUrl) {
                 setActiveClinic({ ...activeClinic, avatarUrl: result.avatarUrl });
             }
-
-            // Update users list cache for immediate UI feedback in dashboard
-            if (user?.id) {
-                queryClient.setQueryData(usersControllerFindAllQueryKey(), (oldData: ClinicUserDto[] | undefined) => {
-                    if (!oldData) return oldData;
-                    return oldData.map(u => u.id === user.id ? { ...u, avatarUrl: result.avatarUrl } : u);
-                });
-            }
-
+            updateAvatarCache(result.avatarUrl ?? null);
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto atualizada com sucesso!');
             handleClose();
@@ -91,15 +95,7 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
             if (activeClinic) {
                 setActiveClinic({ ...activeClinic, avatarUrl: null });
             }
-
-            // Update users list cache for immediate UI feedback in dashboard
-            if (user?.id) {
-                queryClient.setQueryData(usersControllerFindAllQueryKey(), (oldData: ClinicUserDto[] | undefined) => {
-                    if (!oldData) return oldData;
-                    return oldData.map(u => u.id === user.id ? { ...u, avatarUrl: null } : u);
-                });
-            }
-
+            updateAvatarCache(null);
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto removida.');
             handleClose();
