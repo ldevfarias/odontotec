@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
     Dialog,
@@ -14,6 +14,8 @@ import { notificationService } from '@/services/notification.service';
 import { useUsersControllerUploadAvatar } from '@/generated/hooks/useUsersControllerUploadAvatar';
 import { useUsersControllerRemoveAvatar } from '@/generated/hooks/useUsersControllerRemoveAvatar';
 import { authControllerGetMeQueryKey } from '@/generated/hooks/useAuthControllerGetMe';
+import { usersControllerFindAllQueryKey } from '@/generated/hooks/useUsersControllerFindAll';
+import { ClinicUserDto } from '@/generated/ts/ClinicUserDto';
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -32,6 +34,18 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
 
     const uploadMutation = useUsersControllerUploadAvatar();
     const removeMutation = useUsersControllerRemoveAvatar();
+
+    useEffect(() => {
+        return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
+    }, [previewUrl]);
+
+    const updateAvatarCache = (avatarUrl: string | null) => {
+        if (!user?.id) return;
+        queryClient.setQueryData(usersControllerFindAllQueryKey(), (oldData: ClinicUserDto[] | undefined) => {
+            if (!oldData) return oldData;
+            return oldData.map(u => u.id === user.id ? { ...u, avatarUrl } : u);
+        });
+    };
 
     const initials = user?.name
         ? user.name.split(' ').slice(0, 2).map((n) => n[0].toUpperCase()).join('')
@@ -65,6 +79,7 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
             if (activeClinic && result?.avatarUrl) {
                 setActiveClinic({ ...activeClinic, avatarUrl: result.avatarUrl });
             }
+            updateAvatarCache(result.avatarUrl ?? null);
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto atualizada com sucesso!');
             handleClose();
@@ -80,6 +95,7 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
             if (activeClinic) {
                 setActiveClinic({ ...activeClinic, avatarUrl: null });
             }
+            updateAvatarCache(null);
             await queryClient.invalidateQueries({ queryKey: authControllerGetMeQueryKey() });
             notificationService.success('Foto removida.');
             handleClose();
