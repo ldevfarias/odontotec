@@ -24,9 +24,10 @@ export default function SelectClinicPage() {
     };
 
     const roleLabels: Record<string, string> = {
-        OWNER: 'Proprietário',
+        OWNER: 'Administrador',
         ADMIN: 'Administrador',
         DENTIST: 'Dentista',
+        SIMPLE: 'Recepcionista',
         RECEPTIONIST: 'Recepcionista',
     };
 

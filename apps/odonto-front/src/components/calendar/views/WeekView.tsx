@@ -265,6 +265,8 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                                                             onClick={() => {
                                                                 if (window.matchMedia('(pointer: coarse)').matches) {
                                                                     onEventTap?.(event);
+                                                                } else {
+                                                                    onEditAppointment?.(event.originalAppointment);
                                                                 }
                                                             }}
                                                         >
@@ -471,7 +473,7 @@ export function WeekView({ currentDate, events, categories, professionals, onEdi
                             })}
 
                             {/* Red Live Line — current time indicator */}
-                            {isCurrentWeek && liveLineTop > 0 && (
+                            {isCurrentWeek && liveLineTop > 0 && liveLineTop < (END_HOUR - START_HOUR) * HOUR_HEIGHT && (
                                 <div
                                     className="absolute left-0 right-0 z-20 pointer-events-none flex items-center"
                                     style={{ top: `${liveLineTop}px` }}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react'; // useEffect kept for mobile view detection
 import { CalendarSidebar } from './CalendarSidebar';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarState, CalendarEvent, EventCategory, Professional } from './types';
@@ -41,10 +41,18 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
         handleStateChange({ currentDate: date, view: 'agenda' });
     };
 
-    const filteredEvents = events.filter(
-        (event) =>
-            state.selectedCategories.includes(event.categoryId) &&
-            state.selectedProfessionals.includes(event.professionalId)
+    const filteredEvents = useMemo(() =>
+        events.filter(
+            (event) =>
+                state.selectedCategories.includes(event.categoryId) &&
+                state.selectedProfessionals.includes(event.professionalId)
+        ),
+        [events, state.selectedCategories, state.selectedProfessionals]
+    );
+
+    const activeProfessionals = useMemo(() =>
+        professionals.filter(p => state.selectedProfessionals.includes(p.id)),
+        [professionals, state.selectedProfessionals]
     );
 
     return (
@@ -71,7 +79,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             currentDate={state.currentDate}
                             events={filteredEvents}
                             categories={categories}
-                            professionals={professionals}
+                            professionals={activeProfessionals}
                             onEventTap={(e) => setMobileSelectedEvent(e)}
                         />
                     )}
@@ -80,7 +88,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             currentDate={state.currentDate}
                             events={filteredEvents}
                             categories={categories}
-                            professionals={professionals}
+                            professionals={activeProfessionals}
                             onEditAppointment={onEditAppointment}
                             onUpdateAppointmentStatus={onUpdateAppointmentStatus}
                             onEventTap={(e) => setMobileSelectedEvent(e)}
@@ -91,7 +99,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             currentDate={state.currentDate}
                             events={filteredEvents}
                             categories={categories}
-                            professionals={professionals.filter(p => state.selectedProfessionals.includes(p.id))}
+                            professionals={activeProfessionals}
                             onEditAppointment={onEditAppointment}
                             onUpdateAppointmentStatus={onUpdateAppointmentStatus}
                             onEventTap={(e) => setMobileSelectedEvent(e)}
@@ -102,7 +110,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                             currentDate={state.currentDate}
                             events={filteredEvents}
                             categories={categories}
-                            professionals={professionals}
+                            professionals={activeProfessionals}
                             onEditAppointment={onEditAppointment}
                             onUpdateAppointmentStatus={onUpdateAppointmentStatus}
                             onEventTap={(e) => setMobileSelectedEvent(e)}
@@ -117,7 +125,7 @@ export function Calendar({ events, categories, professionals, onNewAppointment, 
                 open={mobileSelectedEvent !== null}
                 onClose={() => setMobileSelectedEvent(null)}
                 categories={categories}
-                professionals={professionals}
+                professionals={activeProfessionals}
                 onEditAppointment={onEditAppointment}
                 onUpdateAppointmentStatus={onUpdateAppointmentStatus}
             />

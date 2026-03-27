@@ -66,6 +66,14 @@ import { useAppointmentsControllerCreate } from '@/generated/hooks/useAppointmen
 import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
 import { useAppointmentsControllerGetAvailableSlots } from '@/generated/hooks/useAppointmentsControllerGetAvailableSlots';
 
+const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
+    SCHEDULED: 'Agendado',
+    CONFIRMED: 'Confirmado',
+    CANCELLED: 'Cancelado',
+    COMPLETED: 'Concluído',
+    ABSENT: 'Faltou',
+};
+
 // Custom schema for the form to separate date and time for better UX
 const appointmentFormSchema = z.object({
     patientId: z.number().min(1, 'Selecione o paciente'),
@@ -73,6 +81,7 @@ const appointmentFormSchema = z.object({
     duration: z.number().min(15, "Duração mínima é 15 minutos").max(480, "Duração máxima é 8 horas"),
     dateOnly: z.string().min(10, 'Selecione uma data'),
     timeOnly: z.string().min(5, 'Selecione um horário'),
+    status: z.string().optional(),
 });
 
 type AppointmentFormValues = z.infer<typeof appointmentFormSchema>;
@@ -171,6 +180,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
                     duration: appointmentToEdit.duration || 30,
                     dateOnly: format(dateObj, "yyyy-MM-dd"),
                     timeOnly: format(dateObj, "HH:mm"),
+                    status: appointmentToEdit.status || 'SCHEDULED',
                 });
             } else {
                 form.reset({
@@ -179,6 +189,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
                     duration: 30,
                     dateOnly: format(initialDate || new Date(), "yyyy-MM-dd"),
                     timeOnly: '',
+                    status: undefined,
                 });
             }
         }
@@ -194,6 +205,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
             date: combinedDateTime.toISOString(),
             // Auto-assign dentist if loged in as dentist
             dentistId: isDentist && user?.id ? user.id : values.dentistId,
+            ...(isEditing && values.status ? { status: values.status as any } : {}),
         };
 
         const successCallback = () => {
@@ -403,7 +415,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
                                         <FormLabel>Duração</FormLabel>
                                         <Select
                                             onValueChange={(v) => field.onChange(parseInt(v))}
-                                            defaultValue={field.value.toString()}
+                                            value={field.value.toString()}
                                         >
                                             <FormControl>
                                                 <SelectTrigger className="rounded-xl">
@@ -462,6 +474,35 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
                                 </FormItem>
                             )}
                         />
+
+                        {/* Status (edit only) */}
+                        {isEditing && (
+                            <FormField
+                                control={form.control}
+                                name="status"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Status</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="rounded-xl">
+                                                    <SelectValue placeholder="Status do agendamento" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {Object.entries(APPOINTMENT_STATUS_LABELS).map(([value, label]) => (
+                                                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <DialogFooter className="pt-4">
                             <Button

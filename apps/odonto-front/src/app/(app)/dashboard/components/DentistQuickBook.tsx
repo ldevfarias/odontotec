@@ -100,6 +100,7 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
                         <button className="flex flex-col items-center gap-2 min-w-[64px] group cursor-pointer outline-none">
                             <div className="relative">
                                 <Avatar className="h-14 w-14 border-2 border-white shadow-md ring-offset-background transition-all duration-200 group-hover:ring-2 group-hover:ring-primary group-hover:ring-offset-2">
+                                    <AvatarImage src={dentist.avatarUrl} alt={dentist.name} className="object-cover" />
                                     <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">{initials}</AvatarFallback>
                                 </Avatar>
                                 {/* Online indicator */}
@@ -120,6 +121,7 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
                 {/* Header */}
                 <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-t-2xl">
                     <Avatar className="h-11 w-11 border-2 border-white shadow-sm">
+                        <AvatarImage src={dentist.avatarUrl} alt={dentist.name} className="object-cover" />
                         <AvatarFallback className="bg-primary/10 text-primary font-bold">{initials}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
@@ -129,8 +131,8 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
                             <p className="text-[11px] text-emerald-600 font-medium">Disponível hoje</p>
                         </div>
                     </div>
-                    <Badge className="text-[10px] font-semibold bg-primary/10 text-primary border-primary/20 rounded-full px-2 h-5 shrink-0">
-                        Dentista
+                    <Badge className="text-[10px] font-semibold bg-primary/10 text-primary border-primary/20 rounded-full px-2 h-5 shrink-0 uppercase">
+                        {dentist.role === 'OWNER' || dentist.role === 'ADMIN' ? 'Administrador' : (dentist.role === 'DENTIST' ? 'Dentista' : dentist.role)}
                     </Badge>
                 </div>
 
@@ -279,7 +281,17 @@ export function DentistQuickBook() {
     const { data: users = [] } = useUsersControllerFindAll();
     const { data: allPatients = [] } = usePatientsControllerFindAll();
     
-    let professionals = (users as any[]).filter(u => ['DENTIST', 'dentist', 'ADMIN', 'admin'].includes(u.role));
+    const allowedRoles = ['DENTIST', 'ADMIN', 'OWNER'];
+    let professionals = (users as any[])
+        .filter(u => u.role && allowedRoles.includes(u.role.toUpperCase()))
+        .sort((a, b) => {
+            const roleA = a.role.toUpperCase();
+            const roleB = b.role.toUpperCase();
+            
+            // Prioritize OWNER and ADMIN
+            const priority = (role: string) => (role === 'OWNER' ? 0 : role === 'ADMIN' ? 1 : 2);
+            return priority(roleA) - priority(roleB);
+        });
 
     // If the user is a dentist, only show themselves
     if (currentUser?.role?.toUpperCase() === 'DENTIST') {

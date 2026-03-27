@@ -38,6 +38,14 @@ export default function AgendamentosPage() {
         client: { params: { role: 'DENTIST' } } as any
     });
 
+    const roleLabels: Record<string, string> = {
+        OWNER: 'Administrador',
+        ADMIN: 'Administrador',
+        DENTIST: 'Dentista',
+        SIMPLE: 'Recepcionista',
+        RECEPTIONIST: 'Recepcionista',
+    };
+
     const professionals = useMemo<Professional[]>(() => {
         let filteredUsers = userData as any[];
         
@@ -49,7 +57,7 @@ export default function AgendamentosPage() {
         return filteredUsers.map((user, index) => ({
             id: user.id.toString(),
             name: user.name,
-            role: user.role === 'DENTIST' ? 'Dentista' : user.role,
+            role: roleLabels[user.role?.toUpperCase()] || user.role,
             color: PROFESSIONAL_COLORS[index % PROFESSIONAL_COLORS.length]
         }));
     }, [userData, currentUser]);
