@@ -158,7 +158,7 @@ export class SubscriptionService {
             customer: customerId,
             mode: 'subscription',
             payment_method_types: ['card', 'boleto'],
-            payment_method_collection: 'if_required',
+            payment_method_collection: 'always',
             line_items: [
                 {
                     price: priceId,
