@@ -1,1 +1,15 @@
 node_modules
+
+# Turbo
+.turbo/
+**/.turbo/
+
+# Claude Code (local/machine-specific)
+.claude/
+docs/superpowers/
+
+# Project docs (local only)
+PRD.md
+
+# TestSprite
+testsprite_tests/
