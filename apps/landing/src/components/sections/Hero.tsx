@@ -43,8 +43,8 @@ export function Hero() {
                             variants={fadeInUp}
                             className="heading-hero mb-8 text-balance"
                         >
-                            Sua clínica, <br className="hidden md:block" />
-                            <span className="text-primary/90 italic">no ritmo</span> do que você <span className="text-primary italic">eh</span>.
+                            Software de Gestão <br className="hidden md:block" />
+                            <span className="text-primary/90 italic">Odontológica</span> para Dentistas e <span className="text-primary italic">Clínicas</span>.
                         </motion.h1>
 
                         <motion.p
