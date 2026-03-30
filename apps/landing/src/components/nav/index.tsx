@@ -3,11 +3,19 @@
 import { useState } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { APP_URL } from "@/lib/config";
+
+const navLinks = [
+    { href: "/funcionalidades", label: "Funcionalidades" },
+    { href: "/precos", label: "Planos" },
+    { href: "/sobre", label: "Sobre" },
+];
 
 export function Nav() {
     const { scrollY } = useScroll();
     const [isScrolled, setIsScrolled] = useState(false);
+    const pathname = usePathname();
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
@@ -25,23 +33,30 @@ export function Nav() {
         >
             <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
                 {/* Logo */}
-                <div className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2">
                     <span className="font-display font-bold text-2xl tracking-tighter text-foreground">
                         Odonto<span className="text-primary">Eh</span>Tec
                     </span>
-                </div>
+                </Link>
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/funcionalidades" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
-                        Funcionalidades
-                    </Link>
-                    <Link href="/precos" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
-                        Planos
-                    </Link>
-                    <Link href="/sobre" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
-                        Sobre
-                    </Link>
+                    {navLinks.map(({ href, label }) => {
+                        const isActive = pathname === href;
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={`relative py-1 text-sm font-medium transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:transition-transform after:duration-300 after:origin-left ${
+                                    isActive
+                                        ? "text-foreground after:scale-x-100"
+                                        : "text-foreground/70 hover:text-foreground after:scale-x-0 hover:after:scale-x-100"
+                                }`}
+                            >
+                                {label}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 {/* CTA */}
