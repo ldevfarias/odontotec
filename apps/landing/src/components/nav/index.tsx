@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import Link from "next/link";
 import { APP_URL } from "@/lib/config";
 
 export function Nav() {
@@ -32,15 +33,15 @@ export function Nav() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <a href="/funcionalidades" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
+                    <Link href="/funcionalidades" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                         Funcionalidades
-                    </a>
-                    <a href="/precos" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
+                    </Link>
+                    <Link href="/precos" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                         Planos
-                    </a>
-                    <a href="/sobre" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
+                    </Link>
+                    <Link href="/sobre" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                         Sobre
-                    </a>
+                    </Link>
                 </nav>
 
                 {/* CTA */}
