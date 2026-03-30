@@ -32,14 +32,14 @@ export function Nav() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <a href="#features" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
+                    <a href="/funcionalidades" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                         Funcionalidades
                     </a>
-                    <a href="#how-it-works" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
-                        Como funciona
-                    </a>
-                    <a href="#pricing" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
+                    <a href="/precos" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                         Planos
+                    </a>
+                    <a href="/sobre" className="relative py-1 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors cursor-pointer after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
+                        Sobre
                     </a>
                 </nav>
 

@@ -116,3 +116,59 @@ function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
         </svg>
     );
 }
+
+export function Footer() {
+  return (
+    <footer className="bg-background py-16 md:py-24 border-t border-border">
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-8 border-b border-border pb-10 md:pb-12 mb-8">
+          <div className="md:col-span-2">
+            <span className="font-display font-bold text-3xl tracking-tighter text-foreground mb-4 block">
+              Odonto<span className="text-primary">Eh</span>Tec
+            </span>
+            <p className="body-small max-w-xs mb-6">
+              Redefinindo a gestão odontológica com design inteligente e transparência de preços.
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-gray-50 transition-colors">
+                <span className="sr-only">Instagram</span>
+                <InstagramIcon className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-gray-50 transition-colors">
+                <span className="sr-only">LinkedIn</span>
+                <LinkedInIcon className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-4">Produto</h4>
+            <ul className="space-y-3">
+              <li><a href="/funcionalidades" className="body-small hover:text-foreground transition-colors">Funcionalidades</a></li>
+              <li><a href="/precos" className="body-small hover:text-foreground transition-colors">Planos & Preços</a></li>
+              <li><a href="/#faq" className="body-small hover:text-foreground transition-colors">FAQ</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-4">Empresa</h4>
+            <ul className="space-y-3">
+              <li><a href="/sobre" className="body-small hover:text-foreground transition-colors">Sobre</a></li>
+              <li><a href="#" className="body-small hover:text-foreground transition-colors">Termos de Uso</a></li>
+              <li><a href="#" className="body-small hover:text-foreground transition-colors">Privacidade</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} OdontoEhTec. Todos os direitos reservados.
+          </p>
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            Feito com <span className="text-primary">♥</span> no Brasil
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
