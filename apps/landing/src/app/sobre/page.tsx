@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Nav } from "@/components/nav";
 import { Footer } from "@/components/sections/Footer";
 import { APP_URL } from "@/lib/config";
 
@@ -39,8 +38,6 @@ export default function SobrePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
-      <Nav />
-
       <section className="pt-36 pb-16 bg-background">
         <div className="container mx-auto px-6 md:px-12 max-w-3xl">
           <div className="mb-6 flex items-center gap-3">

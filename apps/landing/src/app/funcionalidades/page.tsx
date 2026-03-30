@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Nav } from "@/components/nav";
 import { Features } from "@/components/sections/Features";
 import { Footer } from "@/components/sections/Footer";
 import { APP_URL } from "@/lib/config";
@@ -51,8 +50,6 @@ export default function FuncionalidadesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(featureSchema) }}
       />
-      <Nav />
-
       <section className="pt-36 pb-12 bg-background">
         <div className="container mx-auto px-6 md:px-12 max-w-3xl text-center">
           <div className="mb-6 flex items-center justify-center gap-3">
