@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
+import { Nav } from "@/components/nav";
 
 const softwareApplicationSchema = {
   "@context": "https://schema.org",
@@ -83,7 +85,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased selection:bg-primary/20">
-        {children}
+        <Providers>
+          <Nav />
+          {children}
+        </Providers>
       </body>
     </html>
   );

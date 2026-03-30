@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 export function MissionAndFooter() {
@@ -144,16 +145,16 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-4">Produto</h4>
             <ul className="space-y-3">
-              <li><a href="/funcionalidades" className="body-small hover:text-foreground transition-colors">Funcionalidades</a></li>
-              <li><a href="/precos" className="body-small hover:text-foreground transition-colors">Planos & Preços</a></li>
-              <li><a href="/#faq" className="body-small hover:text-foreground transition-colors">FAQ</a></li>
+              <li><Link href="/funcionalidades" className="body-small hover:text-foreground transition-colors">Funcionalidades</Link></li>
+              <li><Link href="/precos" className="body-small hover:text-foreground transition-colors">Planos & Preços</Link></li>
+              <li><Link href="/#faq" className="body-small hover:text-foreground transition-colors">FAQ</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold mb-4">Empresa</h4>
             <ul className="space-y-3">
-              <li><a href="/sobre" className="body-small hover:text-foreground transition-colors">Sobre</a></li>
+              <li><Link href="/sobre" className="body-small hover:text-foreground transition-colors">Sobre</Link></li>
               <li><a href="#" className="body-small hover:text-foreground transition-colors">Termos de Uso</a></li>
               <li><a href="#" className="body-small hover:text-foreground transition-colors">Privacidade</a></li>
             </ul>
