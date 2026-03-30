@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Pricing } from "@/components/sections/Pricing";
-import { Footer } from "@/components/sections/Mission";
+import { Footer } from "@/components/sections/Footer";
 import { APP_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Planos e Preços | OdontoEhTec — R$ 49,99/mês, tudo incluso",
   description: "Software odontológico completo por R$ 49,99/mês. Equipe ilimitada, sem taxa de setup, cancele quando quiser. Compare com os concorrentes e veja quanto você economiza.",
+  alternates: { canonical: "https://odontoehtec.com.br/precos" },
   openGraph: {
     title: "Planos e Preços do OdontoEhTec | R$ 49,99/mês, sem surpresas",
     description: "Um plano único com tudo incluso. Equipe ilimitada, prontuário, agenda e financeiro por R$ 49,99/mês.",
     url: "https://odontoehtec.com.br/precos",
+    siteName: "OdontoEhTec",
+    locale: "pt_BR",
+    type: "website",
+    images: [{ url: "https://odontoehtec.com.br/opengraph-image", width: 1200, height: 630 }],
   },
 };
 
@@ -54,12 +59,29 @@ const priceFaqs = [
   }
 ];
 
+const priceFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": priceFaqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.a
+    }
+  }))
+};
+
 export default function PrecosPage() {
   return (
     <main className="min-h-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(priceSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(priceFaqSchema) }}
       />
       <Nav />
 

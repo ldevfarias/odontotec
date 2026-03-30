@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const softwareApplicationSchema = {
@@ -28,11 +28,17 @@ const softwareApplicationSchema = {
   ]
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#41b883",
+};
+
 export const metadata: Metadata = {
   title: "OdontoEhTec | Software de Gestão Odontológica",
   description: "Software de gestão odontológica completo: prontuário digital, agenda inteligente e financeiro. Equipe ilimitada por R$ 49,99/mês. Teste grátis por 7 dias.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
-  themeColor: "#41b883",
+  alternates: { canonical: "https://odontoehtec.com.br" },
   openGraph: {
     title: "OdontoEhTec | Software de Gestão Odontológica",
     description: "Prontuário, agenda e financeiro em um único lugar. Equipe ilimitada. R$ 49,99/mês, sem surpresas.",

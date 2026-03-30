@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Features } from "@/components/sections/Features";
-import { Footer } from "@/components/sections/Mission";
+import { Footer } from "@/components/sections/Footer";
 import { APP_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Funcionalidades | OdontoEhTec — Prontuário, Agenda e Financeiro",
   description: "Conheça todas as funcionalidades do OdontoEhTec: prontuário digital, agenda inteligente, gestão financeira e equipe ilimitada. Feito para dentistas solos e clínicas.",
+  alternates: { canonical: "https://odontoehtec.com.br/funcionalidades" },
   openGraph: {
     title: "Funcionalidades do OdontoEhTec | Prontuário, Agenda e Financeiro",
     description: "Conheça todas as funcionalidades do OdontoEhTec: prontuário digital, agenda inteligente, gestão financeira e equipe ilimitada.",
     url: "https://odontoehtec.com.br/funcionalidades",
+    siteName: "OdontoEhTec",
+    locale: "pt_BR",
+    type: "website",
+    images: [{ url: "https://odontoehtec.com.br/opengraph-image", width: 1200, height: 630 }],
   },
 };
 

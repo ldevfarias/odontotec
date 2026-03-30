@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
-import { Footer } from "@/components/sections/Mission";
+import { Footer } from "@/components/sections/Footer";
 import { APP_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Sobre | OdontoEhTec — Software odontológico feito no Brasil",
   description: "Conheça a história por trás do OdontoEhTec. Um software criado por brasileiros para dentistas brasileiros, com suporte em português e preço justo.",
+  alternates: { canonical: "https://odontoehtec.com.br/sobre" },
   openGraph: {
     title: "Sobre o OdontoEhTec | Software odontológico feito no Brasil",
     description: "Conheça a história e a missão do OdontoEhTec: tecnologia odontológica transparente, acessível e feita no Brasil.",
     url: "https://odontoehtec.com.br/sobre",
+    siteName: "OdontoEhTec",
+    locale: "pt_BR",
+    type: "website",
+    images: [{ url: "https://odontoehtec.com.br/opengraph-image", width: 1200, height: 630 }],
   },
 };
 
@@ -24,8 +29,7 @@ const organizationSchema = {
     "name": "Brasil"
   },
   "description": "Software de gestão odontológica feito no Brasil para dentistas brasileiros.",
-  "inLanguage": "pt-BR",
-  "sameAs": []
+  "inLanguage": "pt-BR"
 };
 
 export default function SobrePage() {
