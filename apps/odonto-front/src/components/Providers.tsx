@@ -1,8 +1,21 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ProgressProvider } from '@bprogress/next/app';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+function ProgressBootstrap() {
+    useEffect(() => {
+        const id = setTimeout(() => {
+            const el = document.createElement('x');
+            document.body.appendChild(el);
+            document.body.removeChild(el);
+        }, 0);
+        return () => clearTimeout(id);
+    }, []);
+    return null;
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
     const [queryClient] = useState(() => new QueryClient({
@@ -16,10 +29,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
     }));
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-                {children}
-            </AuthProvider>
-        </QueryClientProvider>
+        <ProgressProvider
+            height="3px"
+            color="#41b883"
+            options={{ showSpinner: false }}
+            shallowRouting
+        >
+            <ProgressBootstrap />
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                    {children}
+                </AuthProvider>
+            </QueryClientProvider>
+        </ProgressProvider>
     );
 }
