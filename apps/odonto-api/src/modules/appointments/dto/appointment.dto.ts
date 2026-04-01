@@ -59,6 +59,7 @@ export class UpdateAppointmentDto {
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @IsNotEmpty()
     @MaxLength(1000)
     cancellationReason?: string;
 }
