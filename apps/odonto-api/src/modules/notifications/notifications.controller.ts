@@ -1,10 +1,11 @@
-import { Controller, Get, Patch, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, ParseIntPipe, UseGuards, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Tenant } from '../../common/decorators/tenant.decorator';
 import { CurrentUser } from '../../common/decorators/user.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('Notifications')
 @ApiBearerAuth()
@@ -18,9 +19,10 @@ export class NotificationsController {
     findAll(
         @Tenant() clinicId: number,
         @CurrentUser('userId') userId: number,
-        @CurrentUser('role') role: string
+        @CurrentUser('role') role: string,
+        @Query() pagination: PaginationDto
     ) {
-        return this.notificationsService.findAll(clinicId, userId, role);
+        return this.notificationsService.findAll(clinicId, userId, role, pagination.page, pagination.limit);
     }
 
     @Patch(':id/read')

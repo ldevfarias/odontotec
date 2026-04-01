@@ -10,6 +10,7 @@ import { UserRole } from '../users/enums/role.enum';
 import { Tenant } from '../../common/decorators/tenant.decorator';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { Public } from '../auth/decorators/public.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('Appointments')
 @ApiBearerAuth()
@@ -93,6 +94,7 @@ export class AppointmentsController {
         @Tenant() clinicId: number,
         @CurrentUser('role') role: string,
         @CurrentUser('userId') userId: number,
+        @Query() pagination: PaginationDto,
         @Query('date') date?: string,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
@@ -100,7 +102,7 @@ export class AppointmentsController {
         @Query('patientId') patientId?: number,
         @Query('includeOccurrences', new ParseBoolPipe({ optional: true })) includeOccurrences?: boolean
     ) {
-        return this.appointmentsService.findAll(clinicId, role, userId, { date, startDate, endDate, dentistId, patientId, includeOccurrences });
+        return this.appointmentsService.findAll(clinicId, role, userId, { date, startDate, endDate, dentistId, patientId, includeOccurrences, page: pagination.page, limit: pagination.limit });
     }
 
     @Get(':id')

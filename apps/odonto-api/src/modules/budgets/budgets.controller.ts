@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { BudgetsService } from './budgets.service';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { getClinicId } from '../../common/get-clinic-id';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/enums/role.enum';
@@ -26,8 +27,8 @@ export class BudgetsController {
 
     @Get('patient/:patientId')
     @ApiOperation({ summary: 'Get all budgets for a patient' })
-    findAllByPatient(@Param('patientId', ParseIntPipe) patientId: number, @Request() req) {
-        return this.budgetsService.findAllByPatient(getClinicId(req), patientId);
+    findAllByPatient(@Param('patientId', ParseIntPipe) patientId: number, @Request() req, @Query() pagination: PaginationDto) {
+        return this.budgetsService.findAllByPatient(getClinicId(req), patientId, pagination.page, pagination.limit);
     }
 
     @Get(':id')

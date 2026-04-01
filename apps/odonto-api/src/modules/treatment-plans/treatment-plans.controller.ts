@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { TreatmentPlansService } from './treatment-plans.service';
 import { CreateTreatmentPlanDto, UpdateTreatmentPlanDto } from './dto/treatment-plan.dto';
@@ -7,6 +7,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/enums/role.enum';
 import { getClinicId } from '../../common/get-clinic-id';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('Treatment Plans')
 @ApiBearerAuth()
@@ -25,8 +26,8 @@ export class TreatmentPlansController {
 
     @Get()
     @ApiOperation({ summary: 'Get all treatment plans for the clinic' })
-    findAll(@Request() req) {
-        return this.treatmentPlansService.findAll(getClinicId(req));
+    findAll(@Request() req, @Query() pagination: PaginationDto) {
+        return this.treatmentPlansService.findAll(getClinicId(req), pagination.page, pagination.limit);
     }
 
     @Get(':id')

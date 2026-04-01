@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from './entities/user.entity';
@@ -183,12 +184,14 @@ export class UsersService {
         return this.createUser(createUserDto);
     }
 
-    async findAllByClinic(clinicId: number): Promise<ClinicUserDto[]> {
-        const memberships = await this.membershipRepository.find({
+    async findAllByClinic(clinicId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<ClinicUserDto>> {
+        const [memberships, total] = await this.membershipRepository.findAndCount({
             where: { clinicId, isActive: true },
             relations: ['user'],
+            skip: (page - 1) * limit,
+            take: limit,
         });
-        return memberships
+        const data = memberships
             .filter(m => m.user)
             .map(m => ({
                 id: m.user.id,
@@ -198,6 +201,7 @@ export class UsersService {
                 isActive: m.user.isActive,
                 avatarUrl: m.avatarUrl ?? null,
             }));
+        return { data, total, page, limit };
     }
 
     async update(id: number, updateUserDto: UpdateUserDto | Partial<User>): Promise<User | null> {

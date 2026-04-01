@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { EmailService } from '../email/email.service';
@@ -114,7 +115,10 @@ export class AppointmentsService {
         }
     }
 
-    async findAll(clinicId: number, role?: string, userId?: number, options?: { date?: string; startDate?: string; endDate?: string; dentistId?: number; patientId?: number; includeOccurrences?: boolean }): Promise<Appointment[]> {
+    async findAll(clinicId: number, role?: string, userId?: number, options?: { date?: string; startDate?: string; endDate?: string; dentistId?: number; patientId?: number; includeOccurrences?: boolean; page?: number; limit?: number }): Promise<PaginatedResponseDto<Appointment>> {
+        const page = options?.page ?? 1;
+        const limit = options?.limit ?? 50;
+
         const query = this.appointmentsRepository.createQueryBuilder('appointment')
             .leftJoinAndSelect('appointment.patient', 'patient')
             .leftJoinAndSelect('appointment.dentist', 'dentist')
@@ -145,7 +149,13 @@ export class AppointmentsService {
             query.andWhere('appointment.date BETWEEN :start AND :end', { start, end });
         }
 
-        return query.orderBy('appointment.date', 'ASC').getMany();
+        const [data, total] = await query
+            .orderBy('appointment.date', 'ASC')
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
+
+        return { data, total, page, limit };
     }
 
     async findOne(id: number, clinicId: number): Promise<Appointment> {

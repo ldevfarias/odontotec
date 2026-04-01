@@ -13,6 +13,7 @@ import { EmailService } from '../email/email.service';
 const mockRepo = () => ({
     find: jest.fn(),
     findOne: jest.fn(),
+    findAndCount: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
     update: jest.fn(),
@@ -44,7 +45,7 @@ describe('UsersService - findAllByClinic', () => {
     });
 
     it('returns users with avatarUrl from membership', async () => {
-        mockMembershipRepo.find.mockResolvedValue([
+        const memberships = [
             {
                 role: 'DENTIST',
                 user: { id: 1, name: 'Ana', email: 'ana@test.com', isActive: true },
@@ -55,14 +56,20 @@ describe('UsersService - findAllByClinic', () => {
                 user: { id: 2, name: 'Bob', email: 'bob@test.com', isActive: true },
                 avatarUrl: null,
             },
-        ]);
+        ];
+        mockMembershipRepo.findAndCount.mockResolvedValue([memberships, 2]);
 
         const result = await service.findAllByClinic(5);
 
-        expect(result).toEqual([
-            { id: 1, name: 'Ana', email: 'ana@test.com', role: 'DENTIST', isActive: true, avatarUrl: 'https://cdn.example.com/clinics/5/avatars/uuid.jpg' },
-            { id: 2, name: 'Bob', email: 'bob@test.com', role: 'RECEPTIONIST', isActive: true, avatarUrl: null },
-        ]);
+        expect(result).toEqual({
+            data: [
+                { id: 1, name: 'Ana', email: 'ana@test.com', role: 'DENTIST', isActive: true, avatarUrl: 'https://cdn.example.com/clinics/5/avatars/uuid.jpg' },
+                { id: 2, name: 'Bob', email: 'bob@test.com', role: 'RECEPTIONIST', isActive: true, avatarUrl: null },
+            ],
+            total: 2,
+            page: 1,
+            limit: 50,
+        });
     });
 });
 

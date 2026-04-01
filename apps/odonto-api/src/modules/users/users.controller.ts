@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, ParseIntPipe, NotFoundException, Request, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, ParseIntPipe, NotFoundException, Request, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -12,6 +12,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { UserRole } from './enums/role.enum';
 import { Tenant } from '../../common/decorators/tenant.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -88,9 +89,9 @@ export class UsersController {
     @Get()
     @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
     @ApiOperation({ summary: 'List all clinic users' })
-    @ApiResponse({ status: 200, type: [ClinicUserDto] })
-    findAll(@Tenant() clinicId: number): Promise<ClinicUserDto[]> {
-        return this.usersService.findAllByClinic(clinicId);
+    @ApiResponse({ status: 200 })
+    findAll(@Tenant() clinicId: number, @Query() pagination: PaginationDto) {
+        return this.usersService.findAllByClinic(clinicId, pagination.page, pagination.limit);
     }
 
     @Patch(':id')

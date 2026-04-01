@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Patient } from './entities/patient.entity';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { AnamnesisService } from './services/anamnesis.service';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 
 @Injectable()
 export class PatientsService {
@@ -21,9 +22,15 @@ export class PatientsService {
         return this.patientsRepository.save(patient);
     }
 
-    async findAll(clinicId: number): Promise<any[]> {
-        const query = `
-            SELECT 
+    async findAll(clinicId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<any>> {
+        const offset = (page - 1) * limit;
+        const countQuery = `
+            SELECT COUNT(*) AS total
+            FROM patients p
+            WHERE p.clinic_id = $1 AND p.deleted_at IS NULL
+        `;
+        const dataQuery = `
+            SELECT
                 p.id, p.name, p.birth_date AS "birthDate", p.email, p.phone, p.address, p.document, p.clinic_id AS "clinicId", p.created_at AS "createdAt", p.updated_at AS "updatedAt",
                 MAX(pr.date) AS "lastProcedureDate",
                 MIN(CASE WHEN a.date >= CURRENT_DATE AND a.status NOT IN ('CANCELLED', 'ABSENT') THEN a.date END) AS "nextAppointmentDate"
@@ -32,9 +39,15 @@ export class PatientsService {
             LEFT JOIN appointments a ON a.patient_id = p.id AND a.clinic_id = $1
             WHERE p.clinic_id = $1 AND p.deleted_at IS NULL
             GROUP BY p.id
-            ORDER BY p.name ASC;
+            ORDER BY p.name ASC
+            LIMIT $2 OFFSET $3;
         `;
-        return this.patientsRepository.query(query, [clinicId]);
+        const [countResult, data] = await Promise.all([
+            this.patientsRepository.query(countQuery, [clinicId]),
+            this.patientsRepository.query(dataQuery, [clinicId, limit, offset]),
+        ]);
+        const total = parseInt(countResult[0]?.total ?? '0', 10);
+        return { data, total, page, limit };
     }
 
     async findOne(id: number, clinicId: number): Promise<any> {
