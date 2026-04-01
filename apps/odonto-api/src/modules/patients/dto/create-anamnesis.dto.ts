@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsDefined, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsDefined, ArrayMaxSize, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -25,6 +25,7 @@ export class AnamnesisDataDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AnamnesisAnswerDto)
+    @ArrayMaxSize(100)
     answers: AnamnesisAnswerDto[];
 }
 

@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsEnum, IsArray, ValidateNested, MaxLength } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsEnum, IsArray, ValidateNested, ArrayMaxSize, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { TreatmentPlanStatus, TreatmentPlanItemStatus } from '../enums/status.enum';
@@ -76,6 +76,7 @@ export class CreateTreatmentPlanDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => TreatmentPlanItemDto)
+    @ArrayMaxSize(50)
     items: TreatmentPlanItemDto[];
 }
 
