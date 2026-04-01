@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import express from 'express';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { AppDataSource } from './typeorm.config';
 
@@ -21,6 +22,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true, // Enable raw body for Stripe Webhooks
   });
+
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ limit: '1mb', extended: true }));
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -41,7 +45,7 @@ async function bootstrap() {
   });
 
   app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginResourcePolicy: { policy: 'same-origin' },
   }));
 
   app.useGlobalFilters(new GlobalExceptionFilter());
