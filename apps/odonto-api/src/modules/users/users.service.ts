@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository, IsNull, Not } from 'typeorm';
 import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
@@ -186,7 +186,7 @@ export class UsersService {
 
     async findAllByClinic(clinicId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<ClinicUserDto>> {
         const [memberships, total] = await this.membershipRepository.findAndCount({
-            where: { clinicId, isActive: true },
+            where: { clinicId, isActive: true, user: Not(IsNull()) },
             relations: ['user'],
             skip: (page - 1) * limit,
             take: limit,
