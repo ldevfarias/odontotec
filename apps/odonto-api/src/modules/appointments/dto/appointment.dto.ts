@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { AppointmentStatus } from '../entities/appointment.entity';
 
 export class CreateAppointmentDto {
@@ -58,6 +58,7 @@ export class UpdateAppointmentDto {
 
     @ApiProperty({ required: false })
     @IsOptional()
-    @IsNotEmpty()
+    @IsString()
+    @MaxLength(1000)
     cancellationReason?: string;
 }

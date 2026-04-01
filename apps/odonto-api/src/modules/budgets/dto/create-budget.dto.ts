@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, IsArray, ValidateNested, ArrayMinSize } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsArray, ValidateNested, ArrayMinSize, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateBudgetItemDto } from './create-budget-item.dto';
 
@@ -8,6 +8,7 @@ export class CreateBudgetDto {
 
     @IsOptional()
     @IsString()
+    @MaxLength(2000)
     notes?: string;
 
     @IsArray()
