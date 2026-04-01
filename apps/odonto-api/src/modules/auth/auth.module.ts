@@ -17,10 +17,16 @@ import { EmailModule } from '../email/email.module';
         PassportModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET') || 'secretKey',
-                signOptions: { expiresIn: '60m' },
-            }),
+            useFactory: async (configService: ConfigService) => {
+                const secret = configService.get<string>('JWT_SECRET');
+                if (!secret) {
+                    throw new Error('JWT_SECRET environment variable is required');
+                }
+                return {
+                    secret,
+                    signOptions: { expiresIn: '15m' },
+                };
+            },
             inject: [ConfigService],
         }),
         EmailModule,

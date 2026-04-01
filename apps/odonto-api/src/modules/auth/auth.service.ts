@@ -266,6 +266,8 @@ export class AuthService {
         const refreshTokenMatches = await bcrypt.compare(refreshToken, user.currentHashedRefreshToken);
         if (!refreshTokenMatches) throw new UnauthorizedException('Access Denied');
 
+        if (!user.isActive) throw new UnauthorizedException('Access Denied');
+
         const tokens = await this.getTokens(user.id, user.email, user.role, user.isActive);
         await this.updateRefreshToken(user.id, tokens.refresh_token);
         return tokens;
