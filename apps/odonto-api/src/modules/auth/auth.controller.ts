@@ -48,6 +48,7 @@ export class AuthController {
         return result;
     }
 
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Public()
     @Post('register-invitation')
     @ApiOperation({ summary: 'Register from invitation token' })
@@ -58,6 +59,7 @@ export class AuthController {
         return result;
     }
 
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Public()
     @Post('register-tenant')
     @ApiOperation({ summary: 'Register a new clinic and admin user' })
@@ -68,6 +70,7 @@ export class AuthController {
         return result;
     }
 
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Public()
     @Post('initiate-registration')
     @ApiOperation({ summary: 'Initiate account registration' })
@@ -76,6 +79,7 @@ export class AuthController {
         return this.authService.initiateRegistration(dto);
     }
 
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Public()
     @Post('verify-email')
     @ApiOperation({ summary: 'Verify email and create user' })
