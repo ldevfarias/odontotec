@@ -34,11 +34,18 @@ async function bootstrap() {
   }));
   app.use(cookieParser());
 
-  const allowedOrigins = buildCorsOrigins(
-    process.env.FRONTEND_URL || 'http://localhost:3001',
-    process.env.NODE_ENV || 'development',
-  );
+  let allowedOrigins: string[] = [];
+  try {
+    allowedOrigins = buildCorsOrigins(
+      process.env.FRONTEND_URL || 'http://localhost:3001',
+      process.env.NODE_ENV || 'development',
+    );
+  } catch (err) {
+    console.error('[CORS] Invalid FRONTEND_URL configuration:', (err as Error).message);
+    process.exit(1);
+  }
 
+  // Required so ThrottlerGuard reads real client IPs from X-Forwarded-For behind Fly.io's nginx proxy
   if (process.env.NODE_ENV === 'production') {
     app.getHttpAdapter().getInstance().set('trust proxy', 1);
   }

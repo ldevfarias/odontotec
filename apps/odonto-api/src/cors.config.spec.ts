@@ -38,4 +38,12 @@ describe('buildCorsOrigins', () => {
     it('throws when origin is empty string', () => {
         expect(() => buildCorsOrigins(',', 'development')).toThrow('empty');
     });
+
+    it('throws when a completely empty string is provided', () => {
+        expect(() => buildCorsOrigins('', 'development')).toThrow('empty');
+    });
+
+    it('throws when one origin in a list is invalid', () => {
+        expect(() => buildCorsOrigins('http://localhost:3001,not-a-url', 'development')).toThrow('not a valid URL');
+    });
 });
