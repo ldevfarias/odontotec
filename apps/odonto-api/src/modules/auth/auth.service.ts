@@ -281,7 +281,7 @@ export class AuthService {
 
             const tokens = await this.getTokens(user.id, user.email, user.role, user.isActive);
             await this.updateRefreshToken(user.id, tokens.refresh_token, manager);
-            return { _tokens: tokens };
+            return { _tokens: tokens, message: 'Tokens refreshed' };
         });
     }
 

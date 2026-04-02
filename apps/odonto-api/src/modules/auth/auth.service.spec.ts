@@ -509,6 +509,19 @@ describe('AuthService', () => {
             expect(result).not.toHaveProperty('refresh_token');
         });
 
+        it('refreshTokens() returns a message field so the controller does not respond with an empty body', async () => {
+            const user = buildUser();
+            mockUsersService.findOneWithRefreshToken.mockResolvedValue(user);
+            bcryptMock.compare.mockResolvedValue(true);
+            mockUsersService.update.mockResolvedValue(undefined);
+
+            const { _tokens, ...data } = await service.refreshTokens(1, 'valid-token') as any;
+
+            expect(data).toHaveProperty('message');
+            expect(typeof data.message).toBe('string');
+            expect(data.message.length).toBeGreaterThan(0);
+        });
+
         it('registerTenant() does not return access_token or refresh_token in the top-level object', async () => {
             const user = buildUser();
             mockUsersService.createUser.mockResolvedValue(user);
