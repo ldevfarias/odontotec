@@ -59,6 +59,7 @@ const mockUsersService = {
     deletePendingRegistration: jest.fn(),
     update: jest.fn(),
     findOne: jest.fn(),
+    completeInvitation: jest.fn(),
 };
 
 const mockClinicsService = {
@@ -506,6 +507,91 @@ describe('AuthService', () => {
 
             expect(result).not.toHaveProperty('access_token');
             expect(result).not.toHaveProperty('refresh_token');
+        });
+
+        it('registerTenant() does not return access_token or refresh_token in the top-level object', async () => {
+            const user = buildUser();
+            mockUsersService.createUser.mockResolvedValue(user);
+            mockClinicsService.createForUser.mockResolvedValue({ id: 10, name: 'Test Clinic' });
+            mockUsersService.update.mockResolvedValue(undefined);
+            mockEmailService.sendWelcomeEmail.mockResolvedValue(undefined);
+
+            const result = await service.registerTenant({
+                userName: 'Dr. Ana',
+                email: 'ana@clinic.com',
+                password: 'pass123',
+                clinicName: 'Test Clinic',
+                clinicPhone: '',
+                clinicAddress: '',
+            });
+
+            expect(result).not.toHaveProperty('access_token');
+            expect(result).not.toHaveProperty('refresh_token');
+            expect(result).toHaveProperty('user');
+            expect(result).toHaveProperty('clinics');
+        });
+
+        it('verifyEmailAndSetPassword() does not return access_token or refresh_token in the top-level object', async () => {
+            const pendingReg = { id: 42, name: 'Dr. Ana', email: 'ana@clinic.com', termsAcceptedAt: new Date() };
+            const createdUser = { id: 1, name: 'Dr. Ana', email: 'ana@clinic.com', role: 'ADMIN', isActive: false };
+            mockUsersService.findPendingRegistrationByToken.mockResolvedValue(pendingReg);
+            mockUsersService.createUser.mockResolvedValue(createdUser);
+            mockClinicsService.createForUser.mockResolvedValue({ id: 10, name: 'Dr. Ana Clinic' });
+            mockUsersService.deletePendingRegistration.mockResolvedValue(undefined);
+            mockUsersService.update.mockResolvedValue(undefined);
+
+            const result = await service.verifyEmailAndSetPassword({
+                token: 'valid-token',
+                password: 'Pass123!',
+                confirmPassword: 'Pass123!',
+            });
+
+            expect(result).not.toHaveProperty('access_token');
+            expect(result).not.toHaveProperty('refresh_token');
+            expect(result).toHaveProperty('user');
+        });
+
+        it('completeClinicSetup() does not return access_token or refresh_token in the top-level object', async () => {
+            const user = buildUser({ isActive: false, termsAcceptedAt: new Date() });
+            mockUsersService.findOne.mockResolvedValue(user);
+            mockClinicsService.findAllByUser.mockResolvedValue([
+                { clinic: { id: 10, name: 'Old Clinic' }, role: 'OWNER' }
+            ]);
+            mockClinicsService.update.mockResolvedValue(undefined);
+            mockUsersService.update.mockResolvedValue(undefined);
+            mockEmailService.sendWelcomeEmail.mockResolvedValue(undefined);
+
+            const result = await service.completeClinicSetup(1, {
+                clinicName: 'New Clinic',
+                clinicPhone: '11999999999',
+                clinicAddress: 'Rua X',
+            });
+
+            expect(result).not.toHaveProperty('access_token');
+            expect(result).not.toHaveProperty('refresh_token');
+            expect(result).toHaveProperty('clinics');
+        });
+
+        it('registerByInvitation() does not return access_token or refresh_token in the top-level object', async () => {
+            const user = buildUser();
+            const invitation = { clinicId: 10, role: 'ADMIN' };
+            mockUsersService.completeInvitation.mockResolvedValue({ user, invitation });
+            mockClinicsService.addMember.mockResolvedValue(undefined);
+            mockUsersService.update.mockResolvedValue(undefined);
+            mockClinicsService.findAllByUser.mockResolvedValue([
+                { clinic: { id: 10, name: 'Ana Clinic' }, role: 'ADMIN', avatarUrl: null }
+            ]);
+
+            const result = await service.registerByInvitation({
+                token: 'invite-token',
+                name: 'Dr. Ana',
+                password: 'Pass123!',
+            });
+
+            expect(result).not.toHaveProperty('access_token');
+            expect(result).not.toHaveProperty('refresh_token');
+            expect(result).toHaveProperty('user');
+            expect(result).toHaveProperty('clinics');
         });
     });
 });

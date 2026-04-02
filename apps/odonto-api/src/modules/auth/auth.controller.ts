@@ -40,7 +40,7 @@ export class AuthController {
     @Public()
     @Post('login')
     @ApiOperation({ summary: 'User login' })
-    @ApiResponse({ status: 200, description: 'Return JWT tokens' })
+    @ApiResponse({ status: 200, description: 'User authenticated — session set via HttpOnly cookies' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
         const { _tokens, ...data } = await this.authService.login(loginDto);
@@ -63,7 +63,7 @@ export class AuthController {
     @Public()
     @Post('register-tenant')
     @ApiOperation({ summary: 'Register a new clinic and admin user' })
-    @ApiResponse({ status: 201, description: 'Clinic and User created, returns tokens' })
+    @ApiResponse({ status: 201, description: 'Clinic and user created — session set via HttpOnly cookies' })
     async registerTenant(@Body() registerDto: RegisterTenantDto, @Res({ passthrough: true }) res: Response) {
         const { _tokens, ...data } = await this.authService.registerTenant(registerDto);
         this.setCookies(res, _tokens.access_token, _tokens.refresh_token);
@@ -83,7 +83,7 @@ export class AuthController {
     @Public()
     @Post('verify-email')
     @ApiOperation({ summary: 'Verify email and create user' })
-    @ApiResponse({ status: 201, description: 'User created, returns tokens' })
+    @ApiResponse({ status: 201, description: 'User created — session set via HttpOnly cookies' })
     async verifyEmail(@Body() dto: VerifyEmailDto, @Res({ passthrough: true }) res: Response) {
         const { _tokens, ...data } = await this.authService.verifyEmailAndSetPassword(dto);
         this.setCookies(res, _tokens.access_token, _tokens.refresh_token);
