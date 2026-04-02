@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { AppDataSource } from './typeorm.config';
+import { buildCorsOrigins } from './cors.config';
 
 async function runMigrations() {
   console.log('🔄 Running database migrations...');
@@ -33,9 +34,14 @@ async function bootstrap() {
   }));
   app.use(cookieParser());
 
-  const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3001')
-    .split(',')
-    .map((url) => url.trim());
+  const allowedOrigins = buildCorsOrigins(
+    process.env.FRONTEND_URL || 'http://localhost:3001',
+    process.env.NODE_ENV || 'development',
+  );
+
+  if (process.env.NODE_ENV === 'production') {
+    app.getHttpAdapter().getInstance().set('trust proxy', 1);
+  }
 
   app.enableCors({
     origin: allowedOrigins,
