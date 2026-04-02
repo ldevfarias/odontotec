@@ -52,7 +52,7 @@ export default function ClinicSetupPage() {
             // Update AuthContext with new active token and clinics
             // AuthContext's login function handles the redirect logically
             if (user) {
-                login(res.access_token, values.clinicName, user, res.clinics);
+                login('', values.clinicName, user, res.clinics);
             } else {
                 router.push('/dashboard');
             }

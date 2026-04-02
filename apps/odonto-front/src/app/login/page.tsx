@@ -35,21 +35,18 @@ export default function LoginPage() {
         mutate({ data: values }, {
             onSuccess: (response) => {
                 const res = response as any;
-                if (res.access_token) {
-                    // Identify user in PostHog upon successful login
-                    if (res.user?.id) {
-                        analytics.identify(String(res.user.id), {
-                            email: res.user.email,
-                            name: res.user.name,
-                            role: res.user.role,
-                        });
-                    }
-                    analytics.capture(EVENT_NAMES.USER_LOGGED_IN, {
-                        email: values.email,
-                        role: res.user?.role,
+                if (res.user?.id) {
+                    analytics.identify(String(res.user.id), {
+                        email: res.user.email,
+                        name: res.user.name,
+                        role: res.user.role,
                     });
-                    login(res.access_token, undefined, res.user, res.clinics);
                 }
+                analytics.capture(EVENT_NAMES.USER_LOGGED_IN, {
+                    email: values.email,
+                    role: res.user?.role,
+                });
+                login('', undefined, res.user, res.clinics);
             },
             onError: (error: any) => {
                 console.error('Login error:', error);

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { DataSource } from 'typeorm';
 
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -57,11 +58,14 @@ const mockUsersService = {
     createUser: jest.fn(),
     deletePendingRegistration: jest.fn(),
     update: jest.fn(),
+    findOne: jest.fn(),
 };
 
 const mockClinicsService = {
     findAllByUser: jest.fn(),
     createForUser: jest.fn(),
+    addMember: jest.fn(),
+    update: jest.fn(),
 };
 
 const mockJwtService = {
@@ -81,6 +85,18 @@ const mockConfigService = {
 
 const mockEmailService = {
     sendPasswordResetEmail: jest.fn(),
+    sendWelcomeEmail: jest.fn(),
+};
+
+const mockDataSource = {
+    transaction: jest.fn((cb) => cb({
+        getRepository: jest.fn().mockReturnValue({
+            findOne: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+            create: jest.fn(),
+        }),
+    })),
 };
 
 // ---------------------------------------------------------------------------
@@ -110,6 +126,7 @@ describe('AuthService', () => {
                 { provide: JwtService, useValue: mockJwtService },
                 { provide: ConfigService, useValue: mockConfigService },
                 { provide: EmailService, useValue: mockEmailService },
+                { provide: DataSource, useValue: mockDataSource },
             ],
         }).compile();
 
@@ -190,11 +207,10 @@ describe('AuthService', () => {
             mockClinicsService.findAllByUser.mockResolvedValue(clinicMemberships);
             mockUsersService.update.mockResolvedValue(undefined);
 
-            const result = await service.login({ email: 'ana@clinic.com', password: 'correct' });
+            const result = await service.login({ email: 'ana@clinic.com', password: 'correct-password' });
 
             expect(result).toMatchObject({
-                access_token: mockTokens.access_token,
-                refresh_token: mockTokens.refresh_token,
+                _tokens: { access_token: mockTokens.access_token, refresh_token: mockTokens.refresh_token },
                 user: { id: 1, name: 'Dr. Ana', email: 'ana@clinic.com', role: UserRole.ADMIN },
                 clinics: [{ id: 10, name: 'Ana Clinic', role: 'OWNER', avatarUrl: 'https://cdn.example.com/avatar.jpg' }],
             });
@@ -207,7 +223,7 @@ describe('AuthService', () => {
             mockClinicsService.findAllByUser.mockResolvedValue([]);
             mockUsersService.update.mockResolvedValue(undefined);
 
-            await service.login({ email: 'ana@clinic.com', password: 'correct' });
+            await service.login({ email: 'ana@clinic.com', password: 'correct-password' });
 
             const updateCall = mockUsersService.update.mock.calls.find(
                 (c: unknown[]) => c[1]?.currentHashedRefreshToken,
@@ -225,7 +241,7 @@ describe('AuthService', () => {
             ]);
             mockUsersService.update.mockResolvedValue(undefined);
 
-            const result = await service.login({ email: 'ana@clinic.com', password: 'correct' });
+            const result = await service.login({ email: 'ana@clinic.com', password: 'correct-password' });
 
             expect(result.clinics[0].avatarUrl).toBeNull();
         });
@@ -234,7 +250,7 @@ describe('AuthService', () => {
             mockUsersService.findByEmail.mockResolvedValue(null);
 
             await expect(
-                service.login({ email: 'ana@clinic.com', password: 'wrong' }),
+                service.login({ email: 'ana@clinic.com', password: 'wrong-password' }),
             ).rejects.toThrow(UnauthorizedException);
         });
 
@@ -244,7 +260,7 @@ describe('AuthService', () => {
             bcryptMock.compare.mockResolvedValue(true);
 
             await expect(
-                service.login({ email: 'ana@clinic.com', password: 'correct' }),
+                service.login({ email: 'ana@clinic.com', password: 'correct-password' }),
             ).rejects.toThrow(UnauthorizedException);
         });
     });
@@ -262,7 +278,7 @@ describe('AuthService', () => {
 
             const result = await service.refreshTokens(1, 'valid-refresh-token');
 
-            expect(result).toMatchObject(mockTokens);
+            expect(result._tokens).toMatchObject(mockTokens);
         });
 
         it('throws UnauthorizedException when user is not found', async () => {
@@ -344,15 +360,16 @@ describe('AuthService', () => {
 
             expect(mockUsersService.createUser).toHaveBeenCalledWith(
                 expect.objectContaining({ email: pendingReg.email, role: UserRole.ADMIN }),
+                expect.anything()
             );
             expect(mockClinicsService.createForUser).toHaveBeenCalledWith(
                 createdUser.id,
                 expect.objectContaining({ name: `${pendingReg.name} Clinic` }),
+                expect.anything()
             );
-            expect(mockUsersService.deletePendingRegistration).toHaveBeenCalledWith(pendingReg.id);
+            expect(mockUsersService.deletePendingRegistration).toHaveBeenCalledWith(pendingReg.id, expect.anything());
             expect(result).toMatchObject({
-                access_token: mockTokens.access_token,
-                refresh_token: mockTokens.refresh_token,
+                _tokens: { access_token: mockTokens.access_token, refresh_token: mockTokens.refresh_token },
                 user: expect.objectContaining({ id: createdUser.id, email: createdUser.email }),
             });
         });
@@ -456,6 +473,39 @@ describe('AuthService', () => {
             await expect(service.resetPassword('wrong-type-token', 'NewPass!')).rejects.toThrow(
                 UnauthorizedException,
             );
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // Token exposure — tokens must not appear in service return values
+    // -----------------------------------------------------------------------
+
+    describe('Token exposure — tokens must not appear in service return values', () => {
+        it('login() does not return access_token or refresh_token in the top-level object', async () => {
+            const user = buildUser();
+            mockUsersService.findByEmail.mockResolvedValue(user);
+            bcryptMock.compare.mockResolvedValue(true);
+            mockClinicsService.findAllByUser.mockResolvedValue([]);
+            mockUsersService.update.mockResolvedValue(undefined);
+
+            const result = await service.login({ email: 'ana@clinic.com', password: 'pass123' });
+
+            expect(result).not.toHaveProperty('access_token');
+            expect(result).not.toHaveProperty('refresh_token');
+            expect(result).toHaveProperty('user');
+            expect(result).toHaveProperty('clinics');
+        });
+
+        it('refreshTokens() does not return access_token or refresh_token in the top-level object', async () => {
+            const user = buildUser();
+            mockUsersService.findOneWithRefreshToken.mockResolvedValue(user);
+            bcryptMock.compare.mockResolvedValue(true);
+            mockUsersService.update.mockResolvedValue(undefined);
+
+            const result = await service.refreshTokens(1, 'valid-token');
+
+            expect(result).not.toHaveProperty('access_token');
+            expect(result).not.toHaveProperty('refresh_token');
         });
     });
 });
