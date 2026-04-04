@@ -104,8 +104,10 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
     const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
     const [expandedPlans, setExpandedPlans] = useState<number[]>([]);
 
-    const { data: treatmentPlans = [], isLoading: loadingPlans } = useTreatmentPlansControllerFindAll();
-    const { data: payments = [], isLoading: loadingPayments } = usePaymentsControllerFindAllByPatient(patientId);
+    const { data: treatmentPlansResponse, isLoading: loadingPlans } = useTreatmentPlansControllerFindAll();
+    const treatmentPlans = treatmentPlansResponse?.data ?? [];
+    const { data: paymentsResponse, isLoading: loadingPayments } = usePaymentsControllerFindAllByPatient(patientId);
+    const payments = paymentsResponse?.data ?? [];
     const { mutate: createPayment, isPending: isCreating } = usePaymentsControllerCreate();
     const { mutate: updateTreatmentPlan } = useTreatmentPlansControllerUpdate();
 

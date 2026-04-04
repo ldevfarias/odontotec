@@ -1,6 +1,6 @@
-# CLAUDE.md
+# GEMINI.md
 
-Este arquivo fornece orientação ao Claude Code ao trabalhar com o código neste repositório.
+Este arquivo fornece orientação à Gemini CLI ao trabalhar com o código neste repositório.
 
 ## AI-SDLC & Engenharia de Software
 

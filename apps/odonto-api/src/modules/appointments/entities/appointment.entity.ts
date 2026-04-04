@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { Clinic } from '../../clinics/entities/clinic.entity';
 import { User } from '../../users/entities/user.entity';
 import { Patient } from '../../patients/entities/patient.entity';
@@ -12,6 +12,7 @@ export enum AppointmentStatus {
 }
 
 @Entity('appointments')
+@Unique(['clinicId', 'dentistId', 'date'])
 export class Appointment {
     @PrimaryGeneratedColumn()
     id: number;
@@ -35,17 +36,17 @@ export class Appointment {
         name: 'cancelled_by',
         nullable: true,
     })
-    cancelledBy: 'PATIENT' | 'CLINIC';
+    cancelledBy: 'PATIENT' | 'CLINIC' | null;
 
-    @Column({ name: 'cancellation_reason', nullable: true })
-    cancellationReason: string;
+    @Column({ name: 'cancellation_reason', nullable: true, type: 'text' })
+    cancellationReason: string | null;
 
     @Column({ name: 'clinic_id' })
     clinicId: number;
 
     @ManyToOne(() => Clinic)
     @JoinColumn({ name: 'clinic_id' })
-    clinic: Clinic;
+    clinic: Clinic | null;
 
     @Column({ name: 'dentist_id' })
     dentistId: number;

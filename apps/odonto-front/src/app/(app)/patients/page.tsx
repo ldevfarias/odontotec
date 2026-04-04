@@ -15,7 +15,8 @@ export default function PatientsPage() {
     const userRole = user?.role?.toUpperCase();
     const canCreate = userRole === 'ADMIN' || userRole === 'DENTIST';
 
-    const { data: patients = [] } = usePatientsControllerFindAll();
+    const { data: patientsResponse } = usePatientsControllerFindAll();
+    const patients = patientsResponse?.data ?? [];
     const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
     const [filter, setFilter] = useState<PatientFilterOption>('month');
 

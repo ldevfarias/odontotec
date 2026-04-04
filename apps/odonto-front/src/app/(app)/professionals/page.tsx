@@ -83,8 +83,10 @@ export default function ProfessionalsPage() {
     const [userToDelete, setUserToDelete] = useState<any>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-    const { data: users = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useUsersControllerFindAll();
-    const { data: invitations = [], isLoading: isLoadingInvitations, refetch: refetchInvitations } = useUsersControllerFindAllInvitations();
+    const { data: usersResponse, isLoading: isLoadingUsers, refetch: refetchUsers } = useUsersControllerFindAll();
+    const users = usersResponse?.data ?? [];
+    const { data: invitationsResponse, isLoading: isLoadingInvitations, refetch: refetchInvitations } = useUsersControllerFindAllInvitations();
+    const invitations = invitationsResponse?.data ?? [];
     const { mutate: inviteUser, isPending: isInviting } = useUsersControllerInvite();
 
     const form = useForm<InviteFormValues>({

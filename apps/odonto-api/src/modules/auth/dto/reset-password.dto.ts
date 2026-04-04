@@ -8,9 +8,9 @@ export class ResetPasswordDto {
     @MaxLength(500)
     token: string;
 
-    @ApiProperty({ example: 'newStrongPassword123', description: 'The new password', minLength: 6 })
+    @ApiProperty({ example: 'newStrongPassword123', description: 'The new password', minLength: 8 })
     @IsString()
-    @MinLength(6)
+    @MinLength(8)
     @MaxLength(128)
     password: string;
 }

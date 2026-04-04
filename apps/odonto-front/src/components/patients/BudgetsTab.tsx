@@ -97,8 +97,10 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
     const [planToDelete, setPlanToDelete] = useState<number | null>(null);
 
     // API Hooks
-    const { data: catalog = [] } = useClinicProceduresControllerFindAll();
-    const { data: allPlans = [], isLoading: isLoadingPlans } = useTreatmentPlansControllerFindAll();
+    const { data: catalogResponse } = useClinicProceduresControllerFindAll();
+    const catalog = (catalogResponse as any) ?? [];
+    const { data: allPlansResponse, isLoading: isLoadingPlans } = useTreatmentPlansControllerFindAll();
+    const allPlans = (allPlansResponse as any)?.data ?? [];
     const { mutate: createPlan, isPending: isCreating } = useTreatmentPlansControllerCreate();
     const { mutate: updatePlan, isPending: isUpdating } = useTreatmentPlansControllerUpdate();
     const { mutate: removePlan, isPending: isDeleting } = useTreatmentPlansControllerRemove();

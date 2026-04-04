@@ -1,6 +1,7 @@
 // apps/odonto-api/src/modules/appointments/appointments.service.notifications.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { AppointmentsService } from './appointments.service';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
 import { Patient } from '../patients/entities/patient.entity';
@@ -34,7 +35,7 @@ function makeAppointment(overrides: Partial<Appointment> = {}): Appointment {
 describe('AppointmentsService — update notifications', () => {
     let service: AppointmentsService;
     let notifyCreate: jest.Mock;
-    let findOneSpy: jest.SpyInstance;
+    let findOneSpy: jest.SpyInstance<any, any[]>;
 
     // createQueryBuilder mock returns no conflicts (getOne resolves null).
     // This prevents conflict-check logic from interfering with notification tests.
@@ -44,10 +45,39 @@ describe('AppointmentsService — update notifications', () => {
         save: jest.fn(),
         create: jest.fn(),
         manager: { getRepository: jest.fn().mockReturnValue({ findOne: jest.fn() }) },
-        createQueryBuilder: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnThis(),
-            andWhere: jest.fn().mockReturnThis(),
-            getOne: jest.fn().mockResolvedValue(null),
+        createQueryBuilder: jest.fn().mockImplementation(() => {
+            let isLockQuery = false;
+            const qb: any = {
+                where: jest.fn().mockImplementation((query) => {
+                    if (query.includes('appointment.id = :id')) {
+                        isLockQuery = true;
+                    }
+                    return qb;
+                }),
+                andWhere: jest.fn().mockReturnThis(),
+                setLock: jest.fn().mockReturnThis(),
+                getOne: jest.fn().mockImplementation(() => {
+                    if (isLockQuery) {
+                        return Promise.resolve(makeAppointment({ id: 10 }));
+                    }
+                    return Promise.resolve(null);
+                }),
+            };
+            return qb;
+        }),
+    };
+
+    const mockDataSource = {
+        transaction: jest.fn(async (cb) => {
+            const manager = {
+                getRepository: jest.fn().mockReturnValue({
+                    ...mockRepo,
+                    findOne: jest.fn().mockImplementation((...args) => (findOneSpy as jest.Mock)(...args)),
+                }),
+                update: jest.fn().mockResolvedValue(undefined),
+                findOne: jest.fn().mockImplementation((...args) => (findOneSpy as jest.Mock)(...args)),
+            };
+            return cb(manager);
         }),
     };
 
@@ -63,10 +93,15 @@ describe('AppointmentsService — update notifications', () => {
                 { provide: NotificationsService, useValue: { create: notifyCreate } },
                 { provide: EmailService, useValue: { sendAppointmentConfirmation: jest.fn() } },
                 { provide: JwtService, useValue: { sign: jest.fn(), verify: jest.fn() } },
+                { provide: DataSource, useValue: mockDataSource },
             ],
         }).compile();
 
         service = module.get(AppointmentsService);
+        // We MUST also mock the findOne inside the manager
+        const mockManagerRepo = (mockDataSource.transaction.mock.calls[0] as any); 
+        // Wait, transaction is called during the test, not here.
+        
         findOneSpy = jest.spyOn(service, 'findOne');
     });
 

@@ -17,7 +17,7 @@ export class RegisterTenantDto {
     @ApiProperty({ description: 'The password of the user' })
     @IsNotEmpty()
     @IsString()
-    @MinLength(6)
+    @MinLength(8)
     @MaxLength(128)
     password: string;
 

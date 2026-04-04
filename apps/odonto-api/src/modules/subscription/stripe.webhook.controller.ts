@@ -1,8 +1,9 @@
 import { Controller, Post, Headers, Req, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Clinic } from '../clinics/entities/clinic.entity';
+import { ProcessedStripeEvent } from './entities/processed-stripe-event.entity';
 import Stripe from 'stripe';
 import type { Request } from 'express';
 import { EmailService } from '../email/email.service';
@@ -16,6 +17,7 @@ export class StripeWebhookController {
         @InjectRepository(Clinic)
         private clinicRepository: Repository<Clinic>,
         private emailService: EmailService,
+        private dataSource: DataSource,
     ) {
         this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY')!, {
             apiVersion: '2025-01-27.acacia' as any,
@@ -31,12 +33,8 @@ export class StripeWebhookController {
         let event: Stripe.Event;
 
         try {
-            // Access rawBody directly to avoid NestJS JSON parsing destruction without TypeScript complaining
             const rawBody = req['rawBody'];
             if (!rawBody) {
-                // Fallback or error if rawBody is not available.
-                // NestJS by default parses JSON, destroying the signature verification.
-                // We MUST enable raw body parsing for this route or globally.
                 throw new BadRequestException('Raw body not available');
             }
 
@@ -50,32 +48,52 @@ export class StripeWebhookController {
             throw new BadRequestException(`Webhook Error: ${err.message}`);
         }
 
-        console.log(`Received event: ${event.type}`);
+        console.log(`Received event: ${event.type} [${event.id}]`);
 
-        switch (event.type) {
-            case 'checkout.session.completed':
-                await this.handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
-                break;
-            case 'invoice.payment_succeeded':
-                await this.handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
-                break;
-            case 'invoice.payment_failed':
-                await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-                break;
-            case 'customer.subscription.deleted':
-                await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-                break;
-            case 'customer.subscription.updated':
-                await this.handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
-                break;
-            default:
-            // console.log(`Unhandled event type ${event.type}`);
-        }
+        // Global Transaction for Idempotency
+        return await this.dataSource.transaction(async (manager) => {
+            const processedEventRepo = manager.getRepository(ProcessedStripeEvent);
 
-        return { received: true };
+            // Check if already processed
+            const alreadyProcessed = await processedEventRepo.findOne({
+                where: { id: event.id },
+                lock: { mode: 'pessimistic_write' }
+            });
+
+            if (alreadyProcessed) {
+                console.log(`Event ${event.id} already processed, skipping.`);
+                return { received: true, alreadyProcessed: true };
+            }
+
+            // Route events
+            switch (event.type) {
+                case 'checkout.session.completed':
+                    await this.handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session, manager);
+                    break;
+                case 'invoice.payment_succeeded':
+                    await this.handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice, manager);
+                    break;
+                case 'invoice.payment_failed':
+                    await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice, manager);
+                    break;
+                case 'customer.subscription.deleted':
+                    await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription, manager);
+                    break;
+                case 'customer.subscription.updated':
+                    await this.handleSubscriptionUpdated(event.data.object as Stripe.Subscription, manager);
+                    break;
+                default:
+                // Just log it
+            }
+
+            // Save processed event
+            await processedEventRepo.save({ id: event.id });
+
+            return { received: true };
+        });
     }
 
-    private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+    private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, manager: any) {
         const clinicId = session.metadata?.clinicId;
         if (!clinicId) {
             console.error('[Webhook] checkout.session.completed missing clinicId in metadata', { sessionId: session.id });
@@ -88,22 +106,24 @@ export class StripeWebhookController {
             return;
         }
 
-        const clinic = await this.clinicRepository.findOne({
+        const clinicRepo = manager.getRepository(Clinic);
+        const clinic = await clinicRepo.findOne({
             where: { id: Number(clinicId) },
             relations: { owner: true },
+            lock: { mode: 'pessimistic_write' }
         });
+
         if (!clinic) {
             console.error(`[Webhook] Clinic ${clinicId} not found for checkout.session.completed`);
             return;
         }
 
-        // Idempotency check: Save only if we haven't processed this subscription yet
         if (clinic.stripeSubscriptionId !== subscriptionId) {
             clinic.stripeSubscriptionId = subscriptionId;
             clinic.stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id as string;
             clinic.subscriptionStatus = 'ACTIVE';
             clinic.plan = 'PRO';
-            await this.clinicRepository.save(clinic);
+            await clinicRepo.save(clinic);
             console.log(`[Webhook] Clinic ${clinicId} upgraded to PRO via checkout.session.completed`);
             if (clinic.owner?.email) {
                 await this.emailService.sendSubscriptionProActivatedEmail(
@@ -115,11 +135,15 @@ export class StripeWebhookController {
         }
     }
 
-    private async handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+    private async handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, manager: any) {
         const subscriptionId = typeof (invoice as any).subscription === 'string' ? (invoice as any).subscription : (invoice as any).subscription?.id;
         if (!subscriptionId) return;
 
-        const clinic = await this.clinicRepository.findOne({ where: { stripeSubscriptionId: subscriptionId } });
+        const clinicRepo = manager.getRepository(Clinic);
+        const clinic = await clinicRepo.findOne({
+            where: { stripeSubscriptionId: subscriptionId },
+            lock: { mode: 'pessimistic_write' }
+        });
 
         if (clinic) {
             let changed = false;
@@ -128,9 +152,6 @@ export class StripeWebhookController {
                 changed = true;
             }
 
-            // Always clear trialEndsAt on any successful payment — handles race where
-            // invoice.payment_succeeded arrives after checkout.session.completed already
-            // set status to ACTIVE, leaving trialEndsAt non-null with a stale trial date.
             if (clinic.trialEndsAt !== null) {
                 clinic.trialEndsAt = null;
                 changed = true;
@@ -142,33 +163,30 @@ export class StripeWebhookController {
             }
 
             if (changed) {
-                await this.clinicRepository.save(clinic);
+                await clinicRepo.save(clinic);
             }
         }
     }
 
-    private async handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+    private async handleInvoicePaymentFailed(invoice: Stripe.Invoice, manager: any) {
         const subscriptionId = typeof (invoice as any).subscription === 'string' ? (invoice as any).subscription : (invoice as any).subscription?.id;
         if (!subscriptionId) return;
 
-        const clinic = await this.clinicRepository.findOne({ where: { stripeSubscriptionId: subscriptionId } });
-
-        if (clinic) {
-            // We don't block immediately. Status usually becomes 'past_due' in Stripe automatically.
-            // We wait for subscription.updated to set 'past_due' in DB.
-        }
+        // No action needed for now, just logging or placeholder for later
     }
 
-    private async handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-        const clinic = await this.clinicRepository.findOne({
+    private async handleSubscriptionUpdated(subscription: Stripe.Subscription, manager: any) {
+        const clinicRepo = manager.getRepository(Clinic);
+        const clinic = await clinicRepo.findOne({
             where: { stripeSubscriptionId: subscription.id },
             relations: { owner: true },
+            lock: { mode: 'pessimistic_write' }
         });
+
         if (clinic) {
             const previousCancelAtPeriodEnd = clinic.cancelAtPeriodEnd;
             let newStatus = clinic.subscriptionStatus;
 
-            // Map Stripe status to our status
             if (subscription.status === 'active') newStatus = 'ACTIVE';
             else if (subscription.status === 'trialing') newStatus = 'ACTIVE';
             else if (subscription.status === 'past_due') newStatus = 'past_due';
@@ -178,7 +196,6 @@ export class StripeWebhookController {
             const newCurrentPeriodEnd = periodEnd ? new Date(periodEnd * 1000) : clinic.currentPeriodEnd;
             const newCancelAtPeriodEnd = subscription.cancel_at_period_end;
 
-            // Save only if state actually changed (idempotency improvement)
             if (
                 clinic.subscriptionStatus !== newStatus ||
                 clinic.currentPeriodEnd?.getTime() !== newCurrentPeriodEnd?.getTime() ||
@@ -190,37 +207,35 @@ export class StripeWebhookController {
                 if (newStatus === 'CANCELED') {
                     clinic.plan = 'FREE';
                 }
-                await this.clinicRepository.save(clinic);
+                await clinicRepo.save(clinic);
                 console.log(`[Webhook] Subscription updated for clinic ${clinic.id}: status → ${newStatus}, cancelAtPeriodEnd → ${newCancelAtPeriodEnd}`);
                 if (!previousCancelAtPeriodEnd && newCancelAtPeriodEnd) {
-                    if (!newCurrentPeriodEnd) {
-                        console.warn(`[Webhook] cancel-scheduled email suppressed for clinic ${clinic.id}: no currentPeriodEnd`);
-                    } else if (clinic.owner?.email) {
+                    if (clinic.owner?.email && newCurrentPeriodEnd) {
                         await this.emailService.sendSubscriptionCancelScheduledEmail(
                             clinic.owner.email,
                             clinic.owner.name,
                             clinic.name,
                             newCurrentPeriodEnd,
                         );
-                    } else {
-                        console.warn(`[Webhook] cancel-scheduled email suppressed for clinic ${clinic.id}: no owner email`);
                     }
                 }
             }
         }
     }
 
-    private async handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-        const clinic = await this.clinicRepository.findOne({
+    private async handleSubscriptionDeleted(subscription: Stripe.Subscription, manager: any) {
+        const clinicRepo = manager.getRepository(Clinic);
+        const clinic = await clinicRepo.findOne({
             where: { stripeSubscriptionId: subscription.id },
             relations: { owner: true },
+            lock: { mode: 'pessimistic_write' }
         });
+
         if (clinic && clinic.subscriptionStatus !== 'CANCELED') {
             clinic.subscriptionStatus = 'CANCELED';
             clinic.plan = 'FREE';
             clinic.cancelAtPeriodEnd = false;
-            // Preserve currentPeriodEnd as-is — records when access expired (audit/UI)
-            await this.clinicRepository.save(clinic);
+            await clinicRepo.save(clinic);
             console.log(`[Webhook] Subscription deleted for clinic ${clinic.id}: status → CANCELED`);
             if (clinic.owner?.email) {
                 await this.emailService.sendSubscriptionCancelledEmail(

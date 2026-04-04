@@ -22,10 +22,11 @@ export function DentistDashboard() {
     const queryClient = useQueryClient();
     const today = format(new Date(), 'yyyy-MM-dd');
 
-    const { data: appointments = [], isLoading } = useAppointmentsControllerFindAll({
+    const { data: appointmentsResponse, isLoading } = useAppointmentsControllerFindAll({
         date: today,
         dentistId: user?.id,
     });
+    const appointments = appointmentsResponse?.data ?? [];
 
     const { mutate: updateAppointment } = useAppointmentsControllerUpdate();
 

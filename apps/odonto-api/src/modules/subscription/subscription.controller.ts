@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Req, Body, UseGuards, BadRequestException } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { getClinicId } from '../../common/get-clinic-id';
+import { Tenant } from '../../common/decorators/tenant.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('subscription')
@@ -9,12 +9,12 @@ export class SubscriptionController {
     constructor(private readonly subscriptionService: SubscriptionService) { }
 
     @Get('status')
-    async getStatus(@Req() req: any) {
-        return this.subscriptionService.getStatus(req.user, getClinicId(req));
+    async getStatus(@Req() req: any, @Tenant() clinicId: number) {
+        return this.subscriptionService.getStatus(req.user, clinicId);
     }
 
     @Post('checkout')
-    async createCheckoutSession(@Req() req: any, @Body() body: { cancelUrl?: string }) {
+    async createCheckoutSession(@Req() req: any, @Tenant() clinicId: number, @Body() body: { cancelUrl?: string }) {
         const { cancelUrl } = body ?? {};
 
         // Only allow absolute URLs from known origins to prevent open-redirect abuse.
@@ -30,11 +30,11 @@ export class SubscriptionController {
             }
         }
 
-        return this.subscriptionService.createCheckoutSession(req.user, getClinicId(req), cancelUrl);
+        return this.subscriptionService.createCheckoutSession(req.user, clinicId, cancelUrl);
     }
 
     @Post('portal')
-    async createPortalSession(@Req() req: any) {
-        return this.subscriptionService.createPortalSession(req.user, getClinicId(req));
+    async createPortalSession(@Req() req: any, @Tenant() clinicId: number) {
+        return this.subscriptionService.createPortalSession(req.user, clinicId);
     }
 }

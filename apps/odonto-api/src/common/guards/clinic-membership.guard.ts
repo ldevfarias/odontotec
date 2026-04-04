@@ -32,6 +32,10 @@ export class ClinicMembershipGuard implements CanActivate {
             return true;
         }
 
+        if (request.url.startsWith('/subscription') || request.url.startsWith('/auth')) {
+            return true;
+        }
+
         const rawClinicId = request.headers['x-clinic-id'];
 
         // Authenticated user accessing a route without a clinic context
@@ -43,11 +47,13 @@ export class ClinicMembershipGuard implements CanActivate {
 
         const clinicId = Number(rawClinicId);
         if (isNaN(clinicId) || clinicId <= 0) {
+            console.warn(`[ClinicMembershipGuard] Invalid clinic ID: ${rawClinicId}`);
             throw new ForbiddenException('Invalid clinic ID');
         }
 
         const membership = await this.clinicsService.getUserMembership(user.userId, clinicId);
         if (!membership) {
+            console.warn(`[ClinicMembershipGuard] User ${user.userId} has no membership in clinic ${clinicId}`);
             throw new ForbiddenException('You are not a member of this clinic');
         }
 

@@ -103,8 +103,10 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
     const [isDentistPopoverOpen, setIsDentistPopoverOpen] = useState(false);
 
     // Fetch data
-    const { data: patients = [] } = usePatientsControllerFindAll();
-    const { data: professionals = [] } = useUsersControllerFindAll();
+    const { data: patientsResponse } = usePatientsControllerFindAll();
+    const patients = patientsResponse?.data ?? [];
+    const { data: professionalsResponse } = useUsersControllerFindAll();
+    const professionals = professionalsResponse?.data ?? [];
     const { mutate: createAppointment, isPending: isCreating } = useAppointmentsControllerCreate();
     const { mutate: updateAppointment, isPending: isUpdating } = useAppointmentsControllerUpdate();
 
@@ -218,6 +220,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
             });
             onOpenChange(false);
             queryClient.invalidateQueries({ queryKey: [{ url: '/appointments' }] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
         };
 
         const errorCallback = (error: any) => {

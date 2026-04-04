@@ -2,6 +2,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { AppointmentsService } from './appointments.service';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
 import { Patient } from '../patients/entities/patient.entity';
@@ -41,13 +42,29 @@ function makeAppointment(overrides: Partial<Appointment> = {}): Appointment {
  * works without errors.
  */
 function makeQueryBuilder(getOneResult: Appointment | null) {
-    const qb: Record<string, jest.Mock> = {};
-    const methods = ['where', 'andWhere', 'orWhere', 'leftJoinAndSelect', 'orderBy', 'getMany'];
-    for (const m of methods) {
-        qb[m] = jest.fn().mockReturnThis();
-    }
-    qb.getOne = jest.fn().mockResolvedValue(getOneResult);
-    qb.getManyAndCount = jest.fn().mockResolvedValue([[getOneResult].filter(Boolean), getOneResult ? 1 : 0]);
+    let isSpecificIdQuery = false;
+    const qb: any = {
+        where: jest.fn().mockImplementation((query) => {
+            if (query && typeof query === 'string' && query.includes('appointment.id = :id')) {
+                isSpecificIdQuery = true;
+            }
+            return qb;
+        }),
+        andWhere: jest.fn().mockReturnThis(),
+        orWhere: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        setLock: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockImplementation(() => {
+            if (isSpecificIdQuery) {
+                // Return the appointment being updated/locked
+                return Promise.resolve(makeAppointment({ id: APPT_ID }));
+            }
+            // Return the conflict (or null) for checkConflict
+            return Promise.resolve(getOneResult);
+        }),
+        getManyAndCount: jest.fn().mockResolvedValue([[getOneResult].filter(Boolean), getOneResult ? 1 : 0]),
+    };
     return qb;
 }
 
@@ -55,16 +72,15 @@ describe('AppointmentsService — conflict checking', () => {
     let service: AppointmentsService;
 
     // We rebuild these per test so each test can configure its own getOne result.
-    let mockAppointmentsRepo: Record<string, jest.Mock>;
+    let mockAppointmentsRepo: Record<string, any>;
     let mockPatientRepo: Record<string, jest.Mock>;
     let mockClinicRepo: Record<string, jest.Mock>;
     let mockNotificationsService: { create: jest.Mock };
     let mockEmailService: { sendAppointmentConfirmation: jest.Mock };
     let mockJwtService: { sign: jest.Mock; verify: jest.Mock };
+    let mockDataSource: Record<string, jest.Mock>;
 
     async function buildModule(getOneResult: Appointment | null) {
-        const qb = makeQueryBuilder(getOneResult);
-
         mockAppointmentsRepo = {
             create: jest.fn().mockReturnValue(makeAppointment()),
             save: jest.fn().mockResolvedValue(makeAppointment()),
@@ -75,7 +91,7 @@ describe('AppointmentsService — conflict checking', () => {
                     findOne: jest.fn().mockResolvedValue(null),
                 }),
             },
-            createQueryBuilder: jest.fn().mockReturnValue(qb),
+            createQueryBuilder: jest.fn().mockImplementation(() => makeQueryBuilder(getOneResult)),
         };
 
         mockPatientRepo = {
@@ -91,6 +107,12 @@ describe('AppointmentsService — conflict checking', () => {
         mockEmailService = { sendAppointmentConfirmation: jest.fn() };
         mockJwtService = { sign: jest.fn().mockReturnValue('dummy-token'), verify: jest.fn() };
 
+        mockDataSource = {
+            transaction: jest.fn(async (cb) => cb({
+                getRepository: jest.fn().mockReturnValue(mockAppointmentsRepo),
+            })),
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AppointmentsService,
@@ -100,6 +122,7 @@ describe('AppointmentsService — conflict checking', () => {
                 { provide: NotificationsService, useValue: mockNotificationsService },
                 { provide: EmailService, useValue: mockEmailService },
                 { provide: JwtService, useValue: mockJwtService },
+                { provide: DataSource, useValue: mockDataSource },
             ],
         }).compile();
 
@@ -133,7 +156,7 @@ describe('AppointmentsService — conflict checking', () => {
 
         it('throws BadRequestException with dentist message when dentist has a conflict', async () => {
             // Conflict appointment has the same dentistId as requested → dentist conflict
-            const conflict = makeAppointment({ dentistId: DENTIST_ID, patientId: 99 });
+            const conflict = makeAppointment({ dentistId: DENTIST_ID, patientId: 99, id: 999 });
             await buildModule(conflict);
 
             const dto = {
@@ -153,7 +176,7 @@ describe('AppointmentsService — conflict checking', () => {
 
         it('throws BadRequestException with patient message when patient has a conflict', async () => {
             // Conflict appointment has a DIFFERENT dentistId → patient conflict branch
-            const conflict = makeAppointment({ dentistId: 999, patientId: PATIENT_ID });
+            const conflict = makeAppointment({ dentistId: 999, patientId: PATIENT_ID, id: 999 });
             await buildModule(conflict);
 
             const dto = {
@@ -173,7 +196,7 @@ describe('AppointmentsService — conflict checking', () => {
         it('conflict detected via Brackets (dentist OR patient match)', async () => {
             // Both dentistId and patientId provided → checkConflict uses new Brackets(...) with orWhere.
             // The conflict fixture has the same dentistId as the request, so the dentist branch fires.
-            const conflict = makeAppointment({ dentistId: DENTIST_ID, patientId: 99 });
+            const conflict = makeAppointment({ dentistId: DENTIST_ID, patientId: 99, id: 999 });
             await buildModule(conflict);
 
             const dto = {
@@ -234,8 +257,8 @@ describe('AppointmentsService — conflict checking', () => {
                 CLINIC_ID,
             );
 
-            // createQueryBuilder called for conflict check (date field changed)
-            expect(mockAppointmentsRepo.createQueryBuilder).toHaveBeenCalled();
+            // createQueryBuilder called twice: once for lock, once for conflict check (date field changed)
+            expect(mockAppointmentsRepo.createQueryBuilder).toHaveBeenCalledTimes(2);
             expect(mockAppointmentsRepo.update).toHaveBeenCalledWith(
                 { id: APPT_ID, clinicId: CLINIC_ID },
                 expect.objectContaining({ date: '2026-04-02T14:00:00.000Z' }),
@@ -244,7 +267,7 @@ describe('AppointmentsService — conflict checking', () => {
         });
 
         it('throws BadRequestException when rescheduled date causes a conflict', async () => {
-            const conflict = makeAppointment({ dentistId: DENTIST_ID });
+            const conflict = makeAppointment({ dentistId: DENTIST_ID, id: 999 });
             await buildModule(conflict);
 
             const before = makeAppointment();
@@ -270,15 +293,12 @@ describe('AppointmentsService — conflict checking', () => {
                 CLINIC_ID,
             );
 
-            // createQueryBuilder should NOT have been called — no time-related field changed
-            expect(mockAppointmentsRepo.createQueryBuilder).not.toHaveBeenCalled();
+            // Exactly once for the lock
+            expect(mockAppointmentsRepo.createQueryBuilder).toHaveBeenCalledTimes(1);
             expect(mockAppointmentsRepo.update).toHaveBeenCalledTimes(1);
         });
 
         it('does NOT call checkConflict when only patientId changes (non-time field)', async () => {
-            // Business rule: changing only the patient does not trigger conflict re-check.
-            // The guard in update() only checks: date || duration || dentistId.
-            // This is intentional — patientId changes are not time-based conflicts.
             await buildModule(null);
 
             const appointment = makeAppointment();
@@ -286,7 +306,8 @@ describe('AppointmentsService — conflict checking', () => {
 
             await service.update(APPT_ID, { patientId: 50 }, CLINIC_ID);
 
-            expect(mockAppointmentsRepo.createQueryBuilder).not.toHaveBeenCalled();
+            // Exactly once for the lock
+            expect(mockAppointmentsRepo.createQueryBuilder).toHaveBeenCalledTimes(1);
             expect(mockAppointmentsRepo.update).toHaveBeenCalledTimes(1);
         });
     });

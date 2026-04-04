@@ -227,10 +227,10 @@ describe('AuthService', () => {
             await service.login({ email: 'ana@clinic.com', password: 'correct-password' });
 
             const updateCall = mockUsersService.update.mock.calls.find(
-                (c: unknown[]) => c[1]?.currentHashedRefreshToken,
+                (c: unknown[]) => (c[1] as any)?.currentHashedRefreshToken,
             );
-            expect(updateCall[1].currentHashedRefreshToken).toMatch(/^\$2[aby]\$/);
-            expect(updateCall[1].currentHashedRefreshToken).not.toBe(mockTokens.refresh_token);
+            expect((updateCall as any)[1].currentHashedRefreshToken).toMatch(/^\$2[aby]\$/);
+            expect((updateCall as any)[1].currentHashedRefreshToken).not.toBe(mockTokens.refresh_token);
         });
 
         it('maps null avatarUrl to null in clinic list', async () => {
@@ -422,12 +422,12 @@ describe('AuthService', () => {
             await service.resetPassword('valid-token', 'SuperSecret99!');
 
             const updateCall = mockUsersService.update.mock.calls.find(
-                (c: unknown[]) => c[1]?.password,
+                (c: unknown[]) => (c[1] as any)?.password,
             );
-            expect(updateCall[1].password).toMatch(/^\$2[aby]\$/);
-            expect(updateCall[1].password).not.toBe('SuperSecret99!');
-            expect(updateCall[1].resetPasswordToken).toBeNull();
-            expect(updateCall[1].resetPasswordExpires).toBeNull();
+            expect((updateCall as any)[1].password).toMatch(/^\$2[aby]\$/);
+            expect((updateCall as any)[1].password).not.toBe('SuperSecret99!');
+            expect((updateCall as any)[1].resetPasswordToken).toBeNull();
+            expect((updateCall as any)[1].resetPasswordExpires).toBeNull();
         });
 
         it('throws UnauthorizedException when jti does not match stored token (already used)', async () => {

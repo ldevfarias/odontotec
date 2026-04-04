@@ -89,7 +89,8 @@ export function ToothPopover({
     }, []);
 
     const queryClient = useQueryClient();
-    const { data: catalog = [] } = useClinicProceduresControllerFindAll();
+    const { data: catalogResponse } = useClinicProceduresControllerFindAll();
+    const catalog = catalogResponse?.data ?? [];
     const { mutate: createProcedure, isPending: isCreating } = useProceduresControllerCreate();
 
     const defaultValues: ProcedureFormValues = {

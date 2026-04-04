@@ -1,6 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserRole } from '../../users/enums/role.enum';
+import { PaginationDto } from '../../../common/dto/pagination.dto';
+import { ClinicRole } from '../../clinics/enums/clinic-role.enum';
+
+export class UsersQueryDto extends PaginationDto {
+    @ApiPropertyOptional({ enum: ClinicRole })
+    @IsOptional()
+    @IsEnum(ClinicRole)
+    role?: ClinicRole;
+}
 
 export class CreateUserDto {
     @ApiProperty()
@@ -16,7 +25,7 @@ export class CreateUserDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    @MinLength(6)
+    @MinLength(8)
     @MaxLength(128)
     password: string;
 

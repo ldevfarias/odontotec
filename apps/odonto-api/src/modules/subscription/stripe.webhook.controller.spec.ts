@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { StripeWebhookController } from './stripe.webhook.controller';
 import { Clinic } from '../clinics/entities/clinic.entity';
 import { EmailService } from '../email/email.service';
+import { ProcessedStripeEvent } from './entities/processed-stripe-event.entity';
 
 function makeClinic(overrides: Partial<Clinic> = {}): Clinic {
     return {
@@ -38,6 +40,17 @@ describe('StripeWebhookController — private handlers', () => {
         sendSubscriptionCancelledEmail: jest.Mock;
     };
 
+    const mockDataSource = {
+        transaction: jest.fn(async (cb) => cb({
+            getRepository: jest.fn().mockImplementation((entity) => {
+                if (entity === ProcessedStripeEvent) {
+                    return { findOne: jest.fn().mockResolvedValue(null), save: jest.fn() };
+                }
+                return clinicRepository;
+            }),
+        })),
+    };
+
     beforeEach(async () => {
         clinicRepository = {
             findOne: jest.fn(),
@@ -65,6 +78,10 @@ describe('StripeWebhookController — private handlers', () => {
                     provide: EmailService,
                     useValue: emailService,
                 },
+                {
+                    provide: DataSource,
+                    useValue: mockDataSource,
+                },
             ],
         }).compile();
 
@@ -84,7 +101,8 @@ describe('StripeWebhookController — private handlers', () => {
                 customer: 'cus_abc',
             } as any;
 
-            await (controller as any).handleCheckoutSessionCompleted(session);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleCheckoutSessionCompleted(session, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalledTimes(1);
             const saved: Clinic = clinicRepository.save.mock.calls[0][0];
@@ -104,7 +122,8 @@ describe('StripeWebhookController — private handlers', () => {
                 customer: 'cus_abc',
             } as any;
 
-            await (controller as any).handleCheckoutSessionCompleted(session);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleCheckoutSessionCompleted(session, mockManager);
 
             expect(emailService.sendSubscriptionProActivatedEmail).toHaveBeenCalledWith(
                 'ana@example.com',
@@ -123,7 +142,8 @@ describe('StripeWebhookController — private handlers', () => {
                 customer: 'cus_abc',
             } as any;
 
-            await (controller as any).handleCheckoutSessionCompleted(session);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleCheckoutSessionCompleted(session, mockManager);
 
             expect(clinicRepository.save).not.toHaveBeenCalled();
             expect(emailService.sendSubscriptionProActivatedEmail).not.toHaveBeenCalled();
@@ -136,7 +156,8 @@ describe('StripeWebhookController — private handlers', () => {
                 customer: 'cus_abc',
             } as any;
 
-            await (controller as any).handleCheckoutSessionCompleted(session);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleCheckoutSessionCompleted(session, mockManager);
 
             expect(clinicRepository.findOne).not.toHaveBeenCalled();
             expect(clinicRepository.save).not.toHaveBeenCalled();
@@ -149,7 +170,8 @@ describe('StripeWebhookController — private handlers', () => {
                 customer: 'cus_abc',
             } as any;
 
-            await (controller as any).handleCheckoutSessionCompleted(session);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleCheckoutSessionCompleted(session, mockManager);
 
             expect(clinicRepository.findOne).not.toHaveBeenCalled();
             expect(clinicRepository.save).not.toHaveBeenCalled();
@@ -164,7 +186,8 @@ describe('StripeWebhookController — private handlers', () => {
                 customer: 'cus_abc',
             } as any;
 
-            await expect((controller as any).handleCheckoutSessionCompleted(session)).resolves.not.toThrow();
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await expect((controller as any).handleCheckoutSessionCompleted(session, mockManager)).resolves.not.toThrow();
             expect(clinicRepository.save).not.toHaveBeenCalled();
         });
     });
@@ -183,7 +206,8 @@ describe('StripeWebhookController — private handlers', () => {
 
             const invoice = { subscription: 'sub_abc' } as any;
 
-            await (controller as any).handleInvoicePaymentSucceeded(invoice);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleInvoicePaymentSucceeded(invoice, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalledTimes(1);
             const saved: Clinic = clinicRepository.save.mock.calls[0][0];
@@ -203,7 +227,8 @@ describe('StripeWebhookController — private handlers', () => {
 
             const invoice = { subscription: 'sub_abc' } as any;
 
-            await (controller as any).handleInvoicePaymentSucceeded(invoice);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleInvoicePaymentSucceeded(invoice, mockManager);
 
             expect(clinicRepository.save).not.toHaveBeenCalled();
         });
@@ -211,7 +236,8 @@ describe('StripeWebhookController — private handlers', () => {
         it('returns early when invoice has no subscription ID', async () => {
             const invoice = { subscription: null } as any;
 
-            await (controller as any).handleInvoicePaymentSucceeded(invoice);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleInvoicePaymentSucceeded(invoice, mockManager);
 
             expect(clinicRepository.findOne).not.toHaveBeenCalled();
             expect(clinicRepository.save).not.toHaveBeenCalled();
@@ -222,7 +248,8 @@ describe('StripeWebhookController — private handlers', () => {
 
             const invoice = { subscription: 'sub_unknown' } as any;
 
-            await expect((controller as any).handleInvoicePaymentSucceeded(invoice)).resolves.not.toThrow();
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await expect((controller as any).handleInvoicePaymentSucceeded(invoice, mockManager)).resolves.not.toThrow();
             expect(clinicRepository.save).not.toHaveBeenCalled();
         });
     });
@@ -246,7 +273,8 @@ describe('StripeWebhookController — private handlers', () => {
                 current_period_end: Math.floor(new Date('2026-05-01').getTime() / 1000),
             } as any;
 
-            await (controller as any).handleSubscriptionUpdated(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionUpdated(subscription, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalledTimes(1);
             const saved: Clinic = clinicRepository.save.mock.calls[0][0];
@@ -270,7 +298,8 @@ describe('StripeWebhookController — private handlers', () => {
                 current_period_end: Math.floor(new Date('2026-05-01').getTime() / 1000),
             } as any;
 
-            await (controller as any).handleSubscriptionUpdated(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionUpdated(subscription, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalledTimes(1);
             const saved: Clinic = clinicRepository.save.mock.calls[0][0];
@@ -296,7 +325,8 @@ describe('StripeWebhookController — private handlers', () => {
                 current_period_end: Math.floor(periodEnd.getTime() / 1000),
             } as any;
 
-            await (controller as any).handleSubscriptionUpdated(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionUpdated(subscription, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalled();
             expect(emailService.sendSubscriptionCancelScheduledEmail).toHaveBeenCalledWith(
@@ -325,7 +355,8 @@ describe('StripeWebhookController — private handlers', () => {
                 current_period_end: Math.floor(periodEnd.getTime() / 1000),
             } as any;
 
-            await (controller as any).handleSubscriptionUpdated(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionUpdated(subscription, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalled();
             expect(emailService.sendSubscriptionCancelScheduledEmail).not.toHaveBeenCalled();
@@ -348,7 +379,8 @@ describe('StripeWebhookController — private handlers', () => {
                 current_period_end: Math.floor(periodEnd.getTime() / 1000),
             } as any;
 
-            await (controller as any).handleSubscriptionUpdated(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionUpdated(subscription, mockManager);
 
             expect(clinicRepository.save).not.toHaveBeenCalled();
         });
@@ -363,7 +395,8 @@ describe('StripeWebhookController — private handlers', () => {
                 current_period_end: Math.floor(new Date('2026-05-01').getTime() / 1000),
             } as any;
 
-            await expect((controller as any).handleSubscriptionUpdated(subscription)).resolves.not.toThrow();
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await expect((controller as any).handleSubscriptionUpdated(subscription, mockManager)).resolves.not.toThrow();
             expect(clinicRepository.save).not.toHaveBeenCalled();
         });
     });
@@ -382,7 +415,8 @@ describe('StripeWebhookController — private handlers', () => {
 
             const subscription = { id: 'sub_del' } as any;
 
-            await (controller as any).handleSubscriptionDeleted(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionDeleted(subscription, mockManager);
 
             expect(clinicRepository.save).toHaveBeenCalledTimes(1);
             const saved: Clinic = clinicRepository.save.mock.calls[0][0];
@@ -407,7 +441,8 @@ describe('StripeWebhookController — private handlers', () => {
 
             const subscription = { id: 'sub_del' } as any;
 
-            await (controller as any).handleSubscriptionDeleted(subscription);
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await (controller as any).handleSubscriptionDeleted(subscription, mockManager);
 
             expect(clinicRepository.save).not.toHaveBeenCalled();
             expect(emailService.sendSubscriptionCancelledEmail).not.toHaveBeenCalled();
@@ -418,7 +453,8 @@ describe('StripeWebhookController — private handlers', () => {
 
             const subscription = { id: 'sub_unknown' } as any;
 
-            await expect((controller as any).handleSubscriptionDeleted(subscription)).resolves.not.toThrow();
+            const mockManager = { getRepository: jest.fn().mockReturnValue(clinicRepository) };
+            await expect((controller as any).handleSubscriptionDeleted(subscription, mockManager)).resolves.not.toThrow();
             expect(clinicRepository.save).not.toHaveBeenCalled();
         });
     });

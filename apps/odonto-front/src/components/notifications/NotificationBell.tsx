@@ -23,7 +23,8 @@ export function NotificationBell() {
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
-    const { data: notifications = [], refetch } = useNotificationsControllerFindAll();
+    const { data: notificationsResponse } = useNotificationsControllerFindAll();
+    const notifications = (notificationsResponse?.data ?? []) as unknown[];
     const { mutate: markAsRead } = useNotificationsControllerMarkAsRead();
     const { mutate: markAllAsRead } = useNotificationsControllerMarkAllAsRead();
 

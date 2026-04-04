@@ -14,10 +14,10 @@ export class RegisterInvitationDto {
     @MaxLength(255)
     name: string;
 
-    @ApiProperty({ example: 'password123', minLength: 6 })
+    @ApiProperty({ example: 'password123', minLength: 8 })
     @IsString()
     @IsNotEmpty()
-    @MinLength(6)
+    @MinLength(8)
     @MaxLength(128)
     password: string;
 }

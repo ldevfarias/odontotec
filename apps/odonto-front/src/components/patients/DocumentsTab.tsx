@@ -30,7 +30,8 @@ interface DocumentsTabProps {
 
 export function DocumentsTab({ patientId }: DocumentsTabProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const { data: documents = [], refetch, isLoading } = useDocumentsControllerFindAll({ patientId: String(patientId) });
+    const { data: documentsResponse, refetch, isLoading } = useDocumentsControllerFindAll({ patientId: String(patientId) });
+    const documents = documentsResponse?.data ?? [];
     const { mutate: removeDocument } = useDocumentsControllerRemove();
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
