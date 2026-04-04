@@ -5,7 +5,7 @@
 
 import fetch from "@/lib/api";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
-import type { UsersControllerFindAllQueryResponse } from "../ts/UsersControllerFindAll.ts";
+import type { UsersControllerFindAllQueryResponse, UsersControllerFindAllQueryParams } from "../ts/UsersControllerFindAll.ts";
 
 function getUsersControllerFindAllUrl() {
   const res = { method: 'GET', url: `/users` as const }
@@ -16,11 +16,11 @@ function getUsersControllerFindAllUrl() {
  * @summary List all clinic users
  * {@link /users}
  */
-export async function usersControllerFindAll(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function usersControllerFindAll(params?: UsersControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 
 
-  const res = await request<UsersControllerFindAllQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getUsersControllerFindAllUrl().url.toString(), ... requestConfig })
+  const res = await request<UsersControllerFindAllQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getUsersControllerFindAllUrl().url.toString(), params, ... requestConfig })
   return res.data
 }

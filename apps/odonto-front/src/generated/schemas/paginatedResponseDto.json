@@ -1,0 +1,1 @@
+{"type":"object","properties":{"data":{"type":"array","items":{"type":"array"}},"total":{"type":"number"},"page":{"type":"number"},"limit":{"type":"number"}},"required":["data","total","page","limit"],"x-readme-ref-name":"PaginatedResponseDto"}

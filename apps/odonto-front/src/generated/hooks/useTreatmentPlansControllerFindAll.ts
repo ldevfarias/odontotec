@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
-import type { TreatmentPlansControllerFindAllQueryResponse } from "../ts/TreatmentPlansControllerFindAll.ts";
+import type { TreatmentPlansControllerFindAllQueryResponse, TreatmentPlansControllerFindAllQueryParams } from "../ts/TreatmentPlansControllerFindAll.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { treatmentPlansControllerFindAll } from "../clients/treatmentPlansControllerFindAll.ts";
 
-export const treatmentPlansControllerFindAllQueryKey = () => [{ url: '/treatment-plans' }] as const
+export const treatmentPlansControllerFindAllQueryKey = (params?: TreatmentPlansControllerFindAllQueryParams) => [{ url: '/treatment-plans' }, ...(params ? [params] : [])] as const
 
 export type TreatmentPlansControllerFindAllQueryKey = ReturnType<typeof treatmentPlansControllerFindAllQueryKey>
 
-export function treatmentPlansControllerFindAllQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function treatmentPlansControllerFindAllQueryOptions(params?: TreatmentPlansControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = treatmentPlansControllerFindAllQueryKey()
+        const queryKey = treatmentPlansControllerFindAllQueryKey(params)
         return queryOptions<TreatmentPlansControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TreatmentPlansControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return treatmentPlansControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return treatmentPlansControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function treatmentPlansControllerFindAllQueryOptions(config: Partial<Requ
  * @summary Get all treatment plans for the clinic
  * {@link /treatment-plans}
  */
-export function useTreatmentPlansControllerFindAll<TData = TreatmentPlansControllerFindAllQueryResponse, TQueryData = TreatmentPlansControllerFindAllQueryResponse, TQueryKey extends QueryKey = TreatmentPlansControllerFindAllQueryKey>(options: 
+export function useTreatmentPlansControllerFindAll<TData = TreatmentPlansControllerFindAllQueryResponse, TQueryData = TreatmentPlansControllerFindAllQueryResponse, TQueryKey extends QueryKey = TreatmentPlansControllerFindAllQueryKey>(params?: TreatmentPlansControllerFindAllQueryParams, options: 
 {
   query?: Partial<QueryObserverOptions<TreatmentPlansControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function useTreatmentPlansControllerFindAll<TData = TreatmentPlansControl
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? treatmentPlansControllerFindAllQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? treatmentPlansControllerFindAllQueryKey(params)
          
 
          const query = useQuery({
-          ...treatmentPlansControllerFindAllQueryOptions(config),
+          ...treatmentPlansControllerFindAllQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

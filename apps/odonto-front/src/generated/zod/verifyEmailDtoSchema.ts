@@ -7,6 +7,6 @@ import { z } from "zod/v4";
 
 export const verifyEmailDtoSchema = z.object({
     "token": z.string().describe("The verification token sent via email"),
-"password": z.string().describe("The new password for the account"),
-"confirmPassword": z.string().describe("Confirm the new password")
+"password": z.string().min(8).max(128).describe("The new password for the account"),
+"confirmPassword": z.string().min(8).max(128).describe("Confirm the new password")
     })

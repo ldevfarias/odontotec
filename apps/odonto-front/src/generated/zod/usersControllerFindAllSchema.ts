@@ -3,9 +3,14 @@
 * Do not edit manually.
 */
 
-import { clinicUserDtoSchema } from "./clinicUserDtoSchema.ts";
 import { z } from "zod/v4";
 
-export const usersControllerFindAll200Schema = z.array(z.lazy(() => clinicUserDtoSchema))
+export const usersControllerFindAllQueryParamsSchema = z.object({
+    "page": z.coerce.number().min(1).default(1),
+"limit": z.coerce.number().min(1).max(100).default(50),
+"role": z.optional(z.enum(["OWNER", "ADMIN", "DENTIST", "RECEPTIONIST"]))
+    })
+
+export const usersControllerFindAll200Schema = z.any()
 
 export const usersControllerFindAllQueryResponseSchema = z.lazy(() => usersControllerFindAll200Schema)

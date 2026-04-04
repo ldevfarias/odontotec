@@ -5,7 +5,7 @@
 
 import fetch from "@/lib/api";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
-import type { TreatmentPlansControllerFindAllQueryResponse } from "../ts/TreatmentPlansControllerFindAll.ts";
+import type { TreatmentPlansControllerFindAllQueryResponse, TreatmentPlansControllerFindAllQueryParams } from "../ts/TreatmentPlansControllerFindAll.ts";
 
 function getTreatmentPlansControllerFindAllUrl() {
   const res = { method: 'GET', url: `/treatment-plans` as const }
@@ -16,11 +16,11 @@ function getTreatmentPlansControllerFindAllUrl() {
  * @summary Get all treatment plans for the clinic
  * {@link /treatment-plans}
  */
-export async function treatmentPlansControllerFindAll(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function treatmentPlansControllerFindAll(params?: TreatmentPlansControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 
 
-  const res = await request<TreatmentPlansControllerFindAllQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getTreatmentPlansControllerFindAllUrl().url.toString(), ... requestConfig })
+  const res = await request<TreatmentPlansControllerFindAllQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getTreatmentPlansControllerFindAllUrl().url.toString(), params, ... requestConfig })
   return res.data
 }

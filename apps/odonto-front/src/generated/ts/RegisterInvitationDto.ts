@@ -14,7 +14,7 @@ export type RegisterInvitationDto = {
     */
     name: string;
     /**
-     * @minLength 6
+     * @minLength 8
      * @type string
     */
     password: string;

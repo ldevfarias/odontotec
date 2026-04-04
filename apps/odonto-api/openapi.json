@@ -1378,6 +1378,91 @@
         ]
       }
     },
+    "/tooth-observations": {
+      "post": {
+        "operationId": "ToothObservationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateToothObservationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "ToothObservations"
+        ]
+      }
+    },
+    "/tooth-observations/patient/{patientId}": {
+      "get": {
+        "operationId": "ToothObservationsController_findAllByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "ToothObservations"
+        ]
+      }
+    },
+    "/tooth-observations/{id}": {
+      "delete": {
+        "operationId": "ToothObservationsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "ToothObservations"
+        ]
+      }
+    },
     "/appointments": {
       "post": {
         "operationId": "AppointmentsController_create",
@@ -3162,6 +3247,37 @@
             "example": 1
           }
         }
+      },
+      "CreateToothObservationDto": {
+        "type": "object",
+        "properties": {
+          "toothNumber": {
+            "type": "string",
+            "example": "11"
+          },
+          "toothFaces": {
+            "type": "string",
+            "example": "O,M,D"
+          },
+          "description": {
+            "type": "string",
+            "example": "Cárie incipiente na face oclusal"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-04-04"
+          },
+          "patientId": {
+            "type": "number",
+            "example": 42
+          }
+        },
+        "required": [
+          "toothNumber",
+          "description",
+          "date",
+          "patientId"
+        ]
       },
       "CreateAppointmentDto": {
         "type": "object",

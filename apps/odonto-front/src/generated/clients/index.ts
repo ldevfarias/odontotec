@@ -70,6 +70,9 @@ export { stripeWebhookControllerHandleWebhook } from "./stripeWebhookControllerH
 export { subscriptionControllerCreateCheckoutSession } from "./subscriptionControllerCreateCheckoutSession.ts";
 export { subscriptionControllerCreatePortalSession } from "./subscriptionControllerCreatePortalSession.ts";
 export { subscriptionControllerGetStatus } from "./subscriptionControllerGetStatus.ts";
+export { toothObservationsControllerCreate } from "./toothObservationsControllerCreate.ts";
+export { toothObservationsControllerFindAllByPatient } from "./toothObservationsControllerFindAllByPatient.ts";
+export { toothObservationsControllerRemove } from "./toothObservationsControllerRemove.ts";
 export { treatmentPlansControllerCreate } from "./treatmentPlansControllerCreate.ts";
 export { treatmentPlansControllerFindAll } from "./treatmentPlansControllerFindAll.ts";
 export { treatmentPlansControllerFindOne } from "./treatmentPlansControllerFindOne.ts";

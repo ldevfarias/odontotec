@@ -12,11 +12,15 @@ export type VerifyEmailDto = {
     token: string;
     /**
      * @description The new password for the account
+     * @minLength 8
+     * @maxLength 128
      * @type string
     */
     password: string;
     /**
      * @description Confirm the new password
+     * @minLength 8
+     * @maxLength 128
      * @type string
     */
     confirmPassword: string;

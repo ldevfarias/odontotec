@@ -6,7 +6,7 @@
 import type { LoginDto } from "./LoginDto.ts";
 
 /**
- * @description Return JWT tokens
+ * @description User authenticated — session set via HttpOnly cookies
 */
 export type AuthControllerLogin200 = any;
 

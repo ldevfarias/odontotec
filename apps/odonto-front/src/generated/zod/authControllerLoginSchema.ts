@@ -7,7 +7,7 @@ import { loginDtoSchema } from "./loginDtoSchema.ts";
 import { z } from "zod/v4";
 
 /**
- * @description Return JWT tokens
+ * @description User authenticated — session set via HttpOnly cookies
  */
 export const authControllerLogin200Schema = z.any()
 

@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
-import type { PatientsControllerFindAllQueryResponse } from "../ts/PatientsControllerFindAll.ts";
+import type { PatientsControllerFindAllQueryResponse, PatientsControllerFindAllQueryParams } from "../ts/PatientsControllerFindAll.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { patientsControllerFindAll } from "../clients/patientsControllerFindAll.ts";
 
-export const patientsControllerFindAllSuspenseQueryKey = () => [{ url: '/patients' }] as const
+export const patientsControllerFindAllSuspenseQueryKey = (params?: PatientsControllerFindAllQueryParams) => [{ url: '/patients' }, ...(params ? [params] : [])] as const
 
 export type PatientsControllerFindAllSuspenseQueryKey = ReturnType<typeof patientsControllerFindAllSuspenseQueryKey>
 
-export function patientsControllerFindAllSuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function patientsControllerFindAllSuspenseQueryOptions(params?: PatientsControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = patientsControllerFindAllSuspenseQueryKey()
+        const queryKey = patientsControllerFindAllSuspenseQueryKey(params)
         return queryOptions<PatientsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, PatientsControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return patientsControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return patientsControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function patientsControllerFindAllSuspenseQueryOptions(config: Partial<Re
  * @summary List all patients in the clinic
  * {@link /patients}
  */
-export function usePatientsControllerFindAllSuspense<TData = PatientsControllerFindAllQueryResponse, TQueryKey extends QueryKey = PatientsControllerFindAllSuspenseQueryKey>(options: 
+export function usePatientsControllerFindAllSuspense<TData = PatientsControllerFindAllQueryResponse, TQueryKey extends QueryKey = PatientsControllerFindAllSuspenseQueryKey>(params?: PatientsControllerFindAllQueryParams, options: 
 {
   query?: Partial<UseSuspenseQueryOptions<PatientsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function usePatientsControllerFindAllSuspense<TData = PatientsControllerF
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? patientsControllerFindAllSuspenseQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? patientsControllerFindAllSuspenseQueryKey(params)
          
 
          const query = useSuspenseQuery({
-          ...patientsControllerFindAllSuspenseQueryOptions(config),
+          ...patientsControllerFindAllSuspenseQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

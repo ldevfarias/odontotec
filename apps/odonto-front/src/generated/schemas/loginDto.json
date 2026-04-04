@@ -1,1 +1,1 @@
-{"type":"object","properties":{"email":{"type":"string","example":"dentist@example.com","format":"email"},"password":{"type":"string","example":"password123","minLength":6}},"required":["email","password"],"x-readme-ref-name":"LoginDto"}
+{"type":"object","properties":{"email":{"type":"string","example":"dentist@example.com","format":"email","maxLength":255},"password":{"type":"string","example":"password123","minLength":8,"maxLength":128}},"required":["email","password"],"x-readme-ref-name":"LoginDto"}

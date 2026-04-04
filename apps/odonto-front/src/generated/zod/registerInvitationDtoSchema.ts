@@ -8,5 +8,5 @@ import { z } from "zod/v4";
 export const registerInvitationDtoSchema = z.object({
     "token": z.string(),
 "name": z.string(),
-"password": z.string().min(6)
+"password": z.string().min(8)
     })

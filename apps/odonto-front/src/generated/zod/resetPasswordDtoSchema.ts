@@ -7,5 +7,5 @@ import { z } from "zod/v4";
 
 export const resetPasswordDtoSchema = z.object({
     "token": z.string().describe("The reset token sent via email"),
-"password": z.string().min(6).describe("The new password")
+"password": z.string().min(8).describe("The new password")
     })

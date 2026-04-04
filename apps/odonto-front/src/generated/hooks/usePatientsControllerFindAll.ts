@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
-import type { PatientsControllerFindAllQueryResponse } from "../ts/PatientsControllerFindAll.ts";
+import type { PatientsControllerFindAllQueryResponse, PatientsControllerFindAllQueryParams } from "../ts/PatientsControllerFindAll.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { patientsControllerFindAll } from "../clients/patientsControllerFindAll.ts";
 
-export const patientsControllerFindAllQueryKey = () => [{ url: '/patients' }] as const
+export const patientsControllerFindAllQueryKey = (params?: PatientsControllerFindAllQueryParams) => [{ url: '/patients' }, ...(params ? [params] : [])] as const
 
 export type PatientsControllerFindAllQueryKey = ReturnType<typeof patientsControllerFindAllQueryKey>
 
-export function patientsControllerFindAllQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function patientsControllerFindAllQueryOptions(params?: PatientsControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = patientsControllerFindAllQueryKey()
+        const queryKey = patientsControllerFindAllQueryKey(params)
         return queryOptions<PatientsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, PatientsControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return patientsControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return patientsControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function patientsControllerFindAllQueryOptions(config: Partial<RequestCon
  * @summary List all patients in the clinic
  * {@link /patients}
  */
-export function usePatientsControllerFindAll<TData = PatientsControllerFindAllQueryResponse, TQueryData = PatientsControllerFindAllQueryResponse, TQueryKey extends QueryKey = PatientsControllerFindAllQueryKey>(options: 
+export function usePatientsControllerFindAll<TData = PatientsControllerFindAllQueryResponse, TQueryData = PatientsControllerFindAllQueryResponse, TQueryKey extends QueryKey = PatientsControllerFindAllQueryKey>(params?: PatientsControllerFindAllQueryParams, options: 
 {
   query?: Partial<QueryObserverOptions<PatientsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function usePatientsControllerFindAll<TData = PatientsControllerFindAllQu
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? patientsControllerFindAllQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? patientsControllerFindAllQueryKey(params)
          
 
          const query = useQuery({
-          ...patientsControllerFindAllQueryOptions(config),
+          ...patientsControllerFindAllQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

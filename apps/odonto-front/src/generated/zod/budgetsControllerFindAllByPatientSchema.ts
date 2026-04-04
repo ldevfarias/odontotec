@@ -9,6 +9,11 @@ export const budgetsControllerFindAllByPatientPathParamsSchema = z.object({
     "patientId": z.coerce.number()
     })
 
+export const budgetsControllerFindAllByPatientQueryParamsSchema = z.object({
+    "page": z.coerce.number().min(1).default(1),
+"limit": z.coerce.number().min(1).max(100).default(50)
+    })
+
 export const budgetsControllerFindAllByPatient200Schema = z.any()
 
 export const budgetsControllerFindAllByPatientQueryResponseSchema = z.lazy(() => budgetsControllerFindAllByPatient200Schema)

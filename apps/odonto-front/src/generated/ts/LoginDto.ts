@@ -6,11 +6,13 @@
 
 export type LoginDto = {
     /**
+     * @maxLength 255
      * @type string, email
     */
     email: string;
     /**
-     * @minLength 6
+     * @minLength 8
+     * @maxLength 128
      * @type string
     */
     password: string;

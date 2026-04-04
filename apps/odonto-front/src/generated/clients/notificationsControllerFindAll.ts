@@ -5,7 +5,7 @@
 
 import fetch from "@/lib/api";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
-import type { NotificationsControllerFindAllQueryResponse } from "../ts/NotificationsControllerFindAll.ts";
+import type { NotificationsControllerFindAllQueryResponse, NotificationsControllerFindAllQueryParams } from "../ts/NotificationsControllerFindAll.ts";
 
 function getNotificationsControllerFindAllUrl() {
   const res = { method: 'GET', url: `/notifications` as const }
@@ -16,11 +16,11 @@ function getNotificationsControllerFindAllUrl() {
  * @summary List clinic notifications
  * {@link /notifications}
  */
-export async function notificationsControllerFindAll(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function notificationsControllerFindAll(params?: NotificationsControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 
 
-  const res = await request<NotificationsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getNotificationsControllerFindAllUrl().url.toString(), ... requestConfig })
+  const res = await request<NotificationsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getNotificationsControllerFindAllUrl().url.toString(), params, ... requestConfig })
   return res.data
 }

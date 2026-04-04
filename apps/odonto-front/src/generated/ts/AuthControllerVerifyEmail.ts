@@ -6,7 +6,7 @@
 import type { VerifyEmailDto } from "./VerifyEmailDto.ts";
 
 /**
- * @description User created, returns tokens
+ * @description User created — session set via HttpOnly cookies
 */
 export type AuthControllerVerifyEmail201 = any;
 
