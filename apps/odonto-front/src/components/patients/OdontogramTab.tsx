@@ -40,7 +40,8 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
     const [deleteId, setDeleteId] = useState<number | null>(null);
 
     const queryClient = useQueryClient();
-    const { data: procedures = [], isLoading } = useProceduresControllerFindAllByPatient(patientId);
+    const { data: proceduresResponse, isLoading } = useProceduresControllerFindAllByPatient(patientId);
+    const procedures = proceduresResponse?.data ?? [];
     const { mutate: removeProcedure } = useProceduresControllerRemove();
 
     const allProcedures = useMemo(() => {

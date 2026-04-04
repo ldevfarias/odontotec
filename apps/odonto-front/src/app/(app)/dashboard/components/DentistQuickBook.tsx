@@ -78,6 +78,7 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
                 onSuccess: () => {
                     notificationService.success(`Consulta agendada às ${selectedTime} com ${dentist.name.split(' ')[0]}!`);
                     queryClient.invalidateQueries({ queryKey: [{ url: '/appointments' }] });
+                    queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
                     setOpen(false);
                     setSelectedTime('');
                     setSelectedPatient('');
@@ -278,8 +279,11 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
 
 export function DentistQuickBook() {
     const { user: currentUser } = useAuth();
-    const { data: users = [] } = useUsersControllerFindAll();
-    const { data: allPatients = [] } = usePatientsControllerFindAll();
+    const { data: usersResponse } = useUsersControllerFindAll();
+    const { data: patientsResponse } = usePatientsControllerFindAll();
+    
+    const users = (usersResponse as any)?.data || [];
+    const allPatients = (patientsResponse as any)?.data || [];
     
     const allowedRoles = ['DENTIST', 'ADMIN', 'OWNER'];
     let professionals = (users as any[])

@@ -1,8 +1,16 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Este arquivo fornece orientação ao Claude Code ao trabalhar com o código neste repositório.
+
+## AI-SDLC & Engenharia de Software
+
+**IMPORTANTE:** Todas as interações devem seguir rigorosamente o padrão definido em **[AI-SDLC.md](./AI-SDLC.md)**. O foco deve ser em:
+- **TDD Primeiro:** Escrever testes antes do código de produção.
+- **SDD:** Contratos de API (OpenAPI) como fonte da verdade.
+- **Engenharia de Software:** Aplicação de SOLID, Clean Code e padrões de design.
 
 ## Project Overview
+... (rest of the content)
 
 OdontoTec is a multi-tenant dental clinic management SaaS. It's a Turbo monorepo with three apps:
 - `apps/odonto-api` — NestJS REST API (port 3000)

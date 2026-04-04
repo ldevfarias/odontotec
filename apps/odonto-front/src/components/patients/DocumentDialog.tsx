@@ -51,8 +51,8 @@ interface DocumentDialogProps {
 
 export function DocumentDialog({ isOpen, onOpenChange, patientId, onSuccess }: DocumentDialogProps) {
     const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
-    const { data: users = [] } = useUsersControllerFindAll();
-    const dentists = users.filter((u: any) => u.role === 'DENTIST' || u.role === 'ADMIN');
+    const { data: usersResponse } = useUsersControllerFindAll();
+    const dentists = (usersResponse?.data ?? []).filter((u: any) => u.role === 'DENTIST' || u.role === 'ADMIN');
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
 import { CreatePatientDocumentDto, UpdatePatientDocumentDto } from './dto/patient-document.dto';
@@ -8,6 +8,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/enums/role.enum';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { Tenant } from '../../common/decorators/tenant.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('documents')
 @ApiBearerAuth()
@@ -24,12 +25,14 @@ export class DocumentsController {
     }
 
     @Get()
+    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
     @ApiOperation({ summary: 'List all documents in the clinic' })
-    findAll(@Tenant() clinicId: number, @Query('patientId') patientId?: string) {
-        return this.documentsService.findAll(clinicId, patientId ? Number(patientId) : undefined);
+    findAll(@Tenant() clinicId: number, @Query('patientId') patientId?: string, @Query() pagination: PaginationDto = new PaginationDto()) {
+        return this.documentsService.findAll(clinicId, patientId ? Number(patientId) : undefined, pagination.page, pagination.limit);
     }
 
     @Get(':id')
+    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
     @ApiOperation({ summary: 'Get document details' })
     findOne(@Param('id') id: string, @Tenant() clinicId: number) {
         return this.documentsService.findOne(Number(id), clinicId);

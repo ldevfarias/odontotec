@@ -1,20 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreatePatientDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @MaxLength(255)
     name: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(255)
     email?: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(20)
     phone?: string;
 
     @ApiProperty({ required: false })
@@ -25,11 +28,13 @@ export class CreatePatientDto {
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(500)
     address?: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(20)
     document?: string;
 }
 
@@ -37,16 +42,19 @@ export class UpdatePatientDto {
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(255)
     name?: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(255)
     email?: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(20)
     phone?: string;
 
     @ApiProperty({ required: false })
@@ -57,11 +65,13 @@ export class UpdatePatientDto {
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(500)
     address?: string;
 
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
+    @MaxLength(20)
     document?: string;
 }
 

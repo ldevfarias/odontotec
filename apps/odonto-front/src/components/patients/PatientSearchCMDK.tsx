@@ -23,7 +23,8 @@ interface PatientSearchCMDKProps {
 
 export function PatientSearchCMDK({ open, onOpenChange }: PatientSearchCMDKProps) {
     const router = useRouter();
-    const { data: patients = [], isLoading } = usePatientsControllerFindAll();
+    const { data: patientsResponse, isLoading } = usePatientsControllerFindAll();
+    const patients = patientsResponse?.data ?? [];
 
     const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
     const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>(undefined);

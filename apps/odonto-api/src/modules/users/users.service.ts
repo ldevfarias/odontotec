@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository, IsNull, Not, DataSource, EntityManager, FindOptionsWhere } from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from './entities/user.entity';
@@ -9,6 +10,7 @@ import { PendingRegistration } from './entities/pending-registration.entity';
 import { Clinic } from '../clinics/entities/clinic.entity';
 import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { ClinicRole } from '../clinics/enums/clinic-role.enum';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { ClinicUserDto } from './dto/clinic-user.dto';
 import { EmailService } from '../email/email.service';
@@ -31,7 +33,12 @@ export class UsersService {
         @Inject(STORAGE_PROVIDER)
         private storageProvider: IStorageProvider,
         private emailService: EmailService,
+        private dataSource: DataSource,
     ) { }
+
+    private getRepository<T extends object>(entityClass: new () => T, manager?: EntityManager): Repository<T> {
+        return manager ? manager.getRepository(entityClass) : this.dataSource.getRepository(entityClass);
+    }
 
     async invite(inviteUserDto: InviteUserDto, clinicId: number): Promise<UserInvitation> {
         const { email, cpf, role } = inviteUserDto;
@@ -116,12 +123,14 @@ export class UsersService {
         return pending;
     }
 
-    async deletePendingRegistration(id: number): Promise<void> {
-        await this.pendingRegistrationRepository.delete(id);
+    async deletePendingRegistration(id: number, manager?: EntityManager): Promise<void> {
+        const repo = this.getRepository(PendingRegistration, manager);
+        await repo.delete(id);
     }
 
-    async findInvitationByToken(token: string): Promise<UserInvitation | null> {
-        const invitation = await this.invitationRepository.findOne({
+    async findInvitationByToken(token: string, manager?: EntityManager): Promise<UserInvitation | null> {
+        const repo = this.getRepository(UserInvitation, manager);
+        const invitation = await repo.findOne({
             where: { token, acceptedAt: IsNull() },
             relations: ['clinic']
         });
@@ -133,41 +142,44 @@ export class UsersService {
         return invitation;
     }
 
-    async completeInvitation(token: string, name: string, password: string): Promise<{ user: User; invitation: UserInvitation }> {
-        const invitation = await this.findInvitationByToken(token);
-        if (!invitation) {
-            throw new BadRequestException('Invalid or expired invitation token');
-        }
+    async completeInvitation(token: string, name: string, password: string, manager?: EntityManager): Promise<{ user: User; invitation: UserInvitation }> {
+        return await (manager ? Promise.resolve(manager) : this.dataSource.transaction(async m => m)).then(async m => {
+            const invitation = await this.findInvitationByToken(token, m);
+            if (!invitation) {
+                throw new BadRequestException('Invalid or expired invitation token');
+            }
 
-        // Check if user already exists (invited to multiple clinics)
-        let user = await this.findByEmail(invitation.email);
-        if (!user) {
-            user = await this.createUser({
-                email: invitation.email,
-                name: name,
-                password: password,
-                role: invitation.role,
-                isActive: true,
-            });
-        }
+            // Check if user already exists (invited to multiple clinics)
+            let user = await this.findByEmail(invitation.email);
+            if (!user) {
+                user = await this.createUser({
+                    email: invitation.email,
+                    name: name,
+                    password: password,
+                    role: invitation.role,
+                    isActive: true,
+                }, m);
+            }
 
-        invitation.acceptedAt = new Date();
-        await this.invitationRepository.save(invitation);
+            invitation.acceptedAt = new Date();
+            await m.getRepository(UserInvitation).save(invitation);
 
-        return { user, invitation };
+            return { user, invitation };
+        });
     }
 
-    async createUser(createUserDto: CreateUserDto): Promise<User> {
+    async createUser(createUserDto: CreateUserDto, manager?: EntityManager): Promise<User> {
+        const repo = this.getRepository(User, manager);
         const email = createUserDto.email.toLowerCase().trim();
         const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-        const user = this.usersRepository.create({
+        const user = repo.create({
             ...createUserDto,
             email,
             password: hashedPassword,
         });
 
         try {
-            return await this.usersRepository.save(user);
+            return await repo.save(user);
         } catch (error: any) {
             if (error.code === '23505') {
                 throw new ConflictException('Email already in use');
@@ -183,12 +195,18 @@ export class UsersService {
         return this.createUser(createUserDto);
     }
 
-    async findAllByClinic(clinicId: number): Promise<ClinicUserDto[]> {
-        const memberships = await this.membershipRepository.find({
-            where: { clinicId, isActive: true },
+    async findAllByClinic(clinicId: number, page = 1, limit = 50, role?: ClinicRole): Promise<PaginatedResponseDto<ClinicUserDto>> {
+        const where: FindOptionsWhere<ClinicMembership> = { clinicId, isActive: true, user: Not(IsNull()) };
+        if (role) {
+            where.role = role;
+        }
+        const [memberships, total] = await this.membershipRepository.findAndCount({
+            where,
             relations: ['user'],
+            skip: (page - 1) * limit,
+            take: limit,
         });
-        return memberships
+        const data = memberships
             .filter(m => m.user)
             .map(m => ({
                 id: m.user.id,
@@ -198,15 +216,17 @@ export class UsersService {
                 isActive: m.user.isActive,
                 avatarUrl: m.avatarUrl ?? null,
             }));
+        return { data, total, page, limit };
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto | Partial<User>): Promise<User | null> {
+    async update(id: number, updateUserDto: UpdateUserDto | Partial<User>, manager?: EntityManager): Promise<User | null> {
+        const repo = this.getRepository(User, manager);
         try {
-            const user = await this.usersRepository.findOne({ where: { id } });
+            const user = await repo.findOne({ where: { id } });
             if (!user) return null;
 
             Object.assign(user, updateUserDto);
-            return await this.usersRepository.save(user);
+            return await repo.save(user);
         } catch (error: any) {
             if (error.code === '23505') {
                 throw new ConflictException('Email already in use');
@@ -239,50 +259,59 @@ export class UsersService {
         });
     }
 
-    async findOne(id: number): Promise<User | null> {
-        return this.usersRepository.findOne({ where: { id } });
+    async findOne(id: number, manager?: EntityManager): Promise<User | null> {
+        const repo = this.getRepository(User, manager);
+        return repo.findOne({ where: { id } });
     }
 
-    async findOneWithRefreshToken(id: number): Promise<User | null> {
-        return this.usersRepository.findOne({
+    async findOneWithRefreshToken(id: number, manager?: EntityManager): Promise<User | null> {
+        const repo = this.getRepository(User, manager);
+        return repo.findOne({
             where: { id },
             select: ['id', 'email', 'role', 'isActive', 'currentHashedRefreshToken'],
+            lock: manager ? { mode: 'pessimistic_write' } : undefined,
         });
     }
 
-    async findOneForPasswordReset(id: number): Promise<User | null> {
-        return this.usersRepository.findOne({
+    async findOneForPasswordReset(id: number, manager?: EntityManager): Promise<User | null> {
+        const repo = this.getRepository(User, manager);
+        return repo.findOne({
             where: { id },
             select: ['id', 'email', 'role', 'isActive', 'resetPasswordToken', 'resetPasswordExpires'],
+            lock: manager ? { mode: 'pessimistic_write' } : undefined,
         });
     }
 
     async uploadAvatar(userId: number, clinicId: number, file: Express.Multer.File): Promise<{ avatarUrl: string }> {
-        const membership = await this.membershipRepository.findOne({
-            where: { userId, clinicId, isActive: true },
-        });
-        if (!membership) {
-            throw new NotFoundException('Membership not found for this clinic');
-        }
-
-        // Delete old avatar (best-effort — proceed even if R2 delete fails)
-        if (membership.avatarUrl) {
-            try {
-                await this.storageProvider.delete(membership.avatarUrl);
-            } catch (err) {
-                console.warn(`Failed to delete old avatar from R2: ${membership.avatarUrl}`, err);
+        return await this.dataSource.transaction(async (manager) => {
+            const membershipRepo = manager.getRepository(ClinicMembership);
+            const membership = await membershipRepo.findOne({
+                where: { userId, clinicId, isActive: true },
+                lock: { mode: 'pessimistic_write' }
+            });
+            if (!membership) {
+                throw new NotFoundException('Membership not found for this clinic');
             }
-        }
 
-        const avatarUrl = await this.storageProvider.upload(
-            file.buffer,
-            file.originalname,
-            file.mimetype,
-            `clinics/${clinicId}/avatars`,
-        );
+            // Delete old avatar (best-effort — proceed even if R2 delete fails)
+            if (membership.avatarUrl) {
+                try {
+                    await this.storageProvider.delete(membership.avatarUrl);
+                } catch (err) {
+                    console.warn(`Failed to delete old avatar from R2: ${membership.avatarUrl}`, err);
+                }
+            }
 
-        await this.membershipRepository.update({ userId, clinicId }, { avatarUrl });
-        return { avatarUrl };
+            const avatarUrl = await this.storageProvider.upload(
+                file.buffer,
+                file.originalname,
+                file.mimetype,
+                `clinics/${clinicId}/avatars`,
+            );
+
+            await membershipRepo.update({ userId, clinicId }, { avatarUrl });
+            return { avatarUrl };
+        });
     }
 
     async removeAvatar(userId: number, clinicId: number): Promise<{ avatarUrl: null }> {

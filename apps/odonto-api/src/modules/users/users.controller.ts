@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, ParseIntPipe, NotFoundException, Request, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, ParseIntPipe, NotFoundException, Request, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/user.dto';
+import { UpdateUserDto, UsersQueryDto } from './dto/user.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { ClinicUserDto } from './dto/clinic-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -12,6 +12,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { UserRole } from './enums/role.enum';
 import { Tenant } from '../../common/decorators/tenant.decorator';
+import { ImageMagicNumberValidator } from '../../common/validators/image-magic-number.validator';
+
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -42,6 +44,7 @@ export class UsersController {
                 validators: [
                     new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
                     new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp)$/ }),
+                    new ImageMagicNumberValidator({}),
                 ],
             }),
         ) file: Express.Multer.File,
@@ -88,9 +91,9 @@ export class UsersController {
     @Get()
     @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
     @ApiOperation({ summary: 'List all clinic users' })
-    @ApiResponse({ status: 200, type: [ClinicUserDto] })
-    findAll(@Tenant() clinicId: number): Promise<ClinicUserDto[]> {
-        return this.usersService.findAllByClinic(clinicId);
+    @ApiResponse({ status: 200 })
+    findAll(@Tenant() clinicId: number, @Query() query: UsersQueryDto) {
+        return this.usersService.findAllByClinic(clinicId, query.page, query.limit, query.role);
     }
 
     @Patch(':id')

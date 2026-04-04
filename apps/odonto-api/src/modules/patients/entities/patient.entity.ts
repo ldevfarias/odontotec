@@ -15,16 +15,16 @@ export class Patient {
     @Column({ name: 'birth_date', type: 'date', nullable: true })
     birthDate: Date;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     email: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     phone: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     address: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     document: string; // CPF or RG
 
     @Column({ name: 'clinic_id' })

@@ -20,10 +20,11 @@ export class DashboardService {
         const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
         // 1. Appointments Today
-        const appointmentsToday = await this.appointmentsService.findAll(clinicId, undefined, undefined, {
+        const appointmentsResponse = await this.appointmentsService.findAll(clinicId, undefined, undefined, {
             date: startOfDay.toISOString().split('T')[0]
         });
 
+        const appointmentsToday = appointmentsResponse.data;
         const patientsToday = appointmentsToday.length;
 
         // 2. Occupancy Rate

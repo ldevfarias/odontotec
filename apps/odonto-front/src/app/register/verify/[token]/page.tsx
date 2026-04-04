@@ -49,12 +49,10 @@ export default function VerifyEmailPage() {
                 confirmPassword: values.confirmPassword,
             });
 
-            if (response.access_token) {
-                notificationService.success('E-mail verificado e conta criada com sucesso!');
-                // Pass the newly created user to login so AuthContext upgrades the session.
-                // Empty clinics array signals a new onboarding user — login() will route to /onboarding/terms.
-                login(response.access_token, response.user.clinicName, response.user as any, []);
-            }
+            notificationService.success('E-mail verificado e conta criada com sucesso!');
+            // Pass the newly created user to login so AuthContext upgrades the session.
+            // Empty clinics array signals a new onboarding user — login() will route to /onboarding/terms.
+            login('', response.user.clinicName, response.user as any, []);
         } catch (error: any) {
             console.error(error);
             notificationService.error(error.response?.data?.message || 'Link inválido ou expirado. Solicite um novo cadastro.');

@@ -284,20 +284,46 @@
     "/users": {
       "get": {
         "operationId": "UsersController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OWNER",
+                "ADMIN",
+                "DENTIST",
+                "RECEPTIONIST"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ClinicUserDto"
-                  }
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -393,7 +419,7 @@
         },
         "responses": {
           "200": {
-            "description": "Return JWT tokens"
+            "description": "User authenticated — session set via HttpOnly cookies"
           },
           "401": {
             "description": "Unauthorized"
@@ -446,7 +472,7 @@
         },
         "responses": {
           "201": {
-            "description": "Clinic and User created, returns tokens"
+            "description": "Clinic and user created — session set via HttpOnly cookies"
           }
         },
         "summary": "Register a new clinic and admin user",
@@ -496,7 +522,7 @@
         },
         "responses": {
           "201": {
-            "description": "User created, returns tokens"
+            "description": "User created — session set via HttpOnly cookies"
           }
         },
         "summary": "Verify email and create user",
@@ -656,17 +682,36 @@
       },
       "get": {
         "operationId": "PatientsController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Return all patients with their latest procedure and next appointment dates.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PatientResponseDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDto"
                 }
               }
             }
@@ -1369,6 +1414,27 @@
         "operationId": "AppointmentsController_findAll",
         "parameters": [
           {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
             "name": "date",
             "required": false,
             "in": "query",
@@ -1692,7 +1758,29 @@
     "/notifications": {
       "get": {
         "operationId": "NotificationsController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -1789,7 +1877,29 @@
       },
       "get": {
         "operationId": "TreatmentPlansController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -2111,6 +2221,27 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2328,6 +2459,27 @@
             "schema": {
               "type": "number"
             }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2508,38 +2660,6 @@
           "role"
         ]
       },
-      "ClinicUserDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "avatarUrl": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "email",
-          "role",
-          "isActive",
-          "avatarUrl"
-        ]
-      },
       "UpdateUserDto": {
         "type": "object",
         "properties": {
@@ -2568,12 +2688,14 @@
           "email": {
             "type": "string",
             "example": "dentist@example.com",
-            "format": "email"
+            "format": "email",
+            "maxLength": 255
           },
           "password": {
             "type": "string",
             "example": "password123",
-            "minLength": 6
+            "minLength": 8,
+            "maxLength": 128
           }
         },
         "required": [
@@ -2595,7 +2717,7 @@
           "password": {
             "type": "string",
             "example": "password123",
-            "minLength": 6
+            "minLength": 8
           }
         },
         "required": [
@@ -2665,11 +2787,15 @@
           },
           "password": {
             "type": "string",
-            "description": "The new password for the account"
+            "description": "The new password for the account",
+            "minLength": 8,
+            "maxLength": 128
           },
           "confirmPassword": {
             "type": "string",
-            "description": "Confirm the new password"
+            "description": "Confirm the new password",
+            "minLength": 8,
+            "maxLength": 128
           }
         },
         "required": [
@@ -2722,7 +2848,7 @@
             "type": "string",
             "example": "newStrongPassword123",
             "description": "The new password",
-            "minLength": 6
+            "minLength": 8
           }
         },
         "required": [
@@ -2756,57 +2882,30 @@
           "name"
         ]
       },
-      "PatientResponseDto": {
+      "PaginatedResponseDto": {
         "type": "object",
         "properties": {
-          "id": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "total": {
             "type": "number"
           },
-          "name": {
-            "type": "string"
-          },
-          "birthDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "email": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "address": {
-            "type": "string"
-          },
-          "document": {
-            "type": "string"
-          },
-          "clinicId": {
+          "page": {
             "type": "number"
           },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "lastProcedureDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "nextAppointmentDate": {
-            "type": "string",
-            "format": "date-time"
+          "limit": {
+            "type": "number"
           }
         },
         "required": [
-          "id",
-          "name",
-          "clinicId",
-          "createdAt",
-          "updatedAt"
+          "data",
+          "total",
+          "page",
+          "limit"
         ]
       },
       "UpdatePatientDto": {

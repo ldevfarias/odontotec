@@ -34,9 +34,8 @@ export default function AgendamentosPage() {
     const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
     const { mutate: updateAppointment } = useAppointmentsControllerUpdate();
     const { user: currentUser } = useAuth();
-    const { data: userData = [], isLoading: isLoadingUsers } = useUsersControllerFindAll({
-        client: { params: { role: 'DENTIST' } } as any
-    });
+    const { data: userDataResponse, isLoading: isLoadingUsers } = useUsersControllerFindAll();
+    const userData = (userDataResponse as any)?.data ?? [];
 
     const roleLabels: Record<string, string> = {
         OWNER: 'Administrador',
@@ -47,7 +46,12 @@ export default function AgendamentosPage() {
     };
 
     const professionals = useMemo<Professional[]>(() => {
-        let filteredUsers = userData as any[];
+        const allUsers = userData as any[];
+        const allowedRoles = ['DENTIST', 'ADMIN', 'OWNER'];
+        
+        let filteredUsers = allUsers.filter(u => 
+            u.role && allowedRoles.includes(u.role.toUpperCase()) && u.isActive
+        );
         
         // If the user is a dentist, only show themselves in the calendar
         if (currentUser?.role?.toUpperCase() === 'DENTIST') {
@@ -65,28 +69,30 @@ export default function AgendamentosPage() {
     // 2. Fetch Appointments
     // Note: The Calendar component handles date filtering internally for the view, 
     // but we fetch all for now or could optimize by passing dates if we expose them from Calendar state.
-    const { data: appointmentData = [] } = useAppointmentsControllerFindAll();
+    const { data: appointmentDataResponse } = useAppointmentsControllerFindAll();
 
     const events = useMemo<CalendarEvent[]>(() => {
-        return (appointmentData as any[]).map(app => {
-            const start = parseISO(app.date);
-            const end = addMinutes(start, app.duration || 30);
+        return (appointmentDataResponse?.data ?? []).map((app: Record<string, unknown>) => {
+            const patient = app['patient'] as { name?: string } | null;
+            const dentist = app['dentist'] as { id?: number } | null;
+            const start = parseISO(app['date'] as string);
+            const end = addMinutes(start, (app['duration'] as number) || 30);
 
             return {
-                id: app.id.toString(),
-                title: app.patient?.name ? `Consulta: ${app.patient.name}` : 'Consulta',
-                patientName: app.patient?.name,
-                procedureName: 'Consulta', // Placeholder
+                id: String(app['id']),
+                title: patient?.name ? `Consulta: ${patient.name}` : 'Consulta',
+                patientName: patient?.name,
+                procedureName: 'Consulta',
                 startTime: start,
                 endTime: end,
-                professionalId: (app.dentistId || app.dentist?.id)?.toString() || '',
-                categoryId: 'c1', // Mapping everything to category 1 for now
-                description: app.notes || '',
-                status: app.status,
+                professionalId: String(app['dentistId'] ?? dentist?.id ?? ''),
+                categoryId: 'c1',
+                description: String(app['notes'] ?? ''),
+                status: app['status'] as string,
                 originalAppointment: app,
             };
         });
-    }, [appointmentData]);
+    }, [appointmentDataResponse]);
 
     if (isLoadingUsers) {
         return <CalendarSkeleton />;

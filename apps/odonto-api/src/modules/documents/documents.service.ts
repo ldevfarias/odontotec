@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PatientDocument } from './entities/patient-document.entity';
 import { CreatePatientDocumentDto, UpdatePatientDocumentDto } from './dto/patient-document.dto';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 
 @Injectable()
 export class DocumentsService {
@@ -19,16 +20,19 @@ export class DocumentsService {
         return this.documentRepository.save(document);
     }
 
-    async findAll(clinicId: number, patientId?: number): Promise<PatientDocument[]> {
+    async findAll(clinicId: number, patientId?: number, page = 1, limit = 50): Promise<PaginatedResponseDto<PatientDocument>> {
         const where: any = { clinicId };
         if (patientId) {
             where.patientId = patientId;
         }
-        return this.documentRepository.find({
+        const [data, total] = await this.documentRepository.findAndCount({
             where,
             relations: ['patient', 'dentist'],
             order: { date: 'DESC' },
+            skip: (page - 1) * limit,
+            take: limit,
         });
+        return { data, total, page, limit };
     }
 
     async findOne(id: number, clinicId: number): Promise<PatientDocument> {

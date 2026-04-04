@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from './entities/notification.entity';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 
 @Injectable()
 export class NotificationsService {
@@ -20,7 +21,7 @@ export class NotificationsService {
         return this.notificationsRepository.save(notification);
     }
 
-    async findAll(clinicId: number, userId?: number, role?: string): Promise<Notification[]> {
+    async findAll(clinicId: number, userId?: number, role?: string, page = 1, limit = 50): Promise<PaginatedResponseDto<Notification>> {
         const query = this.notificationsRepository.createQueryBuilder('notification')
             .where('notification.clinicId = :clinicId', { clinicId });
 
@@ -32,9 +33,13 @@ export class NotificationsService {
             // Let's assume ADMIN sees everything for now to monitor the clinic.
         }
 
-        return query.orderBy('notification.createdAt', 'DESC')
-            .take(50)
-            .getMany();
+        const [data, total] = await query
+            .orderBy('notification.createdAt', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
+
+        return { data, total, page, limit };
     }
 
     async markAsRead(id: number, clinicId: number): Promise<void> {

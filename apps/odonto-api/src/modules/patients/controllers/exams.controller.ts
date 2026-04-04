@@ -33,6 +33,7 @@ export class ExamsController {
     @Roles(UserRole.ADMIN, UserRole.DENTIST)
     @UseInterceptors(FilesInterceptor('files', 10, {
         storage: memoryStorage(),
+        limits: { fileSize: 10 * 1024 * 1024 },  // 10MB
         fileFilter: (req, file, cb) => {
             if (file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
                 cb(null, true);

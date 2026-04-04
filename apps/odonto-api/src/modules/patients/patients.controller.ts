@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PatientsService } from './patients.service';
 import { CreatePatientDto, UpdatePatientDto, PatientResponseDto } from './dto/patient.dto';
@@ -7,6 +7,8 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/enums/role.enum';
 import { Tenant } from '../../common/decorators/tenant.decorator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 
 @ApiTags('Patients')
 @ApiBearerAuth()
@@ -26,9 +28,9 @@ export class PatientsController {
     @Get()
     @Roles(UserRole.ADMIN, UserRole.SIMPLE, UserRole.DENTIST)
     @ApiOperation({ summary: 'List all patients in the clinic' })
-    @ApiResponse({ status: 200, description: 'Return all patients with their latest procedure and next appointment dates.', type: PatientResponseDto, isArray: true })
-    findAll(@Tenant() clinicId: number): Promise<PatientResponseDto[]> {
-        return this.patientsService.findAll(clinicId);
+    @ApiResponse({ status: 200, description: 'Return all patients with their latest procedure and next appointment dates.', type: PaginatedResponseDto, isArray: false })
+    findAll(@Tenant() clinicId: number, @Query() pagination: PaginationDto) {
+        return this.patientsService.findAll(clinicId, pagination.page, pagination.limit);
     }
 
     @Get(':id')

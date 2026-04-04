@@ -18,7 +18,8 @@ import { useClinicProceduresControllerFindAll } from '@/generated/hooks/useClini
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function TopTreatments() {
-    const { data: procedures = [], isLoading } = useClinicProceduresControllerFindAll();
+    const { data: proceduresResponse, isLoading } = useClinicProceduresControllerFindAll();
+    const procedures = proceduresResponse?.data ?? [];
     const [isExpanded, setIsExpanded] = useState(false);
 
     // Map index to a specific icon and color scheme to maintain the UI design

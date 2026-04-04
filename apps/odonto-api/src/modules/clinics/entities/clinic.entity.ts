@@ -10,17 +10,17 @@ export class Clinic {
     @Column()
     name: string;
 
-    @Column({ nullable: true })
-    address: string;
+    @Column({ type: 'text', nullable: true })
+    address: string | null;
 
-    @Column({ nullable: true })
-    phone: string;
+    @Column({ type: 'text', nullable: true })
+    phone: string | null;
 
-    @Column({ name: 'logo_url', nullable: true })
-    logoUrl: string;
+    @Column({ name: 'logo_url', type: 'text', nullable: true })
+    logoUrl: string | null;
 
-    @Column({ nullable: true })
-    email: string;
+    @Column({ type: 'text', nullable: true })
+    email: string | null;
 
     @Column({ default: 'FREE' })
     plan: 'FREE' | 'PRO';
@@ -37,11 +37,11 @@ export class Clinic {
     @Column({ name: 'cancel_at_period_end', default: false })
     cancelAtPeriodEnd: boolean;
 
-    @Column({ name: 'stripe_customer_id', nullable: true })
-    stripeCustomerId: string;
+    @Column({ name: 'stripe_customer_id', type: 'text', nullable: true })
+    stripeCustomerId: string | null;
 
-    @Column({ name: 'stripe_subscription_id', nullable: true })
-    stripeSubscriptionId: string;
+    @Column({ name: 'stripe_subscription_id', type: 'text', nullable: true })
+    stripeSubscriptionId: string | null;
 
     @Column({ name: 'owner_id', nullable: true })
     ownerId: number;

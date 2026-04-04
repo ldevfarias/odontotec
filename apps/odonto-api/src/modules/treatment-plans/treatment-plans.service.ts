@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import { TreatmentPlan } from './entities/treatment-plan.entity';
 import { TreatmentPlanItem } from './entities/treatment-plan-item.entity';
 import { CreateTreatmentPlanDto, UpdateTreatmentPlanDto } from './dto/treatment-plan.dto';
@@ -33,11 +34,14 @@ export class TreatmentPlansService {
         return this.treatmentPlanRepository.save(treatmentPlan);
     }
 
-    async findAll(clinicId: number): Promise<TreatmentPlan[]> {
-        return this.treatmentPlanRepository.find({
+    async findAll(clinicId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<TreatmentPlan>> {
+        const [data, total] = await this.treatmentPlanRepository.findAndCount({
             where: { clinicId },
             relations: ['items', 'patient', 'dentist', 'payments'],
+            skip: (page - 1) * limit,
+            take: limit,
         });
+        return { data, total, page, limit };
     }
 
     async findByPeriod(startDate: Date, endDate: Date, clinicId: number): Promise<TreatmentPlan[]> {

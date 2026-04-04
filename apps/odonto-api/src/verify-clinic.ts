@@ -1,3 +1,10 @@
+/**
+ * @deprecated This script was written when auth used Bearer tokens in JSON responses.
+ * Tokens are now delivered via HttpOnly cookies only.
+ * This script must be rewritten to use cookie-based authentication before use.
+ * See apps/odonto-api/src/modules/auth/auth.controller.ts for the updated auth flow.
+ */
+
 // Imports removed as functions are defined below
 
 

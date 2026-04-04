@@ -49,7 +49,8 @@ const STATUS_CONFIG = {
 
 export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
     const queryClient = useQueryClient();
-    const { data: treatmentPlans = [], isLoading } = useTreatmentPlansControllerFindAll();
+    const { data: treatmentPlansResponse, isLoading } = useTreatmentPlansControllerFindAll();
+    const treatmentPlans = treatmentPlansResponse?.data ?? [];
     const { mutate: removePlan } = useTreatmentPlansControllerRemove();
     const { mutate: updatePlan } = useTreatmentPlansControllerUpdate();
 

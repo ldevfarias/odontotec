@@ -67,7 +67,8 @@ export default function ProceduresPage() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const queryClient = useQueryClient();
-    const { data: procedures = [], isLoading } = useClinicProceduresControllerFindAll();
+    const { data: proceduresResponse, isLoading } = useClinicProceduresControllerFindAll();
+    const procedures = (proceduresResponse as any) ?? [];
     const { mutate: createProcedure, isPending: isCreating } = useClinicProceduresControllerCreate();
     const { mutate: updateProcedure, isPending: isUpdating } = useClinicProceduresControllerUpdate();
     const { mutate: removeProcedure } = useClinicProceduresControllerRemove();
@@ -96,9 +97,8 @@ export default function ProceduresPage() {
                         queryClient.setQueryData(
                             clinicProceduresControllerFindAllQueryKey(),
                             (old: any) => {
-                                const oldData = old?.data || old;
-                                const newData = Array.isArray(oldData) ? oldData.map((p: any) => p.id === editingId ? updatedProcedure : p) : [];
-                                return old?.data !== undefined ? { ...old, data: newData } : newData;
+                                const oldData = Array.isArray(old) ? old : (old.data || []);
+                                return oldData.map((p: any) => p.id === editingId ? updatedProcedure : p);
                             }
                         );
                     }
@@ -115,9 +115,8 @@ export default function ProceduresPage() {
                         queryClient.setQueryData(
                             clinicProceduresControllerFindAllQueryKey(),
                             (old: any) => {
-                                const oldData = old?.data || old;
-                                const newData = Array.isArray(oldData) ? [newProcedure, ...oldData] : [newProcedure];
-                                return old?.data !== undefined ? { ...old, data: newData } : newData;
+                                const oldData = Array.isArray(old) ? old : (old.data || []);
+                                return [newProcedure, ...oldData];
                             }
                         );
                     }
@@ -152,9 +151,8 @@ export default function ProceduresPage() {
                     queryClient.setQueryData(
                         clinicProceduresControllerFindAllQueryKey(),
                         (old: any) => {
-                            const oldData = old?.data || old;
-                            const newData = Array.isArray(oldData) ? oldData.filter((p: any) => p.id !== idToDelete) : [];
-                            return old?.data !== undefined ? { ...old, data: newData } : newData;
+                            const oldData = Array.isArray(old) ? old : (old.data || []);
+                            return oldData.filter((p: any) => p.id !== idToDelete);
                         }
                     );
                     setIdToDelete(null);

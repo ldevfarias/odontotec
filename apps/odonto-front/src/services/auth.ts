@@ -16,8 +16,6 @@ export interface RegisterTenantResponse {
         clinicName?: string;
     };
     clinics?: ClinicInfo[];
-    access_token: string;
-    refresh_token: string;
 }
 
 export const registerTenant = async (data: RegisterTenantDto): Promise<RegisterTenantResponse> => {
@@ -59,8 +57,6 @@ export interface CompleteClinicDto {
 
 export interface CompleteClinicResponse {
     message: string;
-    access_token: string;
-    refresh_token: string;
     clinics: ClinicInfo[];
 }
 

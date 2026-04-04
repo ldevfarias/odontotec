@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import { Budget, BudgetStatus } from './entities/budget.entity';
 import { BudgetItem } from './entities/budget-item.entity';
 import { CreateBudgetDto } from './dto/create-budget.dto';
@@ -53,12 +54,15 @@ export class BudgetsService {
         return this.budgetsRepository.save(budget);
     }
 
-    findAllByPatient(clinicId: number, patientId: number) {
-        return this.budgetsRepository.find({
+    async findAllByPatient(clinicId: number, patientId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<Budget>> {
+        const [data, total] = await this.budgetsRepository.findAndCount({
             where: { clinicId, patientId },
             order: { createdAt: 'DESC' },
             relations: ['items', 'items.clinicProcedure'],
+            skip: (page - 1) * limit,
+            take: limit,
         });
+        return { data, total, page, limit };
     }
 
     async findOne(id: number, clinicId: number) {

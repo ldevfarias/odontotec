@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { Clinic } from './entities/clinic.entity';
 import { ClinicMembership } from './entities/clinic-membership.entity';
 import { ClinicRole } from './enums/clinic-role.enum';
@@ -14,38 +14,50 @@ export class ClinicsService {
         private clinicsRepository: Repository<Clinic>,
         @InjectRepository(ClinicMembership)
         private membershipRepository: Repository<ClinicMembership>,
+        private dataSource: DataSource,
     ) { }
 
-    async findOne(id: number): Promise<Clinic> {
-        const clinic = await this.clinicsRepository.findOne({ where: { id } });
+    private getRepository<T extends object>(entityClass: new () => T, manager?: EntityManager): Repository<T> {
+        return manager ? manager.getRepository(entityClass) : this.dataSource.getRepository(entityClass);
+    }
+
+    async findOne(id: number, manager?: EntityManager): Promise<Clinic> {
+        const repo = this.getRepository(Clinic, manager);
+        const clinic = await repo.findOne({ where: { id } });
         if (!clinic) {
             throw new NotFoundException(`Clinic with ID ${id} not found`);
         }
         return clinic;
     }
 
-    async create(createClinicDto: CreateClinicDto): Promise<Clinic> {
-        const clinic = this.clinicsRepository.create(createClinicDto);
-        return this.clinicsRepository.save(clinic);
+    async create(createClinicDto: CreateClinicDto, manager?: EntityManager): Promise<Clinic> {
+        const repo = this.getRepository(Clinic, manager);
+        const clinic = repo.create(createClinicDto);
+        return repo.save(clinic);
     }
 
-    async createForUser(userId: number, createClinicDto: CreateClinicDto): Promise<Clinic> {
-        const clinic = this.clinicsRepository.create({
-            ...createClinicDto,
-            ownerId: userId,
-        });
-        const savedClinic = await this.clinicsRepository.save(clinic);
+    async createForUser(userId: number, createClinicDto: CreateClinicDto, manager?: EntityManager): Promise<Clinic> {
+        return await (manager ? Promise.resolve(manager) : this.dataSource.transaction(async m => m)).then(async m => {
+            const clinicRepo = m.getRepository(Clinic);
+            const membershipRepo = m.getRepository(ClinicMembership);
 
-        // Auto-create OWNER membership
-        const membership = this.membershipRepository.create({
-            userId,
-            clinicId: savedClinic.id,
-            role: ClinicRole.OWNER,
-            isActive: true,
-        });
-        await this.membershipRepository.save(membership);
+            const clinic = clinicRepo.create({
+                ...createClinicDto,
+                ownerId: userId,
+            });
+            const savedClinic = await clinicRepo.save(clinic);
 
-        return savedClinic;
+            // Auto-create OWNER membership
+            const membership = membershipRepo.create({
+                userId,
+                clinicId: savedClinic.id,
+                role: ClinicRole.OWNER,
+                isActive: true,
+            });
+            await membershipRepo.save(membership);
+
+            return savedClinic;
+        });
     }
 
     async findAllByUser(userId: number): Promise<{ clinic: Clinic; role: ClinicRole; avatarUrl: string | null }[]> {
@@ -56,22 +68,23 @@ export class ClinicsService {
         return memberships.map(m => ({ clinic: m.clinic, role: m.role, avatarUrl: m.avatarUrl ?? null }));
     }
 
-    async addMember(clinicId: number, userId: number, role: ClinicRole): Promise<ClinicMembership> {
-        const existing = await this.membershipRepository.findOne({
+    async addMember(clinicId: number, userId: number, role: ClinicRole, manager?: EntityManager): Promise<ClinicMembership> {
+        const repo = this.getRepository(ClinicMembership, manager);
+        const existing = await repo.findOne({
             where: { userId, clinicId },
         });
         if (existing) {
             existing.role = role;
             existing.isActive = true;
-            return this.membershipRepository.save(existing);
+            return repo.save(existing);
         }
-        const membership = this.membershipRepository.create({
+        const membership = repo.create({
             userId,
             clinicId,
             role,
             isActive: true,
         });
-        return this.membershipRepository.save(membership);
+        return repo.save(membership);
     }
 
     async removeMember(clinicId: number, userId: number): Promise<void> {
@@ -84,10 +97,10 @@ export class ClinicsService {
         });
     }
 
-    async update(id: number, updateClinicDto: UpdateClinicDto): Promise<Clinic> {
-        const clinic = await this.findOne(id);
-        await this.clinicsRepository.update(id, updateClinicDto);
-        return this.findOne(id);
+    async update(id: number, updateClinicDto: UpdateClinicDto, manager?: EntityManager): Promise<Clinic> {
+        const repo = this.getRepository(Clinic, manager);
+        await repo.update(id, updateClinicDto);
+        return this.findOne(id, manager);
     }
 
     async updateLogo(id: number, logoUrl: string): Promise<Clinic> {

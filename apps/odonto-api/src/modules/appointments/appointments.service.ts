@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
+import { Repository, Brackets, DataSource, EntityManager } from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { EmailService } from '../email/email.service';
@@ -21,52 +22,55 @@ export class AppointmentsService {
         private emailService: EmailService,
         private jwtService: JwtService,
         private notificationsService: NotificationsService,
+        private dataSource: DataSource,
     ) { }
 
     async create(createAppointmentDto: CreateAppointmentDto, clinicId: number): Promise<Appointment> {
-        const { date, duration = 30, dentistId, patientId } = createAppointmentDto;
+        return await this.dataSource.transaction(async (manager) => {
+            const { date, duration = 30, dentistId, patientId } = createAppointmentDto;
 
-        await this.checkConflict(new Date(date), duration, clinicId, dentistId, patientId);
+            await this.checkConflict(new Date(date), duration, clinicId, dentistId, patientId, undefined, manager);
 
-        const appointment = this.appointmentsRepository.create({
-            ...createAppointmentDto,
-            duration,
-            clinicId,
+            const appointment = manager.getRepository(Appointment).create({
+                ...createAppointmentDto,
+                duration,
+                clinicId,
+            });
+            const saved = await manager.getRepository(Appointment).save(appointment);
+
+            // Fetch details for email/notifications within transaction to ensure consistency
+            const patient = await manager.getRepository(Patient).findOne({ where: { id: saved.patientId } });
+            const clinic = await manager.getRepository(Clinic).findOne({ where: { id: clinicId } });
+            const dentist = await manager.getRepository('User').findOne({ where: { id: saved.dentistId } }) as any;
+
+            if (patient?.email) {
+                const token = this.jwtService.sign(
+                    { appointmentId: saved.id, clinicId, action: 'appointment_action' },
+                    { expiresIn: '7d' }
+                );
+
+                this.emailService.sendAppointmentConfirmation(
+                    patient.email,
+                    patient.name,
+                    clinic?.name || 'Clínica',
+                    new Date(saved.date).toLocaleString('pt-BR'),
+                    dentist?.name || 'Profissional',
+                    saved.id,
+                    token
+                );
+            }
+
+            // Notify Dentist
+            const dateStr = new Date(saved.date).toLocaleString('pt-BR');
+            await this.notificationsService.create(
+                `Novo agendamento com ${patient?.name || 'Paciente'} em ${dateStr}.`,
+                clinicId,
+                'INFO',
+                saved.dentistId
+            );
+
+            return saved;
         });
-        const saved = await this.appointmentsRepository.save(appointment);
-
-        // Fetch details for email
-        const patient = await this.patientRepository.findOne({ where: { id: saved.patientId } });
-        const clinic = await this.clinicRepository.findOne({ where: { id: clinicId } });
-        const dentist = await this.appointmentsRepository.manager.getRepository('User').findOne({ where: { id: saved.dentistId } }) as any;
-
-        if (patient?.email) {
-            const token = this.jwtService.sign(
-                { appointmentId: saved.id, clinicId, action: 'appointment_action' },
-                { expiresIn: '7d' }
-            );
-
-            this.emailService.sendAppointmentConfirmation(
-                patient.email,
-                patient.name,
-                clinic?.name || 'Clínica',
-                new Date(saved.date).toLocaleString('pt-BR'),
-                dentist?.name || 'Profissional',
-                saved.id,
-                token
-            );
-        }
-
-        // Notify Dentist
-        const dateStr = new Date(saved.date).toLocaleString('pt-BR');
-        await this.notificationsService.create(
-            `Novo agendamento com ${patient?.name || 'Paciente'} em ${dateStr}.`,
-            clinicId,
-            'INFO',
-            saved.dentistId
-        );
-
-        return saved;
     }
 
     async updateStatusPublic(id: number, token: string, status: AppointmentStatus): Promise<void> {
@@ -76,45 +80,54 @@ export class AppointmentsService {
                 throw new BadRequestException('Token inválido para esta ação');
             }
 
-            const appointment = await this.appointmentsRepository.findOne({
-                where: { id },
-                relations: ['patient']
+            await this.dataSource.transaction(async (manager) => {
+                const appointment = await manager.getRepository(Appointment).findOne({
+                    where: { id },
+                    relations: ['patient'],
+                    lock: { mode: 'pessimistic_write' }
+                });
+
+                if (!appointment) {
+                    throw new NotFoundException('Agendamento não encontrado');
+                }
+
+                if (payload.clinicId && appointment.clinicId !== payload.clinicId) {
+                    throw new BadRequestException('Token inválido para esta clínica');
+                }
+
+                // If already cancelled, just return success to be idempotent
+                if (appointment.status === AppointmentStatus.CANCELLED) {
+                    return;
+                }
+
+                await manager.getRepository(Appointment).update(id, {
+                    status,
+                    cancelledBy: 'PATIENT',
+                    cancellationReason: 'Cancelado via link público de email'
+                });
+
+                // Create notification for the clinic AND the dentist
+                const dateStr = new Date(appointment.date).toLocaleString('pt-BR');
+                await this.notificationsService.create(
+                    `O paciente ${appointment.patient.name} cancelou o agendamento de ${dateStr}.`,
+                    appointment.clinicId,
+                    'WARNING',
+                    appointment.dentistId
+                );
             });
-
-            if (!appointment) {
-                throw new NotFoundException('Agendamento não encontrado');
-            }
-
-            if (payload.clinicId && appointment.clinicId !== payload.clinicId) {
-                throw new BadRequestException('Token inválido para esta clínica');
-            }
-
-            // If already cancelled, just return success to be idempotent
-            if (appointment.status === AppointmentStatus.CANCELLED) {
-                return;
-            }
-
-            await this.appointmentsRepository.update(id, {
-                status,
-                cancelledBy: 'PATIENT',
-                cancellationReason: 'Cancelado via link público de email'
-            });
-
-            // Create notification for the clinic AND the dentist
-            const dateStr = new Date(appointment.date).toLocaleString('pt-BR');
-            await this.notificationsService.create(
-                `O paciente ${appointment.patient.name} cancelou o agendamento de ${dateStr}.`,
-                appointment.clinicId,
-                'WARNING',
-                appointment.dentistId
-            );
         } catch (e) {
+            if (e instanceof NotFoundException || e instanceof BadRequestException) {
+                throw e;
+            }
             console.error('Erro ao cancelar agendamento público:', e);
             throw new BadRequestException('Token expirado ou inválido');
         }
     }
 
-    async findAll(clinicId: number, role?: string, userId?: number, options?: { date?: string; startDate?: string; endDate?: string; dentistId?: number; patientId?: number; includeOccurrences?: boolean }): Promise<Appointment[]> {
+    async findAll(clinicId: number, role?: string, userId?: number, options?: { date?: string; startDate?: string; endDate?: string; dentistId?: number; patientId?: number; includeOccurrences?: boolean; page?: number; limit?: number }): Promise<PaginatedResponseDto<Appointment>> {
+        const page = options?.page ?? 1;
+        const limit = options?.limit ?? 50;
+
         const query = this.appointmentsRepository.createQueryBuilder('appointment')
             .leftJoinAndSelect('appointment.patient', 'patient')
             .leftJoinAndSelect('appointment.dentist', 'dentist')
@@ -145,7 +158,13 @@ export class AppointmentsService {
             query.andWhere('appointment.date BETWEEN :start AND :end', { start, end });
         }
 
-        return query.orderBy('appointment.date', 'ASC').getMany();
+        const [data, total] = await query
+            .orderBy('appointment.date', 'ASC')
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
+
+        return { data, total, page, limit };
     }
 
     async findOne(id: number, clinicId: number): Promise<Appointment> {
@@ -157,22 +176,49 @@ export class AppointmentsService {
     }
 
     async update(id: number, updateAppointmentDto: UpdateAppointmentDto, clinicId: number): Promise<Appointment> {
-        const before = await this.findOne(id, clinicId);
+        return await this.dataSource.transaction(async (manager) => {
+            const appointmentRepo = manager.getRepository(Appointment);
+            const locked = await appointmentRepo
+                .createQueryBuilder('appointment')
+                .setLock('pessimistic_write')
+                .where('appointment.id = :id AND appointment.clinicId = :clinicId', { id, clinicId })
+                .getOne();
 
-        if (updateAppointmentDto.date || updateAppointmentDto.duration || updateAppointmentDto.dentistId) {
-            const date = updateAppointmentDto.date ? new Date(updateAppointmentDto.date) : before.date;
-            const duration = updateAppointmentDto.duration ?? before.duration;
-            const dentistId = updateAppointmentDto.dentistId ?? before.dentistId;
-            const patientId = updateAppointmentDto.patientId ?? before.patientId;
+            if (!locked) {
+                throw new NotFoundException(`Appointment with ID ${id} not found`);
+            }
 
-            await this.checkConflict(date, duration, clinicId, dentistId, patientId, id);
-        }
+            const before = await appointmentRepo.findOne({
+                where: { id, clinicId },
+                relations: ['patient', 'dentist'],
+            });
 
-        await this.appointmentsRepository.update({ id, clinicId }, updateAppointmentDto);
-        const after = await this.findOne(id, clinicId);
+            if (!before) {
+                throw new NotFoundException(`Appointment with ID ${id} not found`);
+            }
 
-        await this.notifyAppointmentChanges(before, after, clinicId);
-        return after;
+            if (updateAppointmentDto.date || updateAppointmentDto.duration || updateAppointmentDto.dentistId) {
+                const date = updateAppointmentDto.date ? new Date(updateAppointmentDto.date) : before.date;
+                const duration = updateAppointmentDto.duration ?? before.duration;
+                const dentistId = updateAppointmentDto.dentistId ?? before.dentistId;
+                const patientId = updateAppointmentDto.patientId ?? before.patientId;
+
+                await this.checkConflict(date, duration, clinicId, dentistId, patientId, id, manager);
+            }
+
+            await appointmentRepo.update({ id, clinicId }, updateAppointmentDto);
+            const after = await appointmentRepo.findOne({ where: { id, clinicId }, relations: ['patient', 'dentist'] });
+
+            if (before && after) {
+                await this.notifyAppointmentChanges(before, after, clinicId);
+            }
+            
+            if (!after) {
+                throw new NotFoundException(`Appointment with ID ${id} not found after update`);
+            }
+            
+            return after;
+        });
     }
 
     private async notifyAppointmentChanges(before: Appointment, after: Appointment, clinicId: number): Promise<void> {
@@ -243,14 +289,19 @@ export class AppointmentsService {
         }
     }
 
-    private async checkConflict(startDate: Date, duration: number, clinicId: number, dentistId?: number, patientId?: number, excludeId?: number): Promise<void> {
+    private async checkConflict(startDate: Date, duration: number, clinicId: number, dentistId?: number, patientId?: number, excludeId?: number, manager?: EntityManager): Promise<void> {
         const endDate = new Date(startDate.getTime() + duration * 60000);
+        const repo = manager ? manager.getRepository(Appointment) : this.appointmentsRepository;
 
-        const query = this.appointmentsRepository.createQueryBuilder('appointment')
+        const query = repo.createQueryBuilder('appointment')
             .where('appointment.clinicId = :clinicId', { clinicId })
             .andWhere('appointment.status NOT IN (:...badStatus)', { badStatus: [AppointmentStatus.CANCELLED] })
             .andWhere('appointment.date < :endDate', { endDate })
             .andWhere("appointment.date + (appointment.duration * interval '1 minute') > :startDate", { startDate });
+
+        if (manager) {
+            query.setLock('pessimistic_write');
+        }
 
         if (dentistId && patientId) {
             query.andWhere(new Brackets(qb => {
