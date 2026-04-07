@@ -7,7 +7,7 @@ import { verifyEmailDtoSchema } from "./verifyEmailDtoSchema.ts";
 import { z } from "zod/v4";
 
 /**
- * @description User created, returns tokens
+ * @description User created — session set via HttpOnly cookies
  */
 export const authControllerVerifyEmail201Schema = z.any()
 

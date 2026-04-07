@@ -3,12 +3,17 @@
 * Do not edit manually.
 */
 
-import { patientResponseDtoSchema } from "./patientResponseDtoSchema.ts";
+import { paginatedResponseDtoSchema } from "./paginatedResponseDtoSchema.ts";
 import { z } from "zod/v4";
+
+export const patientsControllerFindAllQueryParamsSchema = z.object({
+    "page": z.coerce.number().min(1).default(1),
+"limit": z.coerce.number().min(1).max(100).default(50)
+    })
 
 /**
  * @description Return all patients with their latest procedure and next appointment dates.
  */
-export const patientsControllerFindAll200Schema = z.array(z.lazy(() => patientResponseDtoSchema))
+export const patientsControllerFindAll200Schema = z.lazy(() => paginatedResponseDtoSchema)
 
 export const patientsControllerFindAllQueryResponseSchema = z.lazy(() => patientsControllerFindAll200Schema)

@@ -3,13 +3,42 @@
 * Do not edit manually.
 */
 
-import type { ClinicUserDto } from "./ClinicUserDto.ts";
 
-export type UsersControllerFindAll200 = ClinicUserDto[];
+export const usersControllerFindAllQueryParamsRoleEnum = {
+    OWNER: "OWNER",
+    ADMIN: "ADMIN",
+    DENTIST: "DENTIST",
+    RECEPTIONIST: "RECEPTIONIST"
+} as const;
+
+export type UsersControllerFindAllQueryParamsRoleEnumKey = (typeof usersControllerFindAllQueryParamsRoleEnum)[keyof typeof usersControllerFindAllQueryParamsRoleEnum];
+
+export type UsersControllerFindAllQueryParams = {
+    /**
+     * @minLength 1
+     * @default 1
+     * @type number | undefined
+    */
+    page?: number;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @default 50
+     * @type number | undefined
+    */
+    limit?: number;
+    /**
+     * @type string | undefined
+    */
+    role?: UsersControllerFindAllQueryParamsRoleEnumKey;
+};
+
+export type UsersControllerFindAll200 = any;
 
 export type UsersControllerFindAllQueryResponse = UsersControllerFindAll200;
 
 export type UsersControllerFindAllQuery = {
     Response: UsersControllerFindAll200;
+    QueryParams: UsersControllerFindAllQueryParams;
     Errors: any;
 };

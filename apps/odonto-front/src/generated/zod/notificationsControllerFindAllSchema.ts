@@ -5,6 +5,11 @@
 
 import { z } from "zod/v4";
 
+export const notificationsControllerFindAllQueryParamsSchema = z.object({
+    "page": z.coerce.number().min(1).default(1),
+"limit": z.coerce.number().min(1).max(100).default(50)
+    })
+
 export const notificationsControllerFindAll200Schema = z.any()
 
 export const notificationsControllerFindAllQueryResponseSchema = z.lazy(() => notificationsControllerFindAll200Schema)

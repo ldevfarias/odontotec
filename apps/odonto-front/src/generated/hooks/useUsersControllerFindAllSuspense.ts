@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
-import type { UsersControllerFindAllQueryResponse } from "../ts/UsersControllerFindAll.ts";
+import type { UsersControllerFindAllQueryResponse, UsersControllerFindAllQueryParams } from "../ts/UsersControllerFindAll.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { usersControllerFindAll } from "../clients/usersControllerFindAll.ts";
 
-export const usersControllerFindAllSuspenseQueryKey = () => [{ url: '/users' }] as const
+export const usersControllerFindAllSuspenseQueryKey = (params?: UsersControllerFindAllQueryParams) => [{ url: '/users' }, ...(params ? [params] : [])] as const
 
 export type UsersControllerFindAllSuspenseQueryKey = ReturnType<typeof usersControllerFindAllSuspenseQueryKey>
 
-export function usersControllerFindAllSuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function usersControllerFindAllSuspenseQueryOptions(params?: UsersControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = usersControllerFindAllSuspenseQueryKey()
+        const queryKey = usersControllerFindAllSuspenseQueryKey(params)
         return queryOptions<UsersControllerFindAllQueryResponse, ResponseErrorConfig<Error>, UsersControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return usersControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return usersControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function usersControllerFindAllSuspenseQueryOptions(config: Partial<Reque
  * @summary List all clinic users
  * {@link /users}
  */
-export function useUsersControllerFindAllSuspense<TData = UsersControllerFindAllQueryResponse, TQueryKey extends QueryKey = UsersControllerFindAllSuspenseQueryKey>(options: 
+export function useUsersControllerFindAllSuspense<TData = UsersControllerFindAllQueryResponse, TQueryKey extends QueryKey = UsersControllerFindAllSuspenseQueryKey>(params?: UsersControllerFindAllQueryParams, options: 
 {
   query?: Partial<UseSuspenseQueryOptions<UsersControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function useUsersControllerFindAllSuspense<TData = UsersControllerFindAll
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? usersControllerFindAllSuspenseQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? usersControllerFindAllSuspenseQueryKey(params)
          
 
          const query = useSuspenseQuery({
-          ...usersControllerFindAllSuspenseQueryOptions(config),
+          ...usersControllerFindAllSuspenseQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

@@ -6,13 +6,15 @@
 import { z } from "zod/v4";
 
 export const appointmentsControllerFindAllQueryParamsSchema = z.object({
-    "date": z.optional(z.string()),
+    "page": z.coerce.number().min(1).default(1),
+"limit": z.coerce.number().min(1).max(100).default(50),
+"date": z.optional(z.string()),
 "startDate": z.optional(z.string()),
 "endDate": z.optional(z.string()),
 "dentistId": z.optional(z.coerce.number()),
 "patientId": z.optional(z.coerce.number()),
 "includeOccurrences": z.optional(z.boolean())
-    }).optional()
+    })
 
 export const appointmentsControllerFindAll200Schema = z.any()
 

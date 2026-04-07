@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Tooth } from './Tooth';
 import { ToothPopover } from './ToothPopover';
 
 interface OdontogramProps {
-    procedures?: any[];
+    observations?: any[];
     isPediatric?: boolean;
     patientId: number;
     highlightedTooth?: string | null;
 }
 
 export const Odontogram: React.FC<OdontogramProps> = ({
-    procedures = [],
+    observations = [],
     isPediatric = false,
     patientId,
     highlightedTooth,
@@ -35,8 +35,8 @@ export const Odontogram: React.FC<OdontogramProps> = ({
     const renderToothGrid = (teeth: string[]) => (
         <div className="flex gap-0.5 sm:gap-1 justify-center">
             {teeth.map((num) => {
-                const toothProcs = (procedures as any[]).filter(
-                    (p: any) => String(p.toothNumber) === num
+                const toothObservations = (observations as any[]).filter(
+                    (o: any) => String(o.toothNumber) === num
                 );
                 const isHighlighted = highlightedTooth === num;
 
@@ -45,18 +45,18 @@ export const Odontogram: React.FC<OdontogramProps> = ({
                         key={num}
                         toothNumber={num}
                         patientId={patientId}
-                        toothProcedures={toothProcs}
+                        toothObservations={toothObservations}
                     >
                         <Tooth
                             number={num}
-                            procedures={toothProcs}
+                            observations={toothObservations}
                             isSelected={isHighlighted}
                             className={
                                 isHighlighted
                                     ? 'ring-2 ring-primary rounded-md p-1 bg-primary/10 shadow-sm'
                                     : 'p-1'
                             }
-                            onToothClick={() => {/* popover opens via PopoverTrigger */}}
+                            onToothClick={() => {}}
                         />
                     </ToothPopover>
                 );

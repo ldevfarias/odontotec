@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
-import type { UsersControllerFindAllQueryResponse } from "../ts/UsersControllerFindAll.ts";
+import type { UsersControllerFindAllQueryResponse, UsersControllerFindAllQueryParams } from "../ts/UsersControllerFindAll.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { usersControllerFindAll } from "../clients/usersControllerFindAll.ts";
 
-export const usersControllerFindAllQueryKey = () => [{ url: '/users' }] as const
+export const usersControllerFindAllQueryKey = (params?: UsersControllerFindAllQueryParams) => [{ url: '/users' }, ...(params ? [params] : [])] as const
 
 export type UsersControllerFindAllQueryKey = ReturnType<typeof usersControllerFindAllQueryKey>
 
-export function usersControllerFindAllQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function usersControllerFindAllQueryOptions(params?: UsersControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = usersControllerFindAllQueryKey()
+        const queryKey = usersControllerFindAllQueryKey(params)
         return queryOptions<UsersControllerFindAllQueryResponse, ResponseErrorConfig<Error>, UsersControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return usersControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return usersControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function usersControllerFindAllQueryOptions(config: Partial<RequestConfig
  * @summary List all clinic users
  * {@link /users}
  */
-export function useUsersControllerFindAll<TData = UsersControllerFindAllQueryResponse, TQueryData = UsersControllerFindAllQueryResponse, TQueryKey extends QueryKey = UsersControllerFindAllQueryKey>(options: 
+export function useUsersControllerFindAll<TData = UsersControllerFindAllQueryResponse, TQueryData = UsersControllerFindAllQueryResponse, TQueryKey extends QueryKey = UsersControllerFindAllQueryKey>(params?: UsersControllerFindAllQueryParams, options: 
 {
   query?: Partial<QueryObserverOptions<UsersControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function useUsersControllerFindAll<TData = UsersControllerFindAllQueryRes
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? usersControllerFindAllQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? usersControllerFindAllQueryKey(params)
          
 
          const query = useQuery({
-          ...usersControllerFindAllQueryOptions(config),
+          ...usersControllerFindAllQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

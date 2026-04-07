@@ -6,7 +6,9 @@
 import { z } from "zod/v4";
 
 export const documentsControllerFindAllQueryParamsSchema = z.object({
-    "patientId": z.string()
+    "patientId": z.string(),
+"page": z.optional(z.coerce.number().min(1).default(1)),
+"limit": z.optional(z.coerce.number().min(1).max(100).default(50))
     })
 
 export const documentsControllerFindAll200Schema = z.any()

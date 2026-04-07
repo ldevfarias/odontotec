@@ -4,11 +4,28 @@
 */
 
 
+export type TreatmentPlansControllerFindAllQueryParams = {
+    /**
+     * @minLength 1
+     * @default 1
+     * @type number | undefined
+    */
+    page?: number;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @default 50
+     * @type number | undefined
+    */
+    limit?: number;
+};
+
 export type TreatmentPlansControllerFindAll200 = any;
 
 export type TreatmentPlansControllerFindAllQueryResponse = TreatmentPlansControllerFindAll200;
 
 export type TreatmentPlansControllerFindAllQuery = {
     Response: TreatmentPlansControllerFindAll200;
+    QueryParams: TreatmentPlansControllerFindAllQueryParams;
     Errors: any;
 };

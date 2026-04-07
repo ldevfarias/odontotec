@@ -11,6 +11,22 @@ export type BudgetsControllerFindAllByPatientPathParams = {
     patientId: number;
 };
 
+export type BudgetsControllerFindAllByPatientQueryParams = {
+    /**
+     * @minLength 1
+     * @default 1
+     * @type number | undefined
+    */
+    page?: number;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @default 50
+     * @type number | undefined
+    */
+    limit?: number;
+};
+
 export type BudgetsControllerFindAllByPatient200 = any;
 
 export type BudgetsControllerFindAllByPatientQueryResponse = BudgetsControllerFindAllByPatient200;
@@ -18,5 +34,6 @@ export type BudgetsControllerFindAllByPatientQueryResponse = BudgetsControllerFi
 export type BudgetsControllerFindAllByPatientQuery = {
     Response: BudgetsControllerFindAllByPatient200;
     PathParams: BudgetsControllerFindAllByPatientPathParams;
+    QueryParams: BudgetsControllerFindAllByPatientQueryParams;
     Errors: any;
 };

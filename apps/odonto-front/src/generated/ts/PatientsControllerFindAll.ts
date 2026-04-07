@@ -3,16 +3,33 @@
 * Do not edit manually.
 */
 
-import type { PatientResponseDto } from "./PatientResponseDto.ts";
+import type { PaginatedResponseDto } from "./PaginatedResponseDto.ts";
+
+export type PatientsControllerFindAllQueryParams = {
+    /**
+     * @minLength 1
+     * @default 1
+     * @type number | undefined
+    */
+    page?: number;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @default 50
+     * @type number | undefined
+    */
+    limit?: number;
+};
 
 /**
  * @description Return all patients with their latest procedure and next appointment dates.
 */
-export type PatientsControllerFindAll200 = PatientResponseDto[];
+export type PatientsControllerFindAll200 = PaginatedResponseDto;
 
 export type PatientsControllerFindAllQueryResponse = PatientsControllerFindAll200;
 
 export type PatientsControllerFindAllQuery = {
     Response: PatientsControllerFindAll200;
+    QueryParams: PatientsControllerFindAllQueryParams;
     Errors: any;
 };

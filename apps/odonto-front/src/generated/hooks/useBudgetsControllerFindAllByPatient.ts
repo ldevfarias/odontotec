@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
-import type { BudgetsControllerFindAllByPatientQueryResponse, BudgetsControllerFindAllByPatientPathParams } from "../ts/BudgetsControllerFindAllByPatient.ts";
+import type { BudgetsControllerFindAllByPatientQueryResponse, BudgetsControllerFindAllByPatientPathParams, BudgetsControllerFindAllByPatientQueryParams } from "../ts/BudgetsControllerFindAllByPatient.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { budgetsControllerFindAllByPatient } from "../clients/budgetsControllerFindAllByPatient.ts";
 
-export const budgetsControllerFindAllByPatientQueryKey = (patientId: BudgetsControllerFindAllByPatientPathParams["patientId"]) => [{ url: '/budgets/patient/:patientId', params: {patientId:patientId} }] as const
+export const budgetsControllerFindAllByPatientQueryKey = (patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], params?: BudgetsControllerFindAllByPatientQueryParams) => [{ url: '/budgets/patient/:patientId', params: {patientId:patientId} }, ...(params ? [params] : [])] as const
 
 export type BudgetsControllerFindAllByPatientQueryKey = ReturnType<typeof budgetsControllerFindAllByPatientQueryKey>
 
-export function budgetsControllerFindAllByPatientQueryOptions(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function budgetsControllerFindAllByPatientQueryOptions(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], params?: BudgetsControllerFindAllByPatientQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = budgetsControllerFindAllByPatientQueryKey(patientId)
+        const queryKey = budgetsControllerFindAllByPatientQueryKey(patientId, params)
         return queryOptions<BudgetsControllerFindAllByPatientQueryResponse, ResponseErrorConfig<Error>, BudgetsControllerFindAllByPatientQueryResponse, typeof queryKey>({
          enabled: !!(patientId),
          queryKey,
          queryFn: async ({ signal }) => {
-            return budgetsControllerFindAllByPatient(patientId, { ...config, signal: config.signal ?? signal })
+            return budgetsControllerFindAllByPatient(patientId, params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function budgetsControllerFindAllByPatientQueryOptions(patientId: Budgets
  * @summary Get all budgets for a patient
  * {@link /budgets/patient/:patientId}
  */
-export function useBudgetsControllerFindAllByPatient<TData = BudgetsControllerFindAllByPatientQueryResponse, TQueryData = BudgetsControllerFindAllByPatientQueryResponse, TQueryKey extends QueryKey = BudgetsControllerFindAllByPatientQueryKey>(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], options: 
+export function useBudgetsControllerFindAllByPatient<TData = BudgetsControllerFindAllByPatientQueryResponse, TQueryData = BudgetsControllerFindAllByPatientQueryResponse, TQueryKey extends QueryKey = BudgetsControllerFindAllByPatientQueryKey>(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], params?: BudgetsControllerFindAllByPatientQueryParams, options: 
 {
   query?: Partial<QueryObserverOptions<BudgetsControllerFindAllByPatientQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function useBudgetsControllerFindAllByPatient<TData = BudgetsControllerFi
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? budgetsControllerFindAllByPatientQueryKey(patientId)
+         const queryKey = resolvedOptions?.queryKey ?? budgetsControllerFindAllByPatientQueryKey(patientId, params)
          
 
          const query = useQuery({
-          ...budgetsControllerFindAllByPatientQueryOptions(patientId, config),
+          ...budgetsControllerFindAllByPatientQueryOptions(patientId, params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

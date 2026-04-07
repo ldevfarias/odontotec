@@ -6,6 +6,6 @@
 import { z } from "zod/v4";
 
 export const loginDtoSchema = z.object({
-    "email": z.email(),
-"password": z.string().min(6)
+    "email": z.email().max(255),
+"password": z.string().min(8).max(128)
     })

@@ -6,6 +6,19 @@
 
 export type AppointmentsControllerFindAllQueryParams = {
     /**
+     * @minLength 1
+     * @default 1
+     * @type number | undefined
+    */
+    page?: number;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @default 50
+     * @type number | undefined
+    */
+    limit?: number;
+    /**
      * @type string | undefined
     */
     date?: string;

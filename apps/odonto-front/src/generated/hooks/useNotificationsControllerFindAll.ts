@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
-import type { NotificationsControllerFindAllQueryResponse } from "../ts/NotificationsControllerFindAll.ts";
+import type { NotificationsControllerFindAllQueryResponse, NotificationsControllerFindAllQueryParams } from "../ts/NotificationsControllerFindAll.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { notificationsControllerFindAll } from "../clients/notificationsControllerFindAll.ts";
 
-export const notificationsControllerFindAllQueryKey = () => [{ url: '/notifications' }] as const
+export const notificationsControllerFindAllQueryKey = (params?: NotificationsControllerFindAllQueryParams) => [{ url: '/notifications' }, ...(params ? [params] : [])] as const
 
 export type NotificationsControllerFindAllQueryKey = ReturnType<typeof notificationsControllerFindAllQueryKey>
 
-export function notificationsControllerFindAllQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function notificationsControllerFindAllQueryOptions(params?: NotificationsControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = notificationsControllerFindAllQueryKey()
+        const queryKey = notificationsControllerFindAllQueryKey(params)
         return queryOptions<NotificationsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, NotificationsControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return notificationsControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return notificationsControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function notificationsControllerFindAllQueryOptions(config: Partial<Reque
  * @summary List clinic notifications
  * {@link /notifications}
  */
-export function useNotificationsControllerFindAll<TData = NotificationsControllerFindAllQueryResponse, TQueryData = NotificationsControllerFindAllQueryResponse, TQueryKey extends QueryKey = NotificationsControllerFindAllQueryKey>(options: 
+export function useNotificationsControllerFindAll<TData = NotificationsControllerFindAllQueryResponse, TQueryData = NotificationsControllerFindAllQueryResponse, TQueryKey extends QueryKey = NotificationsControllerFindAllQueryKey>(params?: NotificationsControllerFindAllQueryParams, options: 
 {
   query?: Partial<QueryObserverOptions<NotificationsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function useNotificationsControllerFindAll<TData = NotificationsControlle
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? notificationsControllerFindAllQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? notificationsControllerFindAllQueryKey(params)
          
 
          const query = useQuery({
-          ...notificationsControllerFindAllQueryOptions(config),
+          ...notificationsControllerFindAllQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

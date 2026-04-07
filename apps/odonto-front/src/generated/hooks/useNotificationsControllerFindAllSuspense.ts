@@ -5,22 +5,22 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
-import type { NotificationsControllerFindAllQueryResponse } from "../ts/NotificationsControllerFindAll.ts";
+import type { NotificationsControllerFindAllQueryResponse, NotificationsControllerFindAllQueryParams } from "../ts/NotificationsControllerFindAll.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { notificationsControllerFindAll } from "../clients/notificationsControllerFindAll.ts";
 
-export const notificationsControllerFindAllSuspenseQueryKey = () => [{ url: '/notifications' }] as const
+export const notificationsControllerFindAllSuspenseQueryKey = (params?: NotificationsControllerFindAllQueryParams) => [{ url: '/notifications' }, ...(params ? [params] : [])] as const
 
 export type NotificationsControllerFindAllSuspenseQueryKey = ReturnType<typeof notificationsControllerFindAllSuspenseQueryKey>
 
-export function notificationsControllerFindAllSuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function notificationsControllerFindAllSuspenseQueryOptions(params?: NotificationsControllerFindAllQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
-        const queryKey = notificationsControllerFindAllSuspenseQueryKey()
+        const queryKey = notificationsControllerFindAllSuspenseQueryKey(params)
         return queryOptions<NotificationsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, NotificationsControllerFindAllQueryResponse, typeof queryKey>({
          
          queryKey,
          queryFn: async ({ signal }) => {
-            return notificationsControllerFindAll({ ...config, signal: config.signal ?? signal })
+            return notificationsControllerFindAll(params, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -30,7 +30,7 @@ export function notificationsControllerFindAllSuspenseQueryOptions(config: Parti
  * @summary List clinic notifications
  * {@link /notifications}
  */
-export function useNotificationsControllerFindAllSuspense<TData = NotificationsControllerFindAllQueryResponse, TQueryKey extends QueryKey = NotificationsControllerFindAllSuspenseQueryKey>(options: 
+export function useNotificationsControllerFindAllSuspense<TData = NotificationsControllerFindAllQueryResponse, TQueryKey extends QueryKey = NotificationsControllerFindAllSuspenseQueryKey>(params?: NotificationsControllerFindAllQueryParams, options: 
 {
   query?: Partial<UseSuspenseQueryOptions<NotificationsControllerFindAllQueryResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
@@ -39,11 +39,11 @@ export function useNotificationsControllerFindAllSuspense<TData = NotificationsC
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? notificationsControllerFindAllSuspenseQueryKey()
+         const queryKey = resolvedOptions?.queryKey ?? notificationsControllerFindAllSuspenseQueryKey(params)
          
 
          const query = useSuspenseQuery({
-          ...notificationsControllerFindAllSuspenseQueryOptions(config),
+          ...notificationsControllerFindAllSuspenseQueryOptions(params, config),
           ...resolvedOptions,
           queryKey,
          } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }

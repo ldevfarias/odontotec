@@ -5,7 +5,7 @@
 
 import fetch from "@/lib/api";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@/lib/api";
-import type { BudgetsControllerFindAllByPatientQueryResponse, BudgetsControllerFindAllByPatientPathParams } from "../ts/BudgetsControllerFindAllByPatient.ts";
+import type { BudgetsControllerFindAllByPatientQueryResponse, BudgetsControllerFindAllByPatientPathParams, BudgetsControllerFindAllByPatientQueryParams } from "../ts/BudgetsControllerFindAllByPatient.ts";
 
 function getBudgetsControllerFindAllByPatientUrl(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"]) {
   const res = { method: 'GET', url: `/budgets/patient/${patientId}` as const }
@@ -16,11 +16,11 @@ function getBudgetsControllerFindAllByPatientUrl(patientId: BudgetsControllerFin
  * @summary Get all budgets for a patient
  * {@link /budgets/patient/:patientId}
  */
-export async function budgetsControllerFindAllByPatient(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function budgetsControllerFindAllByPatient(patientId: BudgetsControllerFindAllByPatientPathParams["patientId"], params?: BudgetsControllerFindAllByPatientQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 
 
-  const res = await request<BudgetsControllerFindAllByPatientQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getBudgetsControllerFindAllByPatientUrl(patientId).url.toString(), ... requestConfig })
+  const res = await request<BudgetsControllerFindAllByPatientQueryResponse, ResponseErrorConfig<Error>, unknown>({ method : "GET", url : getBudgetsControllerFindAllByPatientUrl(patientId).url.toString(), params, ... requestConfig })
   return res.data
 }

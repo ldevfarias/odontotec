@@ -7,7 +7,7 @@ import { registerTenantDtoSchema } from "./registerTenantDtoSchema.ts";
 import { z } from "zod/v4";
 
 /**
- * @description Clinic and User created, returns tokens
+ * @description Clinic and user created — session set via HttpOnly cookies
  */
 export const authControllerRegisterTenant201Schema = z.any()
 

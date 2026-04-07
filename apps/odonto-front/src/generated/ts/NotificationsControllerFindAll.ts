@@ -4,11 +4,28 @@
 */
 
 
+export type NotificationsControllerFindAllQueryParams = {
+    /**
+     * @minLength 1
+     * @default 1
+     * @type number | undefined
+    */
+    page?: number;
+    /**
+     * @minLength 1
+     * @maxLength 100
+     * @default 50
+     * @type number | undefined
+    */
+    limit?: number;
+};
+
 export type NotificationsControllerFindAll200 = any;
 
 export type NotificationsControllerFindAllQueryResponse = NotificationsControllerFindAll200;
 
 export type NotificationsControllerFindAllQuery = {
     Response: NotificationsControllerFindAll200;
+    QueryParams: NotificationsControllerFindAllQueryParams;
     Errors: any;
 };
