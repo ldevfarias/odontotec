@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Eye } from 'lucide-react';
 
 export type ToothFace = 'occlusal' | 'mesial' | 'distal' | 'buccal' | 'lingual';
 
@@ -21,8 +20,6 @@ export const Tooth: React.FC<ToothProps> = ({
     isSelected = false,
     onToothClick,
 }) => {
-    const hasObservations = observations.length > 0;
-
     const getFaceColor = (face: ToothFace) => {
         if (isSelected) return 'fill-primary/20 stroke-primary/60';
 
@@ -51,14 +48,6 @@ export const Tooth: React.FC<ToothProps> = ({
             </span>
 
             <div className="relative">
-                {hasObservations && (
-                    <div className="absolute -top-1 -right-1 z-10 pointer-events-none">
-                        <div className="w-4 h-4 rounded-full bg-background border border-border flex items-center justify-center shadow-sm">
-                            <Eye className="w-2.5 h-2.5 text-muted-foreground" />
-                        </div>
-                    </div>
-                )}
-
                 <svg
                     viewBox="0 0 100 100"
                     className="w-8 h-8 sm:w-12 sm:h-12 cursor-pointer transition-transform duration-200 hover:scale-110"

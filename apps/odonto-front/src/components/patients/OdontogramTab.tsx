@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { notificationService } from '@/services/notification.service';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { History, Trash2, Eye } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -39,14 +39,15 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
     const [deleteId, setDeleteId] = useState<number | null>(null);
 
     const queryClient = useQueryClient();
-    const { data: observationsResponse, isLoading } = useToothObservationsControllerFindAllByPatient(patientId);
-    const observations = observationsResponse?.data ?? [];
+    const { data: observations = [], isLoading } = useToothObservationsControllerFindAllByPatient(patientId);
     const { mutate: removeObservation } = useToothObservationsControllerRemove();
 
     const allObservations = useMemo(() => {
-        return (observations as any[]).sort(
-            (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-        );
+        type Obs = { date: string; id: number };
+        return (observations as Obs[]).slice().sort((a, b) => {
+            const dateDiff = parseISO((b.date as string).substring(0, 10)).getTime() - parseISO((a.date as string).substring(0, 10)).getTime();
+            return dateDiff !== 0 ? dateDiff : b.id - a.id;
+        });
     }, [observations]);
 
     const handleDelete = (id: number) => setDeleteId(id);
@@ -113,26 +114,6 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                             />
                         </div>
 
-                        {/* Legend */}
-                        <div className="flex flex-wrap gap-4 px-6 py-3 bg-muted/30 rounded-full border border-muted-foreground/10">
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-sm bg-background border border-muted-foreground/40" />
-                                <span className="text-xs font-medium text-muted-foreground">Saudável</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-sm bg-primary/20 border border-primary/40" />
-                                <span className="text-xs font-medium text-muted-foreground">Selecionado</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-sm bg-destructive/40 border border-destructive/60" />
-                                <span className="text-xs font-medium text-muted-foreground">Com Observação</span>
-                            </div>
-                            <Separator orientation="vertical" className="h-4 hidden sm:block" />
-                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                                <span className="font-bold">💡</span>
-                                Clique em qualquer dente para registrar
-                            </div>
-                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -159,12 +140,12 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                             Nenhuma observação registrada. Clique em um dente no odontograma para começar.
                         </div>
                     ) : (
-                        <ScrollArea className="h-[420px] pr-4">
-                            <div className="space-y-6">
+                        <ScrollArea className="h-[420px]">
+                            <div className="space-y-6 px-1 pb-1">
                                 {(() => {
                                     const eventsByDate: Record<string, any[]> = {};
                                     allObservations.forEach((o) => {
-                                        const dateKey = format(new Date(o.date), 'dd/MM/yyyy');
+                                        const dateKey = format(parseISO((o.date as string).substring(0, 10)), 'dd/MM/yyyy');
                                         if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
                                         eventsByDate[dateKey].push(o);
                                     });
@@ -199,7 +180,7 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                                                             className={`p-3 border rounded-lg transition-all group relative cursor-pointer
                                                                 bg-card hover:bg-muted/50
                                                                 ${isHighlighted
-                                                                    ? 'ring-2 ring-primary border-primary shadow-sm scale-[1.01] z-20'
+                                                                    ? 'ring-2 ring-primary border-primary shadow-sm z-20'
                                                                     : 'opacity-80 hover:opacity-100'
                                                                 }`}
                                                             onClick={() => {

@@ -34,8 +34,9 @@ import { notificationService } from '@/services/notification.service';
 import { createToothObservationDtoSchema } from '@/generated/zod/createToothObservationDtoSchema';
 import { useToothObservationsControllerCreate } from '@/generated/hooks/useToothObservationsControllerCreate';
 import { toothObservationsControllerFindAllByPatientQueryKey } from '@/generated/hooks/useToothObservationsControllerFindAllByPatient';
-import { patientsControllerFindOneQueryKey } from '@/generated/hooks/usePatientsControllerFindOne';
 
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Eye } from 'lucide-react';
 
@@ -49,7 +50,11 @@ const FACE_LABELS: { face: ToothFace; short: string; label: string }[] = [
     { face: 'lingual',  short: 'L', label: 'Lingual' },
 ];
 
-type ObservationFormValues = z.infer<typeof createToothObservationDtoSchema>;
+const observationFormSchema = createToothObservationDtoSchema.extend({
+    description: z.string().min(1, 'A descrição da observação é obrigatória'),
+});
+
+type ObservationFormValues = z.infer<typeof observationFormSchema>;
 
 interface ToothPopoverProps {
     toothNumber: string;
@@ -77,14 +82,14 @@ export function ToothPopover({
 
     const defaultValues: ObservationFormValues = {
         description: '',
-        date: new Date().toISOString().split('T')[0],
+        date: format(new Date(), 'yyyy-MM-dd'),
         patientId,
         toothNumber,
         toothFaces: '',
     };
 
     const form = useForm<ObservationFormValues>({
-        resolver: zodResolver(createToothObservationDtoSchema),
+        resolver: zodResolver(observationFormSchema),
         defaultValues,
     });
 
@@ -105,18 +110,16 @@ export function ToothPopover({
     };
 
     function onSubmit(values: ObservationFormValues) {
-        const today = new Date().toISOString().split('T')[0];
+        const today = format(new Date(), 'yyyy-MM-dd');
         createObservation(
             { data: { ...values, date: today, toothFaces: values.toothFaces || undefined } },
             {
-                onSuccess: () => {
+                onSuccess: (newObservation) => {
                     notificationService.success('Observação registrada com sucesso!');
-                    queryClient.invalidateQueries({
-                        queryKey: toothObservationsControllerFindAllByPatientQueryKey(patientId),
-                    });
-                    queryClient.invalidateQueries({
-                        queryKey: patientsControllerFindOneQueryKey(patientId),
-                    });
+                    queryClient.setQueryData(
+                        toothObservationsControllerFindAllByPatientQueryKey(patientId),
+                        (old: any[] = []) => [...old, newObservation],
+                    );
                     form.reset(defaultValues);
                     setSelectedFaces([]);
                     setOpen(false);
@@ -167,27 +170,34 @@ export function ToothPopover({
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                                 Faces Afetadas
                             </p>
-                            <div className="flex gap-1.5">
-                                {FACE_LABELS.map(({ face, short, label }) => {
-                                    const isActive = selectedFaces.includes(face);
-                                    return (
-                                        <button
-                                            key={face}
-                                            type="button"
-                                            title={label}
-                                            onClick={() => toggleFace(face)}
-                                            className={cn(
-                                                'flex-1 h-9 rounded-md border text-xs font-bold transition-all',
-                                                isActive
-                                                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                                                    : 'bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5',
-                                            )}
-                                        >
-                                            {short}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                            <TooltipProvider delayDuration={300}>
+                                <div className="flex gap-1.5">
+                                    {FACE_LABELS.map(({ face, short, label }) => {
+                                        const isActive = selectedFaces.includes(face);
+                                        return (
+                                            <Tooltip key={face}>
+                                                <TooltipTrigger asChild onFocus={(e) => e.preventDefault()}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleFace(face)}
+                                                        className={cn(
+                                                            'flex-1 h-9 rounded-md border text-xs font-bold transition-all',
+                                                            isActive
+                                                                ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                                                                : 'bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5',
+                                                        )}
+                                                    >
+                                                        {short}
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="bottom">
+                                                    {label}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        );
+                                    })}
+                                </div>
+                            </TooltipProvider>
                             {selectedFaces.length > 0 && (
                                 <p className="text-[10px] text-muted-foreground">
                                     Selecionadas: {selectedFaces
