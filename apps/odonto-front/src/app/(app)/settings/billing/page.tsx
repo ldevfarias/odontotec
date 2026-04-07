@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, CreditCard, PartyPopper, AlertTriangle } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { notificationService } from '@/services/notification.service';
+import { assertStripeUrl } from '@/lib/stripe-url';
 import { useEffect, useState, useRef } from 'react';
 import { BillingCardsSkeleton } from '@/components/skeletons';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -44,11 +45,14 @@ export default function BillingPage() {
         mutationFn: subscriptionService.createCheckoutSession,
         onSuccess: (data) => {
             if (data.url) {
-                analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, {
-                    plan: 'PRO',
-                });
-                setIsRedirecting(true);
-                window.location.href = data.url;
+                try {
+                    const safeUrl = assertStripeUrl(data.url);
+                    analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, { plan: 'PRO' });
+                    setIsRedirecting(true);
+                    window.location.href = safeUrl;
+                } catch {
+                    notificationService.error('URL de checkout inválida. Contate o suporte.');
+                }
             } else {
                 notificationService.error('Erro ao iniciar checkout.');
             }
@@ -62,10 +66,15 @@ export default function BillingPage() {
         mutationFn: subscriptionService.createPortalSession,
         onSuccess: (data) => {
             if (data.url) {
-                analytics.capture(EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED, {});
-                setIsRedirecting(true);
-                window.open(data.url, '_blank');
-                setIsRedirecting(false);
+                try {
+                    const safeUrl = assertStripeUrl(data.url);
+                    analytics.capture(EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED, {});
+                    setIsRedirecting(true);
+                    window.open(safeUrl, '_blank');
+                    setIsRedirecting(false);
+                } catch {
+                    notificationService.error('URL do portal inválida. Contate o suporte.');
+                }
             }
         },
         onError: () => {

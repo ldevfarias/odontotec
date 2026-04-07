@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { subscriptionService } from '@/services/subscription.service';
 import { useAuth } from './AuthContext';
 import { notificationService } from '@/services/notification.service';
+import { assertStripeUrl } from '@/lib/stripe-url';
 
 interface SubscriptionState {
     plan: 'FREE' | 'PRO';
@@ -62,7 +63,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         try {
             const data = await subscriptionService.createCheckoutSession();
             if (data.url) {
-                window.location.href = data.url;
+                try {
+                    window.location.href = assertStripeUrl(data.url);
+                } catch {
+                    notificationService.error('URL de checkout inválida. Contate o suporte.');
+                }
             } else {
                 notificationService.error('Erro ao iniciar checkout.');
             }
