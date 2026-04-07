@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserRole } from '../../users/enums/role.enum';
 import { PaginationDto } from '../../../common/dto/pagination.dto';
 import { ClinicRole } from '../../clinics/enums/clinic-role.enum';
@@ -56,13 +56,16 @@ export class UpdateUserDto {
     @IsEmail()
     @MaxLength(255)
     email?: string;
+}
 
-    @ApiProperty({ required: false, enum: UserRole })
-    @IsOptional()
+export class ChangeRoleDto {
+    @ApiProperty({ enum: UserRole })
     @IsEnum(UserRole)
-    role?: UserRole;
+    role: UserRole;
+}
 
-    @ApiProperty({ required: false })
-    @IsOptional()
-    isActive?: boolean;
+export class DeactivateUserDto {
+    @ApiProperty()
+    @IsBoolean()
+    isActive: boolean;
 }

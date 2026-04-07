@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UsersService } from './users.service';
-import { UpdateUserDto, UsersQueryDto } from './dto/user.dto';
+import { UpdateUserDto, UsersQueryDto, ChangeRoleDto, DeactivateUserDto } from './dto/user.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { ClinicUserDto } from './dto/clinic-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -101,6 +101,28 @@ export class UsersController {
     @ApiOperation({ summary: 'Update user information' })
     update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
         return this.usersService.update(id, updateUserDto);
+    }
+
+    @Patch(':id/role')
+    @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: 'Change user role' })
+    changeRole(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() changeRoleDto: ChangeRoleDto,
+        @Tenant() clinicId: number,
+    ) {
+        return this.usersService.changeRole(id, changeRoleDto.role, clinicId);
+    }
+
+    @Patch(':id/active')
+    @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: 'Activate or deactivate a user' })
+    setActive(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() deactivateUserDto: DeactivateUserDto,
+        @Tenant() clinicId: number,
+    ) {
+        return this.usersService.setActive(id, deactivateUserDto.isActive, clinicId);
     }
 
     @Delete(':id')
