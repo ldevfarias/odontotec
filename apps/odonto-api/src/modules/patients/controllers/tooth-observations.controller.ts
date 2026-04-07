@@ -1,6 +1,6 @@
 import {
     Controller, Get, Post, Body, Param,
-    Delete, UseGuards, ParseIntPipe,
+    Delete, UseGuards, ParseIntPipe, HttpCode,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -37,6 +37,7 @@ export class ToothObservationsController {
     }
 
     @Delete(':id')
+    @HttpCode(204)
     @Roles(UserRole.ADMIN, UserRole.DENTIST)
     remove(
         @Param('id', ParseIntPipe) id: number,

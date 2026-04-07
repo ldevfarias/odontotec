@@ -107,7 +107,7 @@ export function ToothPopover({
     function onSubmit(values: ObservationFormValues) {
         const today = new Date().toISOString().split('T')[0];
         createObservation(
-            { data: { ...values, date: today } },
+            { data: { ...values, date: today, toothFaces: values.toothFaces || undefined } },
             {
                 onSuccess: () => {
                     notificationService.success('Observação registrada com sucesso!');

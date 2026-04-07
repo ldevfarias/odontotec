@@ -58,11 +58,9 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
             {
                 onSuccess: () => {
                     notificationService.success('Observação excluída!');
-                    queryClient.setQueryData(
-                        toothObservationsControllerFindAllByPatientQueryKey(patientId),
-                        (oldData: any[]) =>
-                            oldData ? oldData.filter((o: any) => o.id !== deleteId) : [],
-                    );
+                    queryClient.invalidateQueries({
+                        queryKey: toothObservationsControllerFindAllByPatientQueryKey(patientId),
+                    });
                     setDeleteId(null);
                 },
                 onError: (error: any) => {
