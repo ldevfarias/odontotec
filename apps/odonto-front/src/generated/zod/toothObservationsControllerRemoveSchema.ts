@@ -9,6 +9,6 @@ export const toothObservationsControllerRemovePathParamsSchema = z.object({
     "id": z.coerce.number()
     })
 
-export const toothObservationsControllerRemove200Schema = z.any()
+export const toothObservationsControllerRemove204Schema = z.any()
 
-export const toothObservationsControllerRemoveMutationResponseSchema = z.lazy(() => toothObservationsControllerRemove200Schema)
+export const toothObservationsControllerRemoveMutationResponseSchema = z.lazy(() => toothObservationsControllerRemove204Schema)

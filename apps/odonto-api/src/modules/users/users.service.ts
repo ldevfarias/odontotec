@@ -10,6 +10,7 @@ import { PendingRegistration } from './entities/pending-registration.entity';
 import { Clinic } from '../clinics/entities/clinic.entity';
 import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { UserRole } from './enums/role.enum';
 import { ClinicRole } from '../clinics/enums/clinic-role.enum';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { ClinicUserDto } from './dto/clinic-user.dto';
@@ -233,6 +234,30 @@ export class UsersService {
             }
             throw error;
         }
+    }
+
+    async updateProfile(id: number, updateUserDto: UpdateUserDto, clinicId: number): Promise<User> {
+        const membership = await this.membershipRepository.findOne({ where: { userId: id, clinicId } });
+        if (!membership) throw new NotFoundException('User not found in this clinic');
+        const result = await this.update(id, updateUserDto);
+        if (!result) throw new NotFoundException('User not found');
+        return result;
+    }
+
+    async changeRole(id: number, role: UserRole, clinicId: number): Promise<User> {
+        const membership = await this.membershipRepository.findOne({ where: { userId: id, clinicId } });
+        if (!membership) throw new NotFoundException('User not found in this clinic');
+        const user = await this.usersRepository.findOne({ where: { id } });
+        if (!user) throw new NotFoundException('User not found');
+        user.role = role;
+        return this.usersRepository.save(user);
+    }
+
+    async setActive(id: number, isActive: boolean, clinicId: number): Promise<ClinicMembership> {
+        const membership = await this.membershipRepository.findOne({ where: { userId: id, clinicId } });
+        if (!membership) throw new NotFoundException('User not found in this clinic');
+        membership.isActive = isActive;
+        return this.membershipRepository.save(membership);
     }
 
     async acceptTerms(id: number): Promise<User> {

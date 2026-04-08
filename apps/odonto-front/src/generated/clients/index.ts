@@ -79,11 +79,13 @@ export { treatmentPlansControllerFindOne } from "./treatmentPlansControllerFindO
 export { treatmentPlansControllerRemove } from "./treatmentPlansControllerRemove.ts";
 export { treatmentPlansControllerUpdate } from "./treatmentPlansControllerUpdate.ts";
 export { usersControllerAcceptTerms } from "./usersControllerAcceptTerms.ts";
+export { usersControllerChangeRole } from "./usersControllerChangeRole.ts";
 export { usersControllerFindAll } from "./usersControllerFindAll.ts";
 export { usersControllerFindAllInvitations } from "./usersControllerFindAllInvitations.ts";
 export { usersControllerFindInvitation } from "./usersControllerFindInvitation.ts";
 export { usersControllerInvite } from "./usersControllerInvite.ts";
 export { usersControllerRemove } from "./usersControllerRemove.ts";
 export { usersControllerRemoveAvatar } from "./usersControllerRemoveAvatar.ts";
+export { usersControllerSetActive } from "./usersControllerSetActive.ts";
 export { usersControllerUpdate } from "./usersControllerUpdate.ts";
 export { usersControllerUploadAvatar } from "./usersControllerUploadAvatar.ts";

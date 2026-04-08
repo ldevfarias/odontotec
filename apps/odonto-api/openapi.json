@@ -403,6 +403,84 @@
         ]
       }
     },
+    "/users/{id}/role": {
+      "patch": {
+        "operationId": "UsersController_changeRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change user role",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}/active": {
+      "patch": {
+        "operationId": "UsersController_setActive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeactivateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate or deactivate a user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/auth/login": {
       "post": {
         "operationId": "AuthController_login",
@@ -2753,7 +2831,12 @@
           },
           "email": {
             "type": "string"
-          },
+          }
+        }
+      },
+      "ChangeRoleDto": {
+        "type": "object",
+        "properties": {
           "role": {
             "type": "string",
             "enum": [
@@ -2761,11 +2844,22 @@
               "SIMPLE",
               "DENTIST"
             ]
-          },
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "DeactivateUserDto": {
+        "type": "object",
+        "properties": {
           "isActive": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "isActive"
+        ]
       },
       "LoginDto": {
         "type": "object",

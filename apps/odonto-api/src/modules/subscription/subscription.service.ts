@@ -194,8 +194,18 @@ export class SubscriptionService {
 
     async createPortalSession(user: User, clinicId: number) {
         const clinic = await this.clinicRepository.findOne({ where: { id: clinicId } });
-        if (!clinic || !clinic.stripeCustomerId) {
-            throw new BadRequestException('No billing account found');
+        if (!clinic) {
+            throw new BadRequestException('Clinic not found');
+        }
+
+        if (!clinic.stripeCustomerId) {
+            const customer = await this.stripe.customers.create({
+                email: user.email,
+                name: clinic.name,
+                metadata: { clinicId: clinic.id.toString() },
+            });
+            clinic.stripeCustomerId = customer.id;
+            await this.clinicRepository.save(clinic);
         }
 
         const session = await this.stripe.billingPortal.sessions.create({

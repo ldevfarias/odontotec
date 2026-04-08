@@ -7,7 +7,5 @@ import { z } from "zod/v4";
 
 export const updateUserDtoSchema = z.object({
     "name": z.optional(z.string()),
-"email": z.optional(z.string()),
-"role": z.optional(z.enum(["ADMIN", "SIMPLE", "DENTIST"])),
-"isActive": z.optional(z.boolean())
+"email": z.optional(z.string())
     })
