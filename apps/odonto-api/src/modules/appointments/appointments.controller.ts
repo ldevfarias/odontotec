@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, ParseBoolPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
@@ -37,6 +38,7 @@ export class AppointmentsController {
         return this.appointmentsService.create(createAppointmentDto, clinicId);
     }
 
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Get('public/cancel')
     @Public()
     @ApiOperation({ summary: 'Cancel appointment via public link' })
