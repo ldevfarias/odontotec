@@ -10,10 +10,6 @@ const securityHeaders = [
         value: 'DENY',
     },
     {
-        key: 'X-XSS-Protection',
-        value: '1; mode=block',
-    },
-    {
         key: 'Referrer-Policy',
         value: 'strict-origin-when-cross-origin',
     },
@@ -36,7 +32,7 @@ const nextConfig: NextConfig = {
     async headers() {
         return [
             {
-                source: '/:path*',
+                source: '/(.*)',
                 headers: securityHeaders,
             },
         ];
