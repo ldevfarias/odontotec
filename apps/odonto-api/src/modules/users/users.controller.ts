@@ -99,8 +99,12 @@ export class UsersController {
     @Patch(':id')
     @Roles(UserRole.ADMIN)
     @ApiOperation({ summary: 'Update user information' })
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-        return this.usersService.update(id, updateUserDto);
+    update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateUserDto: UpdateUserDto,
+        @Tenant() clinicId: number,
+    ) {
+        return this.usersService.updateProfile(id, updateUserDto, clinicId);
     }
 
     @Patch(':id/role')

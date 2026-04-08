@@ -236,6 +236,14 @@ export class UsersService {
         }
     }
 
+    async updateProfile(id: number, updateUserDto: UpdateUserDto, clinicId: number): Promise<User> {
+        const membership = await this.membershipRepository.findOne({ where: { userId: id, clinicId } });
+        if (!membership) throw new NotFoundException('User not found in this clinic');
+        const result = await this.update(id, updateUserDto);
+        if (!result) throw new NotFoundException('User not found');
+        return result;
+    }
+
     async changeRole(id: number, role: UserRole, clinicId: number): Promise<User> {
         const membership = await this.membershipRepository.findOne({ where: { userId: id, clinicId } });
         if (!membership) throw new NotFoundException('User not found in this clinic');
