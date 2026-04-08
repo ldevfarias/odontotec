@@ -65,7 +65,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
             if (data.url) {
                 try {
                     window.location.href = assertStripeUrl(data.url);
-                } catch {
+                } catch (err) {
+                    console.error('[assertStripeUrl] blocked checkout redirect:', err);
                     notificationService.error('URL de checkout inválida. Contate o suporte.');
                 }
             } else {

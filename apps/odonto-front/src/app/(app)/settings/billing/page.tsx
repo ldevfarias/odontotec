@@ -50,7 +50,8 @@ export default function BillingPage() {
                     analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, { plan: 'PRO' });
                     setIsRedirecting(true);
                     window.location.href = safeUrl;
-                } catch {
+                } catch (err) {
+                    console.error('[assertStripeUrl] blocked checkout redirect:', err);
                     notificationService.error('URL de checkout inválida. Contate o suporte.');
                 }
             } else {
@@ -72,7 +73,8 @@ export default function BillingPage() {
                     setIsRedirecting(true);
                     window.open(safeUrl, '_blank');
                     setIsRedirecting(false);
-                } catch {
+                } catch (err) {
+                    console.error('[assertStripeUrl] blocked portal redirect:', err);
                     notificationService.error('URL do portal inválida. Contate o suporte.');
                 }
             }

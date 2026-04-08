@@ -1,7 +1,8 @@
+// Only Stripe's known payment redirect endpoints — intentionally excludes apex stripe.com
+// to follow least-privilege and avoid any *.stripe.com subdomain being accepted.
 const ALLOWED_STRIPE_HOSTNAMES = [
     'checkout.stripe.com',
     'billing.stripe.com',
-    'stripe.com',
 ];
 
 /**
