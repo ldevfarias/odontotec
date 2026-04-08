@@ -1,0 +1,1 @@
+{"type":"object","properties":{"role":{"type":"string","enum":["ADMIN","SIMPLE","DENTIST"]}},"required":["role"],"x-readme-ref-name":"ChangeRoleDto"}

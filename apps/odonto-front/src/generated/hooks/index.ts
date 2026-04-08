@@ -110,6 +110,7 @@ export type { TreatmentPlansControllerFindOneSuspenseQueryKey } from "./useTreat
 export type { TreatmentPlansControllerRemoveMutationKey } from "./useTreatmentPlansControllerRemove.ts";
 export type { TreatmentPlansControllerUpdateMutationKey } from "./useTreatmentPlansControllerUpdate.ts";
 export type { UsersControllerAcceptTermsMutationKey } from "./useUsersControllerAcceptTerms.ts";
+export type { UsersControllerChangeRoleMutationKey } from "./useUsersControllerChangeRole.ts";
 export type { UsersControllerFindAllQueryKey } from "./useUsersControllerFindAll.ts";
 export type { UsersControllerFindAllInvitationsQueryKey } from "./useUsersControllerFindAllInvitations.ts";
 export type { UsersControllerFindAllInvitationsSuspenseQueryKey } from "./useUsersControllerFindAllInvitationsSuspense.ts";
@@ -119,6 +120,7 @@ export type { UsersControllerFindInvitationSuspenseQueryKey } from "./useUsersCo
 export type { UsersControllerInviteMutationKey } from "./useUsersControllerInvite.ts";
 export type { UsersControllerRemoveMutationKey } from "./useUsersControllerRemove.ts";
 export type { UsersControllerRemoveAvatarMutationKey } from "./useUsersControllerRemoveAvatar.ts";
+export type { UsersControllerSetActiveMutationKey } from "./useUsersControllerSetActive.ts";
 export type { UsersControllerUpdateMutationKey } from "./useUsersControllerUpdate.ts";
 export type { UsersControllerUploadAvatarMutationKey } from "./useUsersControllerUploadAvatar.ts";
 export { anamnesisControllerCreateMutationKey } from "./useAnamnesisControllerCreate.ts";
@@ -457,6 +459,9 @@ export { useTreatmentPlansControllerUpdate } from "./useTreatmentPlansController
 export { useUsersControllerAcceptTerms } from "./useUsersControllerAcceptTerms.ts";
 export { usersControllerAcceptTermsMutationKey } from "./useUsersControllerAcceptTerms.ts";
 export { usersControllerAcceptTermsMutationOptions } from "./useUsersControllerAcceptTerms.ts";
+export { useUsersControllerChangeRole } from "./useUsersControllerChangeRole.ts";
+export { usersControllerChangeRoleMutationKey } from "./useUsersControllerChangeRole.ts";
+export { usersControllerChangeRoleMutationOptions } from "./useUsersControllerChangeRole.ts";
 export { useUsersControllerFindAll } from "./useUsersControllerFindAll.ts";
 export { usersControllerFindAllQueryKey } from "./useUsersControllerFindAll.ts";
 export { usersControllerFindAllQueryOptions } from "./useUsersControllerFindAll.ts";
@@ -484,6 +489,9 @@ export { usersControllerRemoveMutationOptions } from "./useUsersControllerRemove
 export { useUsersControllerRemoveAvatar } from "./useUsersControllerRemoveAvatar.ts";
 export { usersControllerRemoveAvatarMutationKey } from "./useUsersControllerRemoveAvatar.ts";
 export { usersControllerRemoveAvatarMutationOptions } from "./useUsersControllerRemoveAvatar.ts";
+export { useUsersControllerSetActive } from "./useUsersControllerSetActive.ts";
+export { usersControllerSetActiveMutationKey } from "./useUsersControllerSetActive.ts";
+export { usersControllerSetActiveMutationOptions } from "./useUsersControllerSetActive.ts";
 export { useUsersControllerUpdate } from "./useUsersControllerUpdate.ts";
 export { usersControllerUpdateMutationKey } from "./useUsersControllerUpdate.ts";
 export { usersControllerUpdateMutationOptions } from "./useUsersControllerUpdate.ts";

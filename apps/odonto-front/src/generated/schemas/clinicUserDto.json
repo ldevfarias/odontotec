@@ -1,1 +1,0 @@
-{"type":"object","properties":{"id":{"type":"number"},"name":{"type":"string"},"email":{"type":"string"},"role":{"type":"string"},"isActive":{"type":"boolean"},"avatarUrl":{"type":"string","nullable":true}},"required":["id","name","email","role","isActive","avatarUrl"],"x-readme-ref-name":"ClinicUserDto"}

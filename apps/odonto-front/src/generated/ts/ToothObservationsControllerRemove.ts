@@ -11,12 +11,12 @@ export type ToothObservationsControllerRemovePathParams = {
     id: number;
 };
 
-export type ToothObservationsControllerRemove200 = any;
+export type ToothObservationsControllerRemove204 = any;
 
-export type ToothObservationsControllerRemoveMutationResponse = ToothObservationsControllerRemove200;
+export type ToothObservationsControllerRemoveMutationResponse = ToothObservationsControllerRemove204;
 
 export type ToothObservationsControllerRemoveMutation = {
-    Response: ToothObservationsControllerRemove200;
+    Response: ToothObservationsControllerRemove204;
     PathParams: ToothObservationsControllerRemovePathParams;
     Errors: any;
 };

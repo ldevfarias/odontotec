@@ -4,14 +4,6 @@
 */
 
 
-export const updateUserDtoRoleEnum = {
-    ADMIN: "ADMIN",
-    SIMPLE: "SIMPLE",
-    DENTIST: "DENTIST"
-} as const;
-
-export type UpdateUserDtoRoleEnumKey = (typeof updateUserDtoRoleEnum)[keyof typeof updateUserDtoRoleEnum];
-
 export type UpdateUserDto = {
     /**
      * @type string | undefined
@@ -21,12 +13,4 @@ export type UpdateUserDto = {
      * @type string | undefined
     */
     email?: string;
-    /**
-     * @type string | undefined
-    */
-    role?: UpdateUserDtoRoleEnumKey;
-    /**
-     * @type boolean | undefined
-    */
-    isActive?: boolean;
 };
