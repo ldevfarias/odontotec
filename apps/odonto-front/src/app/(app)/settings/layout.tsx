@@ -3,6 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { Breadcrumb } from '@/components/Breadcrumb';
 
 export default function SettingsLayout({
     children,
@@ -26,5 +27,10 @@ export default function SettingsLayout({
         );
     }
 
-    return <>{children}</>;
+    return (
+        <div className="flex flex-col flex-1 px-4 py-6">
+            <Breadcrumb />
+            {children}
+        </div>
+    );
 }

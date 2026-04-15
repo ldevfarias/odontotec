@@ -8,8 +8,6 @@ import { SubscriptionBlocker } from "@/components/SubscriptionBlocker";
 import { cn } from "@/lib/utils";
 import { AppLayoutSkeleton } from "@/components/skeletons";
 
-import { Breadcrumb } from "@/components/Breadcrumb";
-
 function DashboardContent({ children }: { children: React.ReactNode }) {
     const { isLocked, isLoading } = useSubscription();
 
@@ -29,9 +27,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <div className="flex-1 flex flex-col gap-2 overflow-hidden min-w-0">
                     <DashboardHeader />
                     <main className="flex-1 overflow-y-auto px-2 pt-1 pb-4 custom-scrollbar relative z-0 flex flex-col">
-                        <div className="mb-2">
-                            <Breadcrumb />
-                        </div>
                         {children}
                     </main>
                 </div>

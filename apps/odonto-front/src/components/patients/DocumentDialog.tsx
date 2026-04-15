@@ -34,6 +34,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useDocumentsControllerCreate } from '@/generated/hooks/useDocumentsControllerCreate';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { CreatePatientDocumentDtoTypeEnumKey } from '@/generated/ts/CreatePatientDocumentDto';
+import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
     type: z.enum(['ATESTADO', 'RECEITA', 'OUTRO']),
@@ -50,6 +51,7 @@ interface DocumentDialogProps {
 }
 
 export function DocumentDialog({ isOpen, onOpenChange, patientId, onSuccess }: DocumentDialogProps) {
+    const { user } = useAuth();
     const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
     const { data: usersResponse } = useUsersControllerFindAll();
     const dentists = (usersResponse?.data ?? []).filter((u: any) => u.role === 'DENTIST' || u.role === 'ADMIN');
@@ -64,17 +66,23 @@ export function DocumentDialog({ isOpen, onOpenChange, patientId, onSuccess }: D
         },
     });
 
-    // Populate templates based on type
+    const currentType = form.watch('type');
+
+    // Populate templates and dentist based on type
     useEffect(() => {
-        const type = form.watch('type');
-        if (type === 'ATESTADO') {
+        if (currentType === 'ATESTADO') {
             form.setValue('title', 'Atestado Médico');
             form.setValue('content', 'Atesto para os devidos fins que o(a) paciente acima citado(a) esteve em consulta odontológica na data de hoje, necessitando de X dias de repouso por motivo de tratamento dentário.');
-        } else if (type === 'RECEITA') {
+        } else if (currentType === 'RECEITA') {
             form.setValue('title', 'Receituário');
             form.setValue('content', 'Uso Oral:\n1. Medicamento X --------- 1 caixa\nTomar 1 comprimido a cada 8 horas por 5 dias.');
+
+            // Pre-fill with current logged-in user if they are a dentist/admin
+            if (user && (user.role === 'DENTIST' || user.role === 'ADMIN')) {
+                form.setValue('dentistId', user.id.toString());
+            }
         }
-    }, [form.watch('type')]);
+    }, [currentType, user, form]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         createDocument({
@@ -132,23 +140,14 @@ export function DocumentDialog({ isOpen, onOpenChange, patientId, onSuccess }: D
                             <FormField
                                 control={form.control}
                                 name="dentistId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Profissional Responsável</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Selecione o dentista" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {dentists.map((d: any) => (
-                                                    <SelectItem key={d.id} value={d.id.toString()}>
-                                                        {d.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                render={() => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="mb-2">Profissional Responsável</FormLabel>
+                                        <FormControl>
+                                            <div className="h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground cursor-not-allowed flex items-center">
+                                                {user?.name || 'Carregando...'}
+                                            </div>
+                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}

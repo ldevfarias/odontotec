@@ -27,11 +27,11 @@ export function Breadcrumb() {
 
     const segments = pathname.split('/').filter(Boolean);
 
-    // Don't show breadcrumb on the dashboard home page
-    if (segments.length === 1 && segments[0] === 'dashboard') return null;
+    // Only show breadcrumb if it contains 'settings'
+    if (!segments.includes('settings')) return null;
 
     return (
-        <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-base text-muted-foreground overflow-hidden whitespace-nowrap">
+        <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-sm text-muted-foreground overflow-hidden whitespace-nowrap mb-6">
             <Link
                 href="/dashboard"
                 className="flex items-center hover:text-primary transition-colors duration-150 shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-sm"

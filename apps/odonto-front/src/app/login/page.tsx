@@ -1,20 +1,22 @@
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { analytics, EVENT_NAMES } from '@/services/analytics.service';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, AlertCircle, Users, LayoutDashboard, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
 import { useAuthControllerLogin } from '@/generated/hooks/useAuthControllerLogin';
 import { authControllerLoginMutationRequestSchema } from '@/generated/zod/authControllerLoginSchema';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { analytics, EVENT_NAMES } from '@/services/analytics.service';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, LayoutDashboard, Users } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Logo } from '@/components/ui/logo';
+
+const LANDING_PAGE_URL = process.env.NEXT_PUBLIC_LANDING_URL || 'http://localhost:3002';
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -73,7 +75,7 @@ export default function LoginPage() {
 
                 <div className="relative z-10 flex flex-col h-full">
                     {/* Logo Reutilizável */}
-                    <Link href="/" className="inline-block mb-16">
+                    <Link href={LANDING_PAGE_URL} className="inline-block mb-16">
                         <Logo className="text-3xl text-gray-900" ehColor="text-white" />
                     </Link>
 
@@ -133,7 +135,7 @@ export default function LoginPage() {
 
                 {/* Mobile Header (Sustitui a parte esquerda em telas pequenas) */}
                 <div className="lg:hidden absolute top-0 left-0 right-0 p-6 flex flex-col justify-center items-center bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
-                    <Link href="/" className="flex items-center gap-2">
+                    <Link href={LANDING_PAGE_URL} className="flex items-center gap-2">
                         <Logo className="text-xl text-gray-900" />
                     </Link>
                 </div>
