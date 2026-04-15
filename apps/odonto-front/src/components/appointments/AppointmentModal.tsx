@@ -1,23 +1,29 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
 import { analytics, EVENT_NAMES } from '@/services/analytics.service';
-import { useForm } from 'react-hook-form';
+import { notificationService } from '@/services/notification.service';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { format, addMinutes, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import {
-    Plus,
+    CalendarIcon,
     Check,
     ChevronsUpDown,
-    Clock,
-    User,
-    CalendarIcon,
-    AlertCircle
+    Clock
 } from 'lucide-react';
-import { notificationService } from '@/services/notification.service';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
+import { Calendar } from "@/components/ui/calendar";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command';
 import {
     Dialog,
     DialogContent,
@@ -34,20 +40,11 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '@/components/ui/command';
 import {
     Select,
     SelectContent,
@@ -55,16 +52,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { createAppointmentDtoSchema } from '@/generated/zod/createAppointmentDtoSchema';
-import { useQueryClient } from '@tanstack/react-query';
+import { useAppointmentsControllerCreate } from '@/generated/hooks/useAppointmentsControllerCreate';
+import { useAppointmentsControllerGetAvailableSlots } from '@/generated/hooks/useAppointmentsControllerGetAvailableSlots';
+import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
 import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
-import { useAppointmentsControllerCreate } from '@/generated/hooks/useAppointmentsControllerCreate';
-import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
-import { useAppointmentsControllerGetAvailableSlots } from '@/generated/hooks/useAppointmentsControllerGetAvailableSlots';
+import { cn } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
     SCHEDULED: 'Agendado',
@@ -115,7 +110,7 @@ export function AppointmentModal({ open, onOpenChange, initialDate, appointmentT
     const dentists = useMemo(() =>
         (professionals as any[]).filter((u: any) => {
             const role = u.role?.toUpperCase();
-            return role === 'DENTIST' || role === 'ADMIN';
+            return role === 'DENTIST' || role === 'ADMIN' || role === 'OWNER';
         }),
         [professionals]);
 
