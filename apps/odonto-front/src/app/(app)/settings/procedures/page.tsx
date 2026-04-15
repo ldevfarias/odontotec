@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { cn } from '@/lib/utils';
 import { notificationService } from '@/services/notification.service';
 import { Plus, Loader2, Pencil, Trash2, Search, FileText } from 'lucide-react';
 
@@ -250,72 +249,6 @@ export default function ProceduresPage() {
                             )}
                         />
 
-                        {/* Selection Mode Field */}
-                        <FormField
-                            control={form.control}
-                            name="selectionMode"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium">
-                                        Como registrar no odontograma?
-                                    </FormLabel>
-                                    <div className="space-y-2 pt-1">
-                                        {([
-                                            {
-                                                value: 'FACE',
-                                                label: 'Seleção por Face do Dente',
-                                                description: 'Para procedimentos que afetam uma superfície específica (restauração, obturação, cárie, etc).',
-                                            },
-                                            {
-                                                value: 'TOOTH',
-                                                label: 'Dente Inteiro',
-                                                description: 'Para procedimentos que envolvem o dente todo (extração, canal, limpeza, clareamento, etc).',
-                                            },
-                                            {
-                                                value: 'GENERAL',
-                                                label: 'Sem Seleção',
-                                                description: 'Para procedimentos genéricos que não se aplicam a dentes específicos.',
-                                            },
-                                        ] as const).map((option) => {
-                                            const isActive = field.value === option.value;
-                                            return (
-                                                <div
-                                                    key={option.value}
-                                                    onClick={() => field.onChange(option.value)}
-                                                    className={cn(
-                                                        'flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-all',
-                                                        isActive
-                                                            ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
-                                                            : 'hover:bg-muted/50 hover:border-muted-foreground/30'
-                                                    )}
-                                                >
-                                                    <div className={cn(
-                                                        'mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center flex-shrink-0',
-                                                        isActive ? 'border-primary' : 'border-muted-foreground/40'
-                                                    )}>
-                                                        {isActive && (
-                                                            <div className="h-2 w-2 rounded-full bg-primary" />
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <p className={cn(
-                                                            'text-sm font-medium leading-none',
-                                                            isActive ? 'text-primary' : 'text-foreground'
-                                                        )}>
-                                                            {option.label}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground mt-1">
-                                                            {option.description}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
 
                         <DialogFooter>
                             <Button type="button" variant="ghost" onClick={closeDialog}>Cancelar</Button>
