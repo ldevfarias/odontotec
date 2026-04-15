@@ -130,7 +130,6 @@ export default function ProceduresPage() {
             description: procedure.description || '',
             category: procedure.category || '',
             baseValue: Number(procedure.baseValue),
-            selectionMode: procedure.selectionMode || undefined,
         });
         setIsOpen(true);
     };
@@ -173,18 +172,6 @@ export default function ProceduresPage() {
         p.category?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getSelectionModeLabel = (mode?: string) => {
-        switch (mode) {
-            case 'FACE':
-                return { label: 'Por Face', variant: 'default' as const };
-            case 'TOOTH':
-                return { label: 'Dente Inteiro', variant: 'secondary' as const };
-            case 'GENERAL':
-                return { label: 'Sem Seleção', variant: 'outline' as const };
-            default:
-                return { label: 'Não definido', variant: 'outline' as const };
-        }
-    };
 
     const procedureDialog = (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
