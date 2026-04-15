@@ -1,14 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
-import { useAuth } from '@/contexts/AuthContext';
 import { CreatePatientDialog } from '@/components/patients/CreatePatientDialog';
-import { PatientsKPIs } from '@/components/patients/PatientsKPIs';
-import { PatientsTable } from '@/components/patients/PatientsTable';
 import { PatientsBulkActions } from '@/components/patients/PatientsBulkActions';
-import { PatientsFilter, PatientFilterOption } from '@/components/patients/PatientsFilter';
+import { PatientFilterOption, PatientsFilter } from '@/components/patients/PatientsFilter';
+import { PatientsTable } from '@/components/patients/PatientsTable';
+import { useAuth } from '@/contexts/AuthContext';
+import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
 import { notificationService } from '@/services/notification.service';
+import { useState } from 'react';
 
 export default function PatientsPage() {
     const { user } = useAuth();
@@ -29,12 +28,6 @@ export default function PatientsPage() {
         handleClearSelection();
     };
 
-    // Calculate basic KPIs based on mocked data or simple metrics
-    const totalPatients = patients.length;
-    // Mock for now:
-    const newPatientsMonth = Math.floor(totalPatients * 0.1);
-    const patientsToRemind = Math.floor(totalPatients * 0.15);
-
     const selectedCount = Object.keys(rowSelection).filter(key => rowSelection[key]).length;
 
     return (
@@ -54,12 +47,6 @@ export default function PatientsPage() {
                 </div>
 
                 <PatientsFilter value={filter} onChange={setFilter} />
-
-                <PatientsKPIs
-                    totalPatients={totalPatients}
-                    newPatientsMonth={newPatientsMonth}
-                    patientsToRemind={patientsToRemind}
-                />
 
                 <PatientsTable
                     data={patients as any[]}
