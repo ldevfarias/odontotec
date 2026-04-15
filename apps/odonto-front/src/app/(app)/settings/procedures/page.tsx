@@ -307,21 +307,19 @@ export default function ProceduresPage() {
                     ) : (
                         <>
                             {/* Desktop header row */}
-                            <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-4 py-2 bg-muted/50">
+                            <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 px-4 py-2 bg-muted/50">
                                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Nome</span>
                                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground w-28">Categoria</span>
                                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground w-28 text-right">Valor Base</span>
-                                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground w-32">Modo</span>
                                 <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground w-20 text-center">Ações</span>
                             </div>
 
                             <div className="divide-y divide-border">
                                 {filteredProcedures.map((proc: any) => {
-                                    const modeInfo = getSelectionModeLabel(proc.selectionMode);
                                     return (
                                         <div key={proc.id} className="group">
                                             {/* Desktop row */}
-                                            <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-4 py-3 hover:bg-accent/30 transition-colors">
+                                            <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-4 py-3 hover:bg-accent/30 transition-colors">
                                                 <div>
                                                     <p className="font-semibold text-sm text-foreground">{proc.name}</p>
                                                     {proc.description && (
@@ -341,11 +339,6 @@ export default function ProceduresPage() {
                                                     <span className="font-mono font-semibold text-sm text-foreground">
                                                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(proc.baseValue)}
                                                     </span>
-                                                </div>
-                                                <div className="w-32">
-                                                    <Badge variant={modeInfo.variant} className="text-xs font-medium">
-                                                        {modeInfo.label}
-                                                    </Badge>
                                                 </div>
                                                 <div className="w-20 flex justify-center gap-1">
                                                     <Button
@@ -377,9 +370,6 @@ export default function ProceduresPage() {
                                                                 {proc.category}
                                                             </Badge>
                                                         )}
-                                                        <Badge variant={modeInfo.variant} className="text-[10px] font-medium">
-                                                            {modeInfo.label}
-                                                        </Badge>
                                                         <span className="font-mono text-xs font-semibold text-foreground">
                                                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(proc.baseValue)}
                                                         </span>
