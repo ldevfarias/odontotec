@@ -54,7 +54,6 @@ const localProcedureSchema = z.object({
     description: z.optional(z.string()),
     category: z.optional(z.string()),
     baseValue: z.number().min(0, 'Valor deve ser positivo'),
-    selectionMode: z.enum(['FACE', 'TOOTH', 'GENERAL']).optional(),
 });
 
 type ProcedureFormValues = z.infer<typeof localProcedureSchema>;
@@ -81,7 +80,6 @@ export default function ProceduresPage() {
             description: '',
             category: '',
             baseValue: 0,
-            selectionMode: undefined,
         },
     });
 
