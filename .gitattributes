@@ -1,0 +1,13 @@
+# Normalize line endings to LF for all text files
+* text=auto eol=lf
+
+# Explicitly declare binary files to avoid corruption
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary

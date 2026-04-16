@@ -33,9 +33,11 @@ O serviço já utiliza `repository.create(dto)`, portanto a nova coluna será ma
 ---
 
 #### [VERIFY] Patient Dialog / Forms
+
 Garantir que os campos de formulário estão enviando o campo `birthDate` no formato ISO string (yyyy-mm-dd), que é o esperado pelo TypeORM para colunas do tipo `date`.
 
 #### [VERIFY] [PatientDetailPage](file:///c:/Users/luka/.gemini/antigravity/playground/workspace/apps/odonto-front/src/app/dashboard/patients/%5Bid%5D/page.tsx)
+
 Verificar se o componente já exibe a data corretamente (as linhas 85-88 sugerem que ele já tenta ler `patient.birthDate`).
 
 ---
@@ -43,9 +45,11 @@ Verificar se o componente já exibe a data corretamente (as linhas 85-88 sugerem
 ## Verification Plan
 
 ### Automated Tests
+
 - N/A (Manual validation preferred for schema sync check).
 
 ### Manual Verification
+
 1. **Criação**: Criar um novo paciente preenchendo a data de nascimento e verificar se o valor persiste após o recarregamento.
 2. **Edição**: Alterar a data de nascimento de um paciente existente.
 3. **API**: Verificar o retorno da rota `GET /patients/:id` para confirmar o campo `birthDate`.

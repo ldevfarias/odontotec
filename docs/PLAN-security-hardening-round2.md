@@ -12,32 +12,36 @@
 
 ## Contexto — Vulnerabilidades Cobertas
 
-| # | Gravidade | Tipo | Arquivo | Descrição |
-|---|---|---|---|---|
-| 1 | ALTA | Mass Assignment / Role Escalation | `users.controller.ts:102`, `user.dto.ts:47` | `UpdateUserDto` expõe `role` e `isActive`, permitindo que um admin mude roles sem restrições adicionais |
-| 2 | ALTA | Open Redirect | `billing/page.tsx:51,67`, `SubscriptionContext.tsx:65` | `window.location.href = data.url` sem validar que a URL pertence ao Stripe |
-| 3 | ALTA | Missing Security Headers | `next.config.ts` | Nenhum `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, `Referrer-Policy` |
-| 4 | MÉDIA | Rate Limiting insuficiente | `appointments.controller.ts:40` | Endpoint `GET /appointments/public/cancel` é `@Public()` mas usa apenas throttle global (100 req/min) |
+| #   | Gravidade | Tipo                              | Arquivo                                                | Descrição                                                                                               |
+| --- | --------- | --------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| 1   | ALTA      | Mass Assignment / Role Escalation | `users.controller.ts:102`, `user.dto.ts:47`            | `UpdateUserDto` expõe `role` e `isActive`, permitindo que um admin mude roles sem restrições adicionais |
+| 2   | ALTA      | Open Redirect                     | `billing/page.tsx:51,67`, `SubscriptionContext.tsx:65` | `window.location.href = data.url` sem validar que a URL pertence ao Stripe                              |
+| 3   | ALTA      | Missing Security Headers          | `next.config.ts`                                       | Nenhum `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, `Referrer-Policy`      |
+| 4   | MÉDIA     | Rate Limiting insuficiente        | `appointments.controller.ts:40`                        | Endpoint `GET /appointments/public/cancel` é `@Public()` mas usa apenas throttle global (100 req/min)   |
 
 ---
 
 ## Arquivos Modificados
 
 ### Task 1 — Mass Assignment
+
 - Modify: `apps/odonto-api/src/modules/users/dto/user.dto.ts`
 - Modify: `apps/odonto-api/src/modules/users/users.controller.ts`
 - Modify: `apps/odonto-api/src/modules/users/users.service.ts`
 - Create: `apps/odonto-api/src/modules/users/users.controller.role.spec.ts`
 
 ### Task 2 — Open Redirect
+
 - Create: `apps/odonto-front/src/lib/stripe-url.ts`
 - Modify: `apps/odonto-front/src/app/(app)/settings/billing/page.tsx`
 - Modify: `apps/odonto-front/src/contexts/SubscriptionContext.tsx`
 
 ### Task 3 — Security Headers
+
 - Modify: `apps/odonto-front/next.config.ts`
 
 ### Task 4 — Rate Limiting
+
 - Modify: `apps/odonto-api/src/modules/appointments/appointments.controller.ts`
 - Create: `apps/odonto-api/src/modules/appointments/appointments.controller.throttle.spec.ts`
 
@@ -48,6 +52,7 @@
 **Contexto:** `PATCH /users/:id` aceita `UpdateUserDto` que inclui `role` e `isActive`. O `users.service.ts:228` usa `Object.assign(user, updateUserDto)` — qualquer admin pode escalar ou revogar roles de outros usuários sem validação adicional. A correção é remover esses campos do DTO genérico e criar endpoints específicos protegidos.
 
 **Files:**
+
 - Modify: `apps/odonto-api/src/modules/users/dto/user.dto.ts`
 - Modify: `apps/odonto-api/src/modules/users/users.controller.ts`
 - Modify: `apps/odonto-api/src/modules/users/users.service.ts`
@@ -63,44 +68,44 @@ import { plainToInstance } from 'class-transformer';
 import { UpdateUserDto, ChangeRoleDto, DeactivateUserDto } from './dto/user.dto';
 
 describe('UpdateUserDto — mass assignment protection', () => {
-    it('should reject role field', async () => {
-        const dto = plainToInstance(UpdateUserDto, { name: 'Ana', role: 'ADMIN' });
-        const errors = await validate(dto);
-        // role should not exist in UpdateUserDto — check field is stripped or not present
-        expect((dto as any).role).toBeUndefined();
-    });
+  it('should reject role field', async () => {
+    const dto = plainToInstance(UpdateUserDto, { name: 'Ana', role: 'ADMIN' });
+    const errors = await validate(dto);
+    // role should not exist in UpdateUserDto — check field is stripped or not present
+    expect((dto as any).role).toBeUndefined();
+  });
 
-    it('should reject isActive field', async () => {
-        const dto = plainToInstance(UpdateUserDto, { name: 'Ana', isActive: false });
-        const errors = await validate(dto);
-        expect((dto as any).isActive).toBeUndefined();
-    });
+  it('should reject isActive field', async () => {
+    const dto = plainToInstance(UpdateUserDto, { name: 'Ana', isActive: false });
+    const errors = await validate(dto);
+    expect((dto as any).isActive).toBeUndefined();
+  });
 
-    it('should accept name and email', async () => {
-        const dto = plainToInstance(UpdateUserDto, { name: 'Ana', email: 'ana@test.com' });
-        const errors = await validate(dto);
-        expect(errors.length).toBe(0);
-    });
+  it('should accept name and email', async () => {
+    const dto = plainToInstance(UpdateUserDto, { name: 'Ana', email: 'ana@test.com' });
+    const errors = await validate(dto);
+    expect(errors.length).toBe(0);
+  });
 });
 
 describe('ChangeRoleDto', () => {
-    it('should require role field', async () => {
-        const dto = plainToInstance(ChangeRoleDto, {});
-        const errors = await validate(dto);
-        expect(errors.some(e => e.property === 'role')).toBe(true);
-    });
+  it('should require role field', async () => {
+    const dto = plainToInstance(ChangeRoleDto, {});
+    const errors = await validate(dto);
+    expect(errors.some((e) => e.property === 'role')).toBe(true);
+  });
 
-    it('should reject invalid role', async () => {
-        const dto = plainToInstance(ChangeRoleDto, { role: 'HACKER' });
-        const errors = await validate(dto);
-        expect(errors.some(e => e.property === 'role')).toBe(true);
-    });
+  it('should reject invalid role', async () => {
+    const dto = plainToInstance(ChangeRoleDto, { role: 'HACKER' });
+    const errors = await validate(dto);
+    expect(errors.some((e) => e.property === 'role')).toBe(true);
+  });
 
-    it('should accept valid role', async () => {
-        const dto = plainToInstance(ChangeRoleDto, { role: 'DENTIST' });
-        const errors = await validate(dto);
-        expect(errors.length).toBe(0);
-    });
+  it('should accept valid role', async () => {
+    const dto = plainToInstance(ChangeRoleDto, { role: 'DENTIST' });
+    const errors = await validate(dto);
+    expect(errors.length).toBe(0);
+  });
 });
 ```
 
@@ -118,36 +123,45 @@ Em `apps/odonto-api/src/modules/users/dto/user.dto.ts`, substituir o conteúdo d
 
 ```typescript
 // Manter imports existentes, adicionar IsBoolean:
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsBoolean, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsBoolean,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 // UpdateUserDto — APENAS campos que qualquer admin pode editar
 export class UpdateUserDto {
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsString()
-    @MaxLength(255)
-    name?: string;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  name?: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsEmail()
-    @MaxLength(255)
-    email?: string;
-    // role e isActive removidos — use os endpoints específicos abaixo
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(255)
+  email?: string;
+  // role e isActive removidos — use os endpoints específicos abaixo
 }
 
 // ChangeRoleDto — endpoint dedicado com audit log
 export class ChangeRoleDto {
-    @ApiProperty({ enum: UserRole })
-    @IsEnum(UserRole)
-    role: UserRole;
+  @ApiProperty({ enum: UserRole })
+  @IsEnum(UserRole)
+  role: UserRole;
 }
 
 // DeactivateUserDto — endpoint dedicado para ativar/desativar
 export class DeactivateUserDto {
-    @ApiProperty()
-    @IsBoolean()
-    isActive: boolean;
+  @ApiProperty()
+  @IsBoolean()
+  isActive: boolean;
 }
 ```
 
@@ -184,11 +198,13 @@ async setActive(id: number, isActive: boolean, clinicId: number): Promise<User> 
 Em `apps/odonto-api/src/modules/users/users.controller.ts`:
 
 1. Adicionar `ChangeRoleDto, DeactivateUserDto` ao import do dto:
+
 ```typescript
 import { UpdateUserDto, UsersQueryDto, ChangeRoleDto, DeactivateUserDto } from './dto/user.dto';
 ```
 
 2. Substituir o método `update()` atual (linhas 99-104) por:
+
 ```typescript
 @Patch(':id')
 @Roles(UserRole.ADMIN)
@@ -263,6 +279,7 @@ git commit -m "fix(security): remove role/isActive from UpdateUserDto — add de
 **Contexto:** `window.location.href = data.url` em `billing/page.tsx:51`, `billing/page.tsx:67` e `SubscriptionContext.tsx:65` não valida que a URL retornada pelo servidor pertence ao Stripe. Um servidor comprometido ou XSS no backend poderia retornar `javascript:alert(1)` ou um domínio malicioso. A correção é validar o hostname antes de redirecionar.
 
 **Files:**
+
 - Create: `apps/odonto-front/src/lib/stripe-url.ts`
 - Modify: `apps/odonto-front/src/app/(app)/settings/billing/page.tsx`
 - Modify: `apps/odonto-front/src/contexts/SubscriptionContext.tsx`
@@ -272,37 +289,33 @@ git commit -m "fix(security): remove role/isActive from UpdateUserDto — add de
 Crie `apps/odonto-front/src/lib/stripe-url.ts`:
 
 ```typescript
-const ALLOWED_STRIPE_HOSTNAMES = [
-    'checkout.stripe.com',
-    'billing.stripe.com',
-    'stripe.com',
-];
+const ALLOWED_STRIPE_HOSTNAMES = ['checkout.stripe.com', 'billing.stripe.com', 'stripe.com'];
 
 /**
  * Valida que uma URL pertence ao Stripe antes de redirecionar.
  * Lança erro se a URL for inválida ou não pertencer ao Stripe.
  */
 export function assertStripeUrl(url: string): string {
-    let parsed: URL;
-    try {
-        parsed = new URL(url);
-    } catch {
-        throw new Error(`Invalid redirect URL: "${url}"`);
-    }
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error(`Invalid redirect URL: "${url}"`);
+  }
 
-    if (parsed.protocol !== 'https:') {
-        throw new Error(`Redirect URL must use HTTPS: "${url}"`);
-    }
+  if (parsed.protocol !== 'https:') {
+    throw new Error(`Redirect URL must use HTTPS: "${url}"`);
+  }
 
-    const isAllowed = ALLOWED_STRIPE_HOSTNAMES.some(
-        (host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`)
-    );
+  const isAllowed = ALLOWED_STRIPE_HOSTNAMES.some(
+    (host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`),
+  );
 
-    if (!isAllowed) {
-        throw new Error(`Redirect URL hostname not allowed: "${parsed.hostname}"`);
-    }
+  if (!isAllowed) {
+    throw new Error(`Redirect URL hostname not allowed: "${parsed.hostname}"`);
+  }
 
-    return url;
+  return url;
 }
 ```
 
@@ -319,44 +332,44 @@ Substituir os dois blocos de redirect (linhas ~51 e ~67):
 ```typescript
 // ANTES — checkout mutation onSuccess:
 if (data.url) {
-    analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, { plan: 'PRO' });
-    setIsRedirecting(true);
-    window.location.href = data.url;
+  analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, { plan: 'PRO' });
+  setIsRedirecting(true);
+  window.location.href = data.url;
 }
 
 // DEPOIS:
 if (data.url) {
-    try {
-        const safeUrl = assertStripeUrl(data.url);
-        analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, { plan: 'PRO' });
-        setIsRedirecting(true);
-        window.location.href = safeUrl;
-    } catch {
-        notificationService.error('URL de checkout inválida. Contate o suporte.');
-    }
+  try {
+    const safeUrl = assertStripeUrl(data.url);
+    analytics.capture(EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED, { plan: 'PRO' });
+    setIsRedirecting(true);
+    window.location.href = safeUrl;
+  } catch {
+    notificationService.error('URL de checkout inválida. Contate o suporte.');
+  }
 }
 ```
 
 ```typescript
 // ANTES — portal mutation onSuccess:
 if (data.url) {
-    analytics.capture(EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED, {});
-    setIsRedirecting(true);
-    window.open(data.url, '_blank');
-    setIsRedirecting(false);
+  analytics.capture(EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED, {});
+  setIsRedirecting(true);
+  window.open(data.url, '_blank');
+  setIsRedirecting(false);
 }
 
 // DEPOIS:
 if (data.url) {
-    try {
-        const safeUrl = assertStripeUrl(data.url);
-        analytics.capture(EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED, {});
-        setIsRedirecting(true);
-        window.open(safeUrl, '_blank');
-        setIsRedirecting(false);
-    } catch {
-        notificationService.error('URL do portal inválida. Contate o suporte.');
-    }
+  try {
+    const safeUrl = assertStripeUrl(data.url);
+    analytics.capture(EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED, {});
+    setIsRedirecting(true);
+    window.open(safeUrl, '_blank');
+    setIsRedirecting(false);
+  } catch {
+    notificationService.error('URL do portal inválida. Contate o suporte.');
+  }
 }
 ```
 
@@ -373,16 +386,16 @@ Substituir o bloco `upgradeToPro` (linha ~64):
 ```typescript
 // ANTES:
 if (data.url) {
-    window.location.href = data.url;
+  window.location.href = data.url;
 }
 
 // DEPOIS:
 if (data.url) {
-    try {
-        window.location.href = assertStripeUrl(data.url);
-    } catch {
-        notificationService.error('URL de checkout inválida. Contate o suporte.');
-    }
+  try {
+    window.location.href = assertStripeUrl(data.url);
+  } catch {
+    notificationService.error('URL de checkout inválida. Contate o suporte.');
+  }
 }
 ```
 
@@ -410,70 +423,71 @@ git commit -m "fix(security): validate Stripe redirect URLs before window.locati
 **Contexto:** `next.config.ts` não configura nenhum header de segurança HTTP. Isso expõe o frontend a clickjacking (`X-Frame-Options`), MIME type sniffing (`X-Content-Type-Options`), e não força HTTPS em produção (`Strict-Transport-Security`). O Content-Security-Policy precisa permitir PostHog (usado via `rewrites`) e Stripe.
 
 **Files:**
+
 - Modify: `apps/odonto-front/next.config.ts`
 
 - [ ] **Step 1: Substituir conteúdo do `next.config.ts`**
 
 ```typescript
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const securityHeaders = [
-    {
-        key: 'X-Content-Type-Options',
-        value: 'nosniff',
-    },
-    {
-        key: 'X-Frame-Options',
-        value: 'DENY',
-    },
-    {
-        key: 'X-XSS-Protection',
-        value: '1; mode=block',
-    },
-    {
-        key: 'Referrer-Policy',
-        value: 'strict-origin-when-cross-origin',
-    },
-    {
-        key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=()',
-    },
-    // HSTS — apenas em produção (Vercel adiciona automaticamente, mas não custa ser explícito)
-    ...(process.env.NODE_ENV === 'production'
-        ? [
-              {
-                  key: 'Strict-Transport-Security',
-                  value: 'max-age=31536000; includeSubDomains',
-              },
-          ]
-        : []),
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
+  },
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=()',
+  },
+  // HSTS — apenas em produção (Vercel adiciona automaticamente, mas não custa ser explícito)
+  ...(process.env.NODE_ENV === 'production'
+    ? [
+        {
+          key: 'Strict-Transport-Security',
+          value: 'max-age=31536000; includeSubDomains',
+        },
+      ]
+    : []),
 ];
 
 const nextConfig: NextConfig = {
-    async headers() {
-        return [
-            {
-                source: '/:path*',
-                headers: securityHeaders,
-            },
-        ];
-    },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+    ];
+  },
 
-    async rewrites() {
-        return [
-            {
-                source: '/ingest/static/:path*',
-                destination: 'https://us-assets.i.posthog.com/static/:path*',
-            },
-            {
-                source: '/ingest/:path*',
-                destination: 'https://us.i.posthog.com/:path*',
-            },
-        ];
-    },
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+    ];
+  },
 
-    // This is required to support PostHog trailing slash API requests
-    skipTrailingSlashRedirect: true,
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;
@@ -511,6 +525,7 @@ git commit -m "fix(security): add HTTP security headers to Next.js config (X-Fra
 **Contexto:** `GET /appointments/public/cancel` é marcado como `@Public()` e não tem `@Throttle` customizado — usa apenas o throttle global de 100 req/min. Um atacante pode fazer brute force do parâmetro `token` para cancelar consultas de outros pacientes. O endpoint deve ter limite restritivo.
 
 **Files:**
+
 - Modify: `apps/odonto-api/src/modules/appointments/appointments.controller.ts`
 - Create: `apps/odonto-api/src/modules/appointments/appointments.controller.throttle.spec.ts`
 
@@ -525,20 +540,20 @@ import { AppointmentsController } from './appointments.controller';
 const THROTTLER_METADATA_KEY = 'THROTTLER:default';
 
 function getThrottle(controller: any, methodName: string) {
-    return Reflect.getMetadata(THROTTLER_METADATA_KEY, controller.prototype[methodName]);
+  return Reflect.getMetadata(THROTTLER_METADATA_KEY, controller.prototype[methodName]);
 }
 
 describe('AppointmentsController — Throttle on public cancel endpoint', () => {
-    it('publicCancel should have throttle limit ≤ 10', () => {
-        const meta = getThrottle(AppointmentsController, 'publicCancel');
-        expect(meta).toBeDefined();
-        expect(meta[0].limit).toBeLessThanOrEqual(10);
-    });
+  it('publicCancel should have throttle limit ≤ 10', () => {
+    const meta = getThrottle(AppointmentsController, 'publicCancel');
+    expect(meta).toBeDefined();
+    expect(meta[0].limit).toBeLessThanOrEqual(10);
+  });
 
-    it('publicCancel throttle TTL should be at least 60s', () => {
-        const meta = getThrottle(AppointmentsController, 'publicCancel');
-        expect(meta[0].ttl).toBeGreaterThanOrEqual(60000);
-    });
+  it('publicCancel throttle TTL should be at least 60s', () => {
+    const meta = getThrottle(AppointmentsController, 'publicCancel');
+    expect(meta[0].ttl).toBeGreaterThanOrEqual(60000);
+  });
 });
 ```
 
@@ -608,6 +623,7 @@ git commit -m "fix(security): add rate limiting to public appointment cancel end
 ## Self-Review
 
 ### Spec coverage
+
 - ✅ Mass assignment / role escalation — Task 1 (remove `role`/`isActive` do `UpdateUserDto`, endpoints dedicados)
 - ✅ Open redirect — Task 2 (`assertStripeUrl` valida hostname antes do redirect)
 - ✅ Missing security headers — Task 3 (`next.config.ts` com headers de segurança)
@@ -616,9 +632,11 @@ git commit -m "fix(security): add rate limiting to public appointment cancel end
 - ⏩ X-Clinic-Id client-side validation — defesa em profundidade; backend já valida. Cliente pode validar na `setActiveClinic`, mas não é a linha de defesa primária. Deixado fora para sprint futura.
 
 ### Placeholder scan
+
 Nenhum placeholder encontrado. Todos os steps têm código real e comandos exatos.
 
 ### Type consistency
+
 - `ChangeRoleDto` e `DeactivateUserDto` definidos na Task 1, Step 3 e usados no controller no Step 6.
 - `assertStripeUrl` definida em `stripe-url.ts` (Task 2, Step 1) e importada em billing e SubscriptionContext.
 - `Throttle` importado de `@nestjs/throttler` (já usado em outros controllers do projeto).

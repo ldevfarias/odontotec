@@ -4,8 +4,8 @@
 
 O fluxo atual de registro (`/register`) coleta todos os dados em um único formulário de 2 passos (nome/email/senha + dados da clínica), sem qualquer verificação de email. Isso tem problemas sérios:
 
-- **Segurança**: senha criada antes da verificação da identidade (email pode estar errado)  
-- **Abandono**: formulário longo desencoraja novos usuários  
+- **Segurança**: senha criada antes da verificação da identidade (email pode estar errado)
+- **Abandono**: formulário longo desencoraja novos usuários
 - **UX**: sem feedback de "e-mail enviado" — o usuário não sabe o que espera
 
 A nova abordagem segue o padrão adotado por **Linear**, **Notion**, **Vercel** e **Stripe**: coleta mínima → verificação → completar perfil.
@@ -32,7 +32,7 @@ A nova abordagem segue o padrão adotado por **Linear**, **Notion**, **Vercel** 
 > **Decisão de design: Clínica no Step 3 — OBRIGATÓRIO (Definido)**
 > O usuário confirmou (Opção A): o middleware de onboarding será bloqueante.
 > Ninguém acessará o `/dashboard` sem dados válidos de clínica.
-> 
+>
 > Redirecionamento de segurança para `/onboarding/clinic` caso `User.isActive === false`.
 
 > [!WARNING]
@@ -51,6 +51,7 @@ A nova abordagem segue o padrão adotado por **Linear**, **Notion**, **Vercel** 
 Uma tabela temporária para armazenar registros pendentes antes da verificação do email.
 
 **Campos:**
+
 - `id` — PK
 - `name` — string
 - `email` — string (unique, pending)
@@ -64,19 +65,21 @@ Uma tabela temporária para armazenar registros pendentes antes da verificação
 
 #### [MODIFY] `auth.service.ts`
 
-| Método atual | Método novo |
-|---|---|
-| `registerTenant(dto)` | Continua existindo para compatibilidade — pode ser removido futuramente |
-| — | `initiateRegistration(name, email)` → cria `PendingRegistration` + manda email |
-| — | `verifyEmailAndSetPassword(token, password)` → valida token + cria Clinic + User + retorna JWT |
+| Método atual          | Método novo                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------- |
+| `registerTenant(dto)` | Continua existindo para compatibilidade — pode ser removido futuramente                        |
+| —                     | `initiateRegistration(name, email)` → cria `PendingRegistration` + manda email                 |
+| —                     | `verifyEmailAndSetPassword(token, password)` → valida token + cria Clinic + User + retorna JWT |
 
 **`initiateRegistration`:**
+
 1. Verifica se email já existe em `users` → lança `ConflictException`
 2. Gera UUID token, salva em `PendingRegistration` com expiress in 24h
 3. Envia email de verificação via `EmailService.sendRegistrationVerificationEmail`
 4. Retorna `{ message: 'Email sent' }` (sem expor token)
 
 **`verifyEmailAndSetPassword`:**
+
 1. Busca `PendingRegistration` pelo token → valida existência e expiração
 2. Cria `Clinic` com nome provisório (pode ser o nome do usuário + "Clinic") ou apenas clinicId vazio e deixa para Step 3
 3. Cria `User` com role `ADMIN`, `isEmailVerified: true`, `isActive: false` (aguardando Step 3)
@@ -84,6 +87,7 @@ Uma tabela temporária para armazenar registros pendentes antes da verificação
 5. Retorna JWT — usuário está autenticado mas precisa completar o onboarding
 
 **`completeClinicSetup`:**
+
 1. Requer JWT válido (middleware)
 2. Atualiza `Clinic` com nome, telefone, endereço
 3. Atualiza `User.isActive = true`
@@ -112,6 +116,7 @@ POST /auth/complete-clinic            → completeClinicSetup() [🔒 JWT requir
 #### [NEW] Email Template: `registration-verification.template.ts`
 
 Template HTML com:
+
 - Saudação com nome do usuário
 - CTA principal: `Verificar e-mail e criar senha`
 - Link: `${FRONTEND_URL}/register/verify/${token}`
@@ -123,6 +128,7 @@ Template HTML com:
 #### [MODIFY] `email.service.ts`
 
 Adicionar método:
+
 ```ts
 sendRegistrationVerificationEmail(toEmail: string, userName: string, token: string): Promise<boolean>
 ```
@@ -172,6 +178,7 @@ const step1Schema = z.object({
 #### [MODIFY] `middleware.ts` — Proteção de rotas
 
 Adicionar lógica:
+
 - Se `isActive === false` (onboarding incompleto) → redirecionar para `/onboarding/clinic`
 - Exceto se já está em `/onboarding/*` ou `/register/*`
 
@@ -181,6 +188,7 @@ Adicionar lógica:
 
 **Referências:** Linear, Vercel, Clerk Auth  
 **Estrutura visual:**
+
 - Layout: split — lado esquerdo com branding/ilustração, lado direito com formulário
 - Progress indicator: numbered circles (1 → 2 → 3) no topo
 - Sem card genérico — design clean com fundo off-white suave
@@ -196,6 +204,7 @@ Adicionar lógica:
 **Pré-requisito:** `npm run dev` em execução (já rodando), backend disponível em `localhost:3000`, frontend em `localhost:3001`
 
 **Step 1 — Iniciar Registro:**
+
 1. Acesse `http://localhost:3001/register`
 2. Preencha Nome e Email
 3. Clique em "Criar Conta"
@@ -203,6 +212,7 @@ Adicionar lógica:
 5. Verifique no console/log do backend que o email foi chamado
 
 **Step 2 — Verificar Email e Criar Senha:**
+
 1. Inspecione o banco de dados: `SELECT * FROM pending_registrations ORDER BY created_at DESC LIMIT 1;`
 2. Copie o `verification_token`
 3. Acesse `http://localhost:3001/register/verify/{token}`
@@ -211,11 +221,13 @@ Adicionar lógica:
 6. Esperado: redirecionamento para `/onboarding/clinic`
 
 **Step 3 — Dados da Clínica:**
+
 1. Em `/onboarding/clinic`, preencha Nome da Clínica
 2. Clique em "Entrar no sistema"
 3. Esperado: redirecionamento para `/dashboard` com dados da clínica visíveis
 
 **Testes de Edge Cases:**
+
 - Token expirado: altere `expires_at` no banco para data passada → acesse a URL → deve mostrar erro
 - Token já usado: depois de completar Step 2, tente acessar a mesma URL de verificação novamente → deve mostrar erro
 - Email duplicado: tente registrar o mesmo email duas vezes → deve mostrar mensagem de "Email já cadastrado"
@@ -236,6 +248,6 @@ Verificar se não há erros de TypeScript nem de lint.
 # Backend
 cd apps/odonto-api && npx tsc --noEmit && npm run lint
 
-# Frontend  
+# Frontend
 cd apps/odonto-front && npx tsc --noEmit && npm run lint
 ```

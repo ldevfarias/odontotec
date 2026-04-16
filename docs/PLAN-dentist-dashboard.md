@@ -1,4 +1,5 @@
 # PLAN-dentist-dashboard.md
+
 > Dashboard personalizado para o perfil **DENTIST**
 
 ---
@@ -37,11 +38,11 @@ dashboard/components/dentist/
 
 ## 📊 KPIs do Dentista (`DentistKPIStrip`)
 
-| KPI | Fonte de dados | Ícone |
-|-----|---------------|-------|
+| KPI            | Fonte de dados                                       | Ícone           |
+| -------------- | ---------------------------------------------------- | --------------- |
 | Pacientes hoje | `appointments` filtrados por `dentistId` + data hoje | `CalendarCheck` |
-| Confirmados | `appointments` com `status === 'CONFIRMED'` | `CheckCircle2` |
-| Pendentes | `appointments` com `status === 'SCHEDULED'` | `Clock` |
+| Confirmados    | `appointments` com `status === 'CONFIRMED'`          | `CheckCircle2`  |
+| Pendentes      | `appointments` com `status === 'SCHEDULED'`          | `Clock`         |
 
 **Fonte:** `useAppointmentsControllerFindAll({ date: today, dentistId: user.id })`
 
@@ -52,6 +53,7 @@ dashboard/components/dentist/
 Inspirado na referência enviada (layout de disponibilidade com horários à esquerda e cards de agendamento à direita).
 
 ### Estrutura visual
+
 ```
 08:00 ─────────────────────────────────────
       [ João Silva · Limpeza · 30min       ]  ← SCHEDULED (indigo)
@@ -63,6 +65,7 @@ Inspirado na referência enviada (layout de disponibilidade com horários à esq
 ```
 
 ### Comportamento
+
 - Scroll automático para o horário atual
 - Cards clicáveis → abre `AppointmentPopover`
 - Cores por status (igual ao `ScheduleGrid` existente)
@@ -77,6 +80,7 @@ Inspirado na referência enviada (layout de disponibilidade com horários à esq
 Lista dos últimos 5 pacientes do dentista (baseado nos agendamentos mais recentes).
 
 ### Estrutura visual
+
 ```
 [ Avatar ] João Silva          → botão "Ver Ficha"
            Última consulta: hoje, 09:00
@@ -114,25 +118,30 @@ Lista dos últimos 5 pacientes do dentista (baseado nos agendamentos mais recent
 ## 📁 Arquivos a Criar/Modificar
 
 ### [MODIFY] `dashboard/page.tsx`
+
 - Importar `useAuth`
 - Condicional: `isDentist ? <DentistDashboard /> : <AdminDashboard />`
 - Mover JSX atual para `AdminDashboard` (componente local)
 
 ### [NEW] `dashboard/components/dentist/DentistDashboard.tsx`
+
 - Orquestrador: busca dados, distribui para sub-componentes
 - Hook: `useAppointmentsControllerFindAll({ date: today, dentistId: user.id })`
 - Hook: `usePatientsControllerFindAll()` (para dados dos pacientes)
 
 ### [NEW] `dashboard/components/dentist/DentistKPIStrip.tsx`
+
 - 3 cards KPI em linha horizontal
 - Dados calculados a partir dos appointments do dia
 
 ### [NEW] `dashboard/components/dentist/DentistTimeline.tsx`
+
 - Timeline vertical de 08:00-18:00
 - Linha "Agora" animada
 - Cards de agendamento clicáveis com `AppointmentPopover`
 
 ### [NEW] `dashboard/components/dentist/DentistRecentPatients.tsx`
+
 - Lista dos últimos 5 pacientes únicos
 - Link para ficha do paciente (`/dashboard/patients/[id]`)
 
