@@ -1,3 +1,7 @@
+import type { AppointmentData } from '@/components/appointments/AppointmentModal/hooks/useAppointmentForm';
+
+export type { AppointmentData };
+
 export type CalendarView = 'day' | 'week' | 'month' | 'agenda';
 
 export interface EventCategory {
@@ -27,7 +31,7 @@ export interface CalendarEvent {
   attendees?: number;
   description?: string;
   status?: string;
-  originalAppointment?: any;
+  originalAppointment?: AppointmentData;
 }
 
 export interface CalendarState {

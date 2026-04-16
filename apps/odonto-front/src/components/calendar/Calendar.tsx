@@ -3,7 +3,13 @@ import { useEffect, useMemo, useState } from 'react'; // useEffect kept for mobi
 import { AppointmentDetailSheet } from './AppointmentDetailSheet';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarSidebar } from './CalendarSidebar';
-import { CalendarEvent, CalendarState, EventCategory, Professional } from './types';
+import {
+  AppointmentData,
+  CalendarEvent,
+  CalendarState,
+  EventCategory,
+  Professional,
+} from './types';
 import { AgendaView } from './views/AgendaView';
 import { DayView } from './views/DayView';
 import { MonthView } from './views/MonthView';
@@ -14,7 +20,7 @@ interface CalendarProps {
   categories: EventCategory[];
   professionals: Professional[];
   onNewAppointment?: () => void;
-  onEditAppointment?: (originalAppointment: any) => void;
+  onEditAppointment?: (originalAppointment: AppointmentData) => void;
   onUpdateAppointmentStatus?: (
     id: string,
     newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT',

@@ -8,7 +8,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-import { CalendarEvent, EventCategory, Professional } from '../types';
+import { AppointmentData, CalendarEvent, EventCategory, Professional } from '../types';
 
 type PositionedEvent = CalendarEvent & { leftPos: number; widthPct: number };
 
@@ -74,8 +74,8 @@ interface DayViewProps {
   events: CalendarEvent[];
   categories: EventCategory[];
   professionals: Professional[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onEditAppointment?: (originalAppointment: any) => void;
+
+  onEditAppointment?: (originalAppointment: AppointmentData) => void;
   onUpdateAppointmentStatus?: (
     id: string,
     newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT',
@@ -378,7 +378,7 @@ export function DayView({
                                       className="text-muted-foreground hover:text-foreground hover:bg-muted h-7 w-7 rounded-sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (onEditAppointment)
+                                        if (onEditAppointment && event.originalAppointment)
                                           onEditAppointment(event.originalAppointment);
                                       }}
                                     >

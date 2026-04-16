@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
-import { CalendarEvent, EventCategory, Professional } from './types';
+import { AppointmentData, CalendarEvent, EventCategory, Professional } from './types';
 
 interface AppointmentDetailSheetProps {
   event: CalendarEvent | null;
@@ -17,8 +17,7 @@ interface AppointmentDetailSheetProps {
   onClose: () => void;
   categories: EventCategory[];
   professionals: Professional[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onEditAppointment?: (appointment: any) => void;
+  onEditAppointment?: (appointment: AppointmentData) => void;
   onUpdateAppointmentStatus?: (
     id: string,
     newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT',
@@ -129,7 +128,7 @@ export function AppointmentDetailSheet({
                 variant="outline"
                 className="w-full justify-start gap-2"
                 onClick={() => {
-                  onEditAppointment?.(event.originalAppointment);
+                  if (event.originalAppointment) onEditAppointment?.(event.originalAppointment);
                   onClose();
                 }}
               >

@@ -9,7 +9,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { Activity, CheckCircle2, CheckSquare, Clock, Edit2, UserX, XCircle } from 'lucide-react';
+import { CheckCircle2, CheckSquare, Clock, Edit2, UserX, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,15 +18,15 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-import { CalendarEvent, EventCategory, Professional } from '../types';
+import { AppointmentData, CalendarEvent, EventCategory, Professional } from '../types';
 
 interface MonthViewProps {
   currentDate: Date;
   events: CalendarEvent[];
   categories: EventCategory[];
   professionals?: Professional[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onEditAppointment?: (appointment: any) => void;
+
+  onEditAppointment?: (appointment: AppointmentData) => void;
   onUpdateAppointmentStatus?: (
     id: string,
     newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'ABSENT',
@@ -265,7 +265,7 @@ export function MonthView({
                                     className="text-muted-foreground hover:text-foreground hover:bg-muted h-7 w-7 rounded-sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      if (onEditAppointment)
+                                      if (onEditAppointment && event.originalAppointment)
                                         onEditAppointment(event.originalAppointment);
                                     }}
                                   >
