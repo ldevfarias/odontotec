@@ -8,6 +8,7 @@ export { anamnesisDataDtoSchema } from "./anamnesisDataDtoSchema.ts";
 export { appControllerGetHello200Schema, appControllerGetHelloQueryResponseSchema } from "./appControllerGetHelloSchema.ts";
 export { appointmentsControllerCheckAvailability200Schema, appointmentsControllerCheckAvailabilityQueryParamsSchema, appointmentsControllerCheckAvailabilityQueryResponseSchema } from "./appointmentsControllerCheckAvailabilitySchema.ts";
 export { appointmentsControllerCreate201Schema, appointmentsControllerCreate400Schema, appointmentsControllerCreateMutationRequestSchema, appointmentsControllerCreateMutationResponseSchema } from "./appointmentsControllerCreateSchema.ts";
+export { appointmentsControllerCreateWithPatient201Schema, appointmentsControllerCreateWithPatientMutationRequestSchema, appointmentsControllerCreateWithPatientMutationResponseSchema } from "./appointmentsControllerCreateWithPatientSchema.ts";
 export { appointmentsControllerFindAll200Schema, appointmentsControllerFindAllQueryParamsSchema, appointmentsControllerFindAllQueryResponseSchema } from "./appointmentsControllerFindAllSchema.ts";
 export { appointmentsControllerFindOne200Schema, appointmentsControllerFindOnePathParamsSchema, appointmentsControllerFindOneQueryResponseSchema } from "./appointmentsControllerFindOneSchema.ts";
 export { appointmentsControllerGetAvailableSlots200Schema, appointmentsControllerGetAvailableSlotsQueryParamsSchema, appointmentsControllerGetAvailableSlotsQueryResponseSchema } from "./appointmentsControllerGetAvailableSlotsSchema.ts";
@@ -44,6 +45,7 @@ export { clinicsControllerUploadLogo200Schema, clinicsControllerUploadLogoMutati
 export { completeClinicDtoSchema } from "./completeClinicDtoSchema.ts";
 export { createAnamnesisDtoSchema } from "./createAnamnesisDtoSchema.ts";
 export { createAppointmentDtoSchema } from "./createAppointmentDtoSchema.ts";
+export { createAppointmentWithPatientDtoSchema } from "./createAppointmentWithPatientDtoSchema.ts";
 export { createBudgetDtoSchema } from "./createBudgetDtoSchema.ts";
 export { createClinicDtoSchema } from "./createClinicDtoSchema.ts";
 export { createClinicProcedureDtoSchema } from "./createClinicProcedureDtoSchema.ts";

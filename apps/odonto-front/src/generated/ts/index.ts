@@ -8,6 +8,7 @@ export type { AnamnesisDataDto } from "./AnamnesisDataDto.ts";
 export type { AppControllerGetHello200, AppControllerGetHelloQuery, AppControllerGetHelloQueryResponse } from "./AppControllerGetHello.ts";
 export type { AppointmentsControllerCheckAvailability200, AppointmentsControllerCheckAvailabilityQuery, AppointmentsControllerCheckAvailabilityQueryParams, AppointmentsControllerCheckAvailabilityQueryResponse } from "./AppointmentsControllerCheckAvailability.ts";
 export type { AppointmentsControllerCreate201, AppointmentsControllerCreate400, AppointmentsControllerCreateMutation, AppointmentsControllerCreateMutationRequest, AppointmentsControllerCreateMutationResponse } from "./AppointmentsControllerCreate.ts";
+export type { AppointmentsControllerCreateWithPatient201, AppointmentsControllerCreateWithPatientMutation, AppointmentsControllerCreateWithPatientMutationRequest, AppointmentsControllerCreateWithPatientMutationResponse } from "./AppointmentsControllerCreateWithPatient.ts";
 export type { AppointmentsControllerFindAll200, AppointmentsControllerFindAllQuery, AppointmentsControllerFindAllQueryParams, AppointmentsControllerFindAllQueryResponse } from "./AppointmentsControllerFindAll.ts";
 export type { AppointmentsControllerFindOne200, AppointmentsControllerFindOnePathParams, AppointmentsControllerFindOneQuery, AppointmentsControllerFindOneQueryResponse } from "./AppointmentsControllerFindOne.ts";
 export type { AppointmentsControllerGetAvailableSlots200, AppointmentsControllerGetAvailableSlotsQuery, AppointmentsControllerGetAvailableSlotsQueryParams, AppointmentsControllerGetAvailableSlotsQueryResponse } from "./AppointmentsControllerGetAvailableSlots.ts";
@@ -44,6 +45,7 @@ export type { ClinicsControllerUploadLogo200, ClinicsControllerUploadLogoMutatio
 export type { CompleteClinicDto } from "./CompleteClinicDto.ts";
 export type { CreateAnamnesisDto } from "./CreateAnamnesisDto.ts";
 export type { CreateAppointmentDto } from "./CreateAppointmentDto.ts";
+export type { CreateAppointmentWithPatientDto } from "./CreateAppointmentWithPatientDto.ts";
 export type { CreateBudgetDto } from "./CreateBudgetDto.ts";
 export type { CreateClinicDto } from "./CreateClinicDto.ts";
 export type { CreateClinicProcedureDto, CreateClinicProcedureDtoSelectionModeEnumKey } from "./CreateClinicProcedureDto.ts";

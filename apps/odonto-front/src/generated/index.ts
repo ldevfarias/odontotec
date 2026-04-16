@@ -10,6 +10,7 @@ export type { AppControllerGetHelloSuspenseQueryKey } from "./hooks/useAppContro
 export type { AppointmentsControllerCheckAvailabilityQueryKey } from "./hooks/useAppointmentsControllerCheckAvailability.ts";
 export type { AppointmentsControllerCheckAvailabilitySuspenseQueryKey } from "./hooks/useAppointmentsControllerCheckAvailabilitySuspense.ts";
 export type { AppointmentsControllerCreateMutationKey } from "./hooks/useAppointmentsControllerCreate.ts";
+export type { AppointmentsControllerCreateWithPatientMutationKey } from "./hooks/useAppointmentsControllerCreateWithPatient.ts";
 export type { AppointmentsControllerFindAllQueryKey } from "./hooks/useAppointmentsControllerFindAll.ts";
 export type { AppointmentsControllerFindAllSuspenseQueryKey } from "./hooks/useAppointmentsControllerFindAllSuspense.ts";
 export type { AppointmentsControllerFindOneQueryKey } from "./hooks/useAppointmentsControllerFindOne.ts";
@@ -133,6 +134,7 @@ export type { AnamnesisDataDto } from "./ts/AnamnesisDataDto.ts";
 export type { AppControllerGetHello200, AppControllerGetHelloQuery, AppControllerGetHelloQueryResponse } from "./ts/AppControllerGetHello.ts";
 export type { AppointmentsControllerCheckAvailability200, AppointmentsControllerCheckAvailabilityQuery, AppointmentsControllerCheckAvailabilityQueryParams, AppointmentsControllerCheckAvailabilityQueryResponse } from "./ts/AppointmentsControllerCheckAvailability.ts";
 export type { AppointmentsControllerCreate201, AppointmentsControllerCreate400, AppointmentsControllerCreateMutation, AppointmentsControllerCreateMutationRequest, AppointmentsControllerCreateMutationResponse } from "./ts/AppointmentsControllerCreate.ts";
+export type { AppointmentsControllerCreateWithPatient201, AppointmentsControllerCreateWithPatientMutation, AppointmentsControllerCreateWithPatientMutationRequest, AppointmentsControllerCreateWithPatientMutationResponse } from "./ts/AppointmentsControllerCreateWithPatient.ts";
 export type { AppointmentsControllerFindAll200, AppointmentsControllerFindAllQuery, AppointmentsControllerFindAllQueryParams, AppointmentsControllerFindAllQueryResponse } from "./ts/AppointmentsControllerFindAll.ts";
 export type { AppointmentsControllerFindOne200, AppointmentsControllerFindOnePathParams, AppointmentsControllerFindOneQuery, AppointmentsControllerFindOneQueryResponse } from "./ts/AppointmentsControllerFindOne.ts";
 export type { AppointmentsControllerGetAvailableSlots200, AppointmentsControllerGetAvailableSlotsQuery, AppointmentsControllerGetAvailableSlotsQueryParams, AppointmentsControllerGetAvailableSlotsQueryResponse } from "./ts/AppointmentsControllerGetAvailableSlots.ts";
@@ -169,6 +171,7 @@ export type { ClinicsControllerUploadLogo200, ClinicsControllerUploadLogoMutatio
 export type { CompleteClinicDto } from "./ts/CompleteClinicDto.ts";
 export type { CreateAnamnesisDto } from "./ts/CreateAnamnesisDto.ts";
 export type { CreateAppointmentDto } from "./ts/CreateAppointmentDto.ts";
+export type { CreateAppointmentWithPatientDto } from "./ts/CreateAppointmentWithPatientDto.ts";
 export type { CreateBudgetDto } from "./ts/CreateBudgetDto.ts";
 export type { CreateClinicDto } from "./ts/CreateClinicDto.ts";
 export type { CreateClinicProcedureDto, CreateClinicProcedureDtoSelectionModeEnumKey } from "./ts/CreateClinicProcedureDto.ts";
@@ -259,6 +262,7 @@ export { anamnesisControllerUpdate } from "./clients/anamnesisControllerUpdate.t
 export { appControllerGetHello } from "./clients/appControllerGetHello.ts";
 export { appointmentsControllerCheckAvailability } from "./clients/appointmentsControllerCheckAvailability.ts";
 export { appointmentsControllerCreate } from "./clients/appointmentsControllerCreate.ts";
+export { appointmentsControllerCreateWithPatient } from "./clients/appointmentsControllerCreateWithPatient.ts";
 export { appointmentsControllerFindAll } from "./clients/appointmentsControllerFindAll.ts";
 export { appointmentsControllerFindOne } from "./clients/appointmentsControllerFindOne.ts";
 export { appointmentsControllerGetAvailableSlots } from "./clients/appointmentsControllerGetAvailableSlots.ts";
@@ -378,6 +382,9 @@ export { useAppointmentsControllerCheckAvailabilitySuspense } from "./hooks/useA
 export { appointmentsControllerCreateMutationKey } from "./hooks/useAppointmentsControllerCreate.ts";
 export { appointmentsControllerCreateMutationOptions } from "./hooks/useAppointmentsControllerCreate.ts";
 export { useAppointmentsControllerCreate } from "./hooks/useAppointmentsControllerCreate.ts";
+export { appointmentsControllerCreateWithPatientMutationKey } from "./hooks/useAppointmentsControllerCreateWithPatient.ts";
+export { appointmentsControllerCreateWithPatientMutationOptions } from "./hooks/useAppointmentsControllerCreateWithPatient.ts";
+export { useAppointmentsControllerCreateWithPatient } from "./hooks/useAppointmentsControllerCreateWithPatient.ts";
 export { appointmentsControllerFindAllQueryKey } from "./hooks/useAppointmentsControllerFindAll.ts";
 export { appointmentsControllerFindAllQueryOptions } from "./hooks/useAppointmentsControllerFindAll.ts";
 export { useAppointmentsControllerFindAll } from "./hooks/useAppointmentsControllerFindAll.ts";
@@ -742,6 +749,7 @@ export { anamnesisDataDtoSchema } from "./zod/anamnesisDataDtoSchema.ts";
 export { appControllerGetHello200Schema, appControllerGetHelloQueryResponseSchema } from "./zod/appControllerGetHelloSchema.ts";
 export { appointmentsControllerCheckAvailability200Schema, appointmentsControllerCheckAvailabilityQueryParamsSchema, appointmentsControllerCheckAvailabilityQueryResponseSchema } from "./zod/appointmentsControllerCheckAvailabilitySchema.ts";
 export { appointmentsControllerCreate201Schema, appointmentsControllerCreate400Schema, appointmentsControllerCreateMutationRequestSchema, appointmentsControllerCreateMutationResponseSchema } from "./zod/appointmentsControllerCreateSchema.ts";
+export { appointmentsControllerCreateWithPatient201Schema, appointmentsControllerCreateWithPatientMutationRequestSchema, appointmentsControllerCreateWithPatientMutationResponseSchema } from "./zod/appointmentsControllerCreateWithPatientSchema.ts";
 export { appointmentsControllerFindAll200Schema, appointmentsControllerFindAllQueryParamsSchema, appointmentsControllerFindAllQueryResponseSchema } from "./zod/appointmentsControllerFindAllSchema.ts";
 export { appointmentsControllerFindOne200Schema, appointmentsControllerFindOnePathParamsSchema, appointmentsControllerFindOneQueryResponseSchema } from "./zod/appointmentsControllerFindOneSchema.ts";
 export { appointmentsControllerGetAvailableSlots200Schema, appointmentsControllerGetAvailableSlotsQueryParamsSchema, appointmentsControllerGetAvailableSlotsQueryResponseSchema } from "./zod/appointmentsControllerGetAvailableSlotsSchema.ts";
@@ -778,6 +786,7 @@ export { clinicsControllerUploadLogo200Schema, clinicsControllerUploadLogoMutati
 export { completeClinicDtoSchema } from "./zod/completeClinicDtoSchema.ts";
 export { createAnamnesisDtoSchema } from "./zod/createAnamnesisDtoSchema.ts";
 export { createAppointmentDtoSchema } from "./zod/createAppointmentDtoSchema.ts";
+export { createAppointmentWithPatientDtoSchema } from "./zod/createAppointmentWithPatientDtoSchema.ts";
 export { createBudgetDtoSchema } from "./zod/createBudgetDtoSchema.ts";
 export { createClinicDtoSchema } from "./zod/createClinicDtoSchema.ts";
 export { createClinicProcedureDtoSchema } from "./zod/createClinicProcedureDtoSchema.ts";

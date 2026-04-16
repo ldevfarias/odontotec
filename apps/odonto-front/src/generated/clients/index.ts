@@ -6,6 +6,7 @@ export { anamnesisControllerUpdate } from "./anamnesisControllerUpdate.ts";
 export { appControllerGetHello } from "./appControllerGetHello.ts";
 export { appointmentsControllerCheckAvailability } from "./appointmentsControllerCheckAvailability.ts";
 export { appointmentsControllerCreate } from "./appointmentsControllerCreate.ts";
+export { appointmentsControllerCreateWithPatient } from "./appointmentsControllerCreateWithPatient.ts";
 export { appointmentsControllerFindAll } from "./appointmentsControllerFindAll.ts";
 export { appointmentsControllerFindOne } from "./appointmentsControllerFindOne.ts";
 export { appointmentsControllerGetAvailableSlots } from "./appointmentsControllerGetAvailableSlots.ts";
