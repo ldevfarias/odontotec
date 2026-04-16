@@ -1,6 +1,8 @@
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Plus, X } from 'lucide-react';
+import { useState } from 'react';
 import { type Control } from 'react-hook-form';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -21,6 +23,9 @@ interface PatientComboboxFieldProps {
   patients: PatientRecord[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  pendingPatientName?: string;
+  onCreateNew?: (name: string) => void;
+  onClearNewPatient?: () => void;
 }
 
 export function PatientComboboxField({
@@ -28,7 +33,35 @@ export function PatientComboboxField({
   patients,
   open,
   onOpenChange,
+  pendingPatientName,
+  onCreateNew,
+  onClearNewPatient,
 }: PatientComboboxFieldProps) {
+  const [searchValue, setSearchValue] = useState('');
+
+  if (pendingPatientName) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-sm font-medium">Paciente</span>
+        <div className="flex items-center justify-between rounded-xl border px-3 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{pendingPatientName}</span>
+            <Badge variant="secondary" className="text-xs">Novo</Badge>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
+            onClick={onClearNewPatient}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <FormField
       control={control}
@@ -56,9 +89,32 @@ export function PatientComboboxField({
             </PopoverTrigger>
             <PopoverContent className="w-[450px] p-0" align="start">
               <Command>
-                <CommandInput placeholder="Buscar paciente..." />
+                <CommandInput
+                  placeholder="Buscar paciente..."
+                  value={searchValue}
+                  onValueChange={setSearchValue}
+                />
                 <CommandList>
-                  <CommandEmpty>Paciente não encontrado.</CommandEmpty>
+                  <CommandEmpty>
+                    {searchValue.trim() ? (
+                      <CommandItem
+                        value={`__create__${searchValue}`}
+                        onSelect={() => {
+                          onCreateNew?.(searchValue.trim());
+                          setSearchValue('');
+                          onOpenChange(false);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Criar &quot;{searchValue.trim()}&quot; como novo paciente
+                      </CommandItem>
+                    ) : (
+                      <p className="py-6 text-center text-sm text-muted-foreground">
+                        Paciente não encontrado.
+                      </p>
+                    )}
+                  </CommandEmpty>
                   <CommandGroup>
                     {patients.map((patient) => (
                       <CommandItem
@@ -66,6 +122,7 @@ export function PatientComboboxField({
                         key={patient.id}
                         onSelect={() => {
                           field.onChange(patient.id);
+                          setSearchValue('');
                           onOpenChange(false);
                         }}
                       >
