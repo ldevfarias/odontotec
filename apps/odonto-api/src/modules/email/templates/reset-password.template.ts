@@ -1,16 +1,16 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export function getResetPasswordEmailTemplate(
-    userName: string,
-    resetUrl: string,
-    expiresInParams: string = '1 hora',
+  userName: string,
+  resetUrl: string,
+  expiresInParams: string = '1 hora',
 ): { subject: string; html: string } {
-    const subject = `Redefinição de Senha - OdontoEhTec 🔒`;
+  const subject = `Redefinição de Senha - OdontoEhTec 🔒`;
 
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Segurança da Conta',
-        content: `
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Segurança da Conta',
+    content: `
             <p class="paragraph">Olá, <strong>${userName}</strong>!</p>
             
             <p class="paragraph">
@@ -40,9 +40,9 @@ export function getResetPasswordEmailTemplate(
                 <a href="${resetUrl}" class="link-url">${resetUrl}</a>
             </div>
         `,
-        footerNote: 'Este é um e-mail de segurança de OdontoEhTec. Ocultamos detalhes para sua proteção.',
-    });
+    footerNote:
+      'Este é um e-mail de segurança de OdontoEhTec. Ocultamos detalhes para sua proteção.',
+  });
 
-    return { subject, html };
+  return { subject, html };
 }
-

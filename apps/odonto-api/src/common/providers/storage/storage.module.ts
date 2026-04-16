@@ -6,19 +6,19 @@ import { S3StorageProvider } from './s3-storage.provider';
 
 @Global()
 @Module({
-    providers: [
-        {
-            provide: STORAGE_PROVIDER,
-            useFactory: (configService: ConfigService) => {
-                const storageType = configService.get<string>('STORAGE_TYPE');
-                if (storageType === 's3' || storageType === 'r2') {
-                    return new S3StorageProvider(configService);
-                }
-                return new LocalStorageProvider(configService);
-            },
-            inject: [ConfigService],
-        },
-    ],
-    exports: [STORAGE_PROVIDER],
+  providers: [
+    {
+      provide: STORAGE_PROVIDER,
+      useFactory: (configService: ConfigService) => {
+        const storageType = configService.get<string>('STORAGE_TYPE');
+        if (storageType === 's3' || storageType === 'r2') {
+          return new S3StorageProvider(configService);
+        }
+        return new LocalStorageProvider(configService);
+      },
+      inject: [ConfigService],
+    },
+  ],
+  exports: [STORAGE_PROVIDER],
 })
-export class StorageModule { }
+export class StorageModule {}

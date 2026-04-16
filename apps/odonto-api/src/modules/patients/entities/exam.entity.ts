@@ -1,41 +1,49 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Patient } from './patient.entity';
 import { Clinic } from '../../clinics/entities/clinic.entity';
 
 @Entity('exams')
 export class Exam {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column({ nullable: true })
-    description: string;
+  @Column({ nullable: true })
+  description: string;
 
-    @Column()
-    fileUrl: string;
+  @Column()
+  fileUrl: string;
 
-    @Column()
-    fileType: string; // image/jpeg, application/pdf, etc.
+  @Column()
+  fileType: string; // image/jpeg, application/pdf, etc.
 
-    @Column({ name: 'patient_id' })
-    patientId: number;
+  @Column({ name: 'patient_id' })
+  patientId: number;
 
-    @ManyToOne(() => Patient)
-    @JoinColumn({ name: 'patient_id' })
-    patient: Patient;
+  @ManyToOne(() => Patient)
+  @JoinColumn({ name: 'patient_id' })
+  patient: Patient;
 
-    @Column({ name: 'clinic_id' })
-    clinicId: number;
+  @Column({ name: 'clinic_id' })
+  clinicId: number;
 
-    @ManyToOne(() => Clinic)
-    @JoinColumn({ name: 'clinic_id' })
-    clinic: Clinic;
+  @ManyToOne(() => Clinic)
+  @JoinColumn({ name: 'clinic_id' })
+  clinic: Clinic;
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-    @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

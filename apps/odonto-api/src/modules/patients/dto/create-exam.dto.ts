@@ -3,19 +3,19 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateExamDto {
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
-    @ApiPropertyOptional()
-    @IsString()
-    @IsOptional()
-    description?: string;
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  description?: string;
 
-    @ApiProperty()
-    @IsNumber()
-    @IsNotEmpty()
-    @Type(() => Number)
-    patientId: number;
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  @Type(() => Number)
+  patientId: number;
 }

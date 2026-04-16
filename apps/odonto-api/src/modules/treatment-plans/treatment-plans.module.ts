@@ -7,9 +7,11 @@ import { TreatmentPlanItem } from './entities/treatment-plan-item.entity';
 import { Payment } from '../patients/entities/payment.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([TreatmentPlan, TreatmentPlanItem, Payment])],
-    controllers: [TreatmentPlansController],
-    providers: [TreatmentPlansService],
-    exports: [TreatmentPlansService],
+  imports: [
+    TypeOrmModule.forFeature([TreatmentPlan, TreatmentPlanItem, Payment]),
+  ],
+  controllers: [TreatmentPlansController],
+  providers: [TreatmentPlansService],
+  exports: [TreatmentPlansService],
 })
-export class TreatmentPlansModule { }
+export class TreatmentPlansModule {}

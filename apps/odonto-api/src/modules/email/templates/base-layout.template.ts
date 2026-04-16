@@ -1,21 +1,21 @@
 export interface EmailLayoutOptions {
-    title: string;
-    headerTitle: string;
-    headerSubtitle?: string;
-    content: string;
-    footerNote?: string;
+  title: string;
+  headerTitle: string;
+  headerSubtitle?: string;
+  content: string;
+  footerNote?: string;
 }
 
 export function renderEmailLayout({
-    title,
-    headerTitle,
-    headerSubtitle = 'Sistema de Gestão Odontológica',
-    content,
-    footerNote,
+  title,
+  headerTitle,
+  headerSubtitle = 'Sistema de Gestão Odontológica',
+  content,
+  footerNote,
 }: EmailLayoutOptions): string {
-    const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
 
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

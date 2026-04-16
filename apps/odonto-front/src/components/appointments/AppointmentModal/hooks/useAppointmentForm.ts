@@ -153,7 +153,6 @@ export function useAppointmentForm({
       ? form.formState.isValid && newPatientPhone.replace(/\D/g, '').length >= 10
       : form.formState.isValid && watchPatient > 0;
 
-
   function handleCreateNew(name: string) {
     setNewPatientName(name);
     setNewPatientPhone('');

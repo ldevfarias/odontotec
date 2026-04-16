@@ -1,16 +1,16 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export function getSubscriptionProActivatedEmailTemplate(
-    adminName: string,
-    clinicName: string,
-    dashboardUrl: string,
+  adminName: string,
+  clinicName: string,
+  dashboardUrl: string,
 ): { subject: string; html: string } {
-    const subject = `Sua clínica agora é PRO! Bem-vindo(a) ao plano completo`;
+  const subject = `Sua clínica agora é PRO! Bem-vindo(a) ao plano completo`;
 
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Plano PRO Ativado!',
-        content: `
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Plano PRO Ativado!',
+    content: `
             <p class="paragraph">Olá, <strong>${adminName}</strong>!</p>
 
             <p class="paragraph">
@@ -42,8 +42,9 @@ export function getSubscriptionProActivatedEmailTemplate(
                 aproveite ao máximo cada recurso disponível.
             </p>
         `,
-        footerNote: 'Você recebeu este e-mail porque ativou o plano PRO na OdontoEhTec.',
-    });
+    footerNote:
+      'Você recebeu este e-mail porque ativou o plano PRO na OdontoEhTec.',
+  });
 
-    return { subject, html };
+  return { subject, html };
 }

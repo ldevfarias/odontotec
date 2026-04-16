@@ -1,6 +1,13 @@
 import {
-    Controller, Get, Post, Body, Param,
-    Delete, UseGuards, ParseIntPipe, HttpCode,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -16,33 +23,27 @@ import { CreateToothObservationDto } from '../dto/create-tooth-observation.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tooth-observations')
 export class ToothObservationsController {
-    constructor(private readonly service: ToothObservationsService) {}
+  constructor(private readonly service: ToothObservationsService) {}
 
-    @Post()
-    @Roles(UserRole.ADMIN, UserRole.DENTIST)
-    create(
-        @Body() dto: CreateToothObservationDto,
-        @Tenant() clinicId: number,
-    ) {
-        return this.service.create(dto, clinicId);
-    }
+  @Post()
+  @Roles(UserRole.ADMIN, UserRole.DENTIST)
+  create(@Body() dto: CreateToothObservationDto, @Tenant() clinicId: number) {
+    return this.service.create(dto, clinicId);
+  }
 
-    @Get('patient/:patientId')
-    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
-    findAllByPatient(
-        @Param('patientId', ParseIntPipe) patientId: number,
-        @Tenant() clinicId: number,
-    ) {
-        return this.service.findAllByPatient(patientId, clinicId);
-    }
+  @Get('patient/:patientId')
+  @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
+  findAllByPatient(
+    @Param('patientId', ParseIntPipe) patientId: number,
+    @Tenant() clinicId: number,
+  ) {
+    return this.service.findAllByPatient(patientId, clinicId);
+  }
 
-    @Delete(':id')
-    @HttpCode(204)
-    @Roles(UserRole.ADMIN, UserRole.DENTIST)
-    remove(
-        @Param('id', ParseIntPipe) id: number,
-        @Tenant() clinicId: number,
-    ) {
-        return this.service.remove(id, clinicId);
-    }
+  @Delete(':id')
+  @HttpCode(204)
+  @Roles(UserRole.ADMIN, UserRole.DENTIST)
+  remove(@Param('id', ParseIntPipe) id: number, @Tenant() clinicId: number) {
+    return this.service.remove(id, clinicId);
+  }
 }

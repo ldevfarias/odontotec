@@ -5,6 +5,7 @@ Este arquivo fornece orientacao ao GitHub Copilot ao trabalhar com o codigo nest
 ## AI-SDLC & Engenharia de Software
 
 **IMPORTANTE:** Todas as interacoes devem seguir rigorosamente o padrao definido em **[AI-SDLC.md](../AI-SDLC.md)**. O foco deve ser em:
+
 - **TDD Primeiro:** Escrever testes antes do codigo de producao.
 - **SDD:** Contratos de API (OpenAPI) como fonte da verdade.
 - **Engenharia de Software:** Aplicacao de SOLID, Clean Code e padroes de design.
@@ -12,6 +13,7 @@ Este arquivo fornece orientacao ao GitHub Copilot ao trabalhar com o codigo nest
 ## Project Overview
 
 OdontoTec is a multi-tenant dental clinic management SaaS. It's a Turbo monorepo with three apps:
+
 - `apps/odonto-api` - NestJS REST API (port 3000)
 - `apps/odonto-front` - Next.js 16 frontend dashboard (port 3001)
 - `apps/landing` - Next.js 16 marketing landing page (port 3002)
@@ -19,6 +21,7 @@ OdontoTec is a multi-tenant dental clinic management SaaS. It's a Turbo monorepo
 ## Commands
 
 ### Root (Turbo - runs all apps in parallel)
+
 ```bash
 npm run dev          # Start all apps
 npm run build        # Build all apps
@@ -28,6 +31,7 @@ npm run clean-ports  # Kill processes on 3000, 3001
 ```
 
 ### odonto-api
+
 ```bash
 npm run start:dev          # Watch mode
 npm run build              # Compile to dist/
@@ -40,6 +44,7 @@ npm run lint               # ESLint --fix
 ```
 
 ### odonto-front
+
 ```bash
 npm run dev    # Start on port 3001
 npm run build  # Next.js production build
@@ -50,11 +55,13 @@ npm run kubb   # Regenerate API clients from openapi.json
 ## Architecture
 
 ### Multi-Tenancy
+
 Shared database, shared schema. Every entity has a `clinicId` FK. Isolation is enforced at the service layer by filtering all queries by `clinicId`. The frontend sends `X-Clinic-Id` header on every request (set by axios interceptor from sessionStorage). The `@Tenant()` decorator extracts it server-side. A `TenancyInterceptor` validates response data stays within the clinic's scope.
 
 Guard execution order: `ThrottlerGuard -> SubscriptionGuard -> ClinicMembershipGuard`
 
 ### Authentication Flow
+
 - Login -> JWT access token (15m) + refresh token (7d), both set as HttpOnly cookies
 - Frontend axios interceptor auto-calls `/auth/refresh` on 401, then retries the original request
 - `middleware.ts` in odonto-front uses `jwtVerify` to protect routes before rendering
@@ -62,7 +69,9 @@ Guard execution order: `ThrottlerGuard -> SubscriptionGuard -> ClinicMembershipG
 - Three roles: `ADMIN`, `DENTIST`, `SIMPLE` (receptionist)
 
 ### API Client Generation (Kubb)
+
 The frontend does **not** manually write API clients. Kubb reads `apps/odonto-api/openapi.json` and generates into `apps/odonto-front/src/generated/`:
+
 - `clients/` - Axios clients
 - `hooks/` - React Query hooks
 - `ts/` - TypeScript types
@@ -71,19 +80,23 @@ The frontend does **not** manually write API clients. Kubb reads `apps/odonto-ap
 **Workflow**: Modify API -> `npm run generate:openapi` in odonto-api -> `npm run kubb` in odonto-front -> use generated hooks.
 
 ### State Management (Frontend)
+
 - `AuthContext` - user identity, list of clinics, active clinic
 - `SubscriptionContext` - current plan status (gates features via `SubscriptionBlocker`)
 - React Query (TanStack) - all server state; prefer generated hooks from `src/generated/hooks/`
 
 ### Notification Pattern
+
 Use `notificationService` (Sonner wrapper at `src/services/notification.service.ts`), not raw `toast()` calls.
 
 ### Analytics
+
 `useAnalytics` hook wraps PostHog. Track events like `patient_created`, `appointment_created`, `payment_registered` on significant user actions.
 
 ## Environment Setup
 
 **apps/odonto-api/.env**
+
 ```env
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5434
@@ -97,6 +110,7 @@ FRONTEND_URL=http://localhost:3001
 ```
 
 **apps/odonto-front/.env.local**
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3000
 NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=phc_...
@@ -112,6 +126,7 @@ OdontoTec uses **TypeORM migrations** for database schema management in producti
 ### Migration Workflow
 
 **For Developers:**
+
 1. Modify entities in `apps/odonto-api/src/modules/*/entities/*.entity.ts`
 2. Locally, the app uses `synchronize: true` (in dev only) to auto-sync schema
 3. When ready to commit:
@@ -121,6 +136,7 @@ OdontoTec uses **TypeORM migrations** for database schema management in producti
    - Commit both the entity and migration files
 
 **For Deployment (Fly.io):**
+
 - `fly.toml` defines the release command: `node dist/src/run-migrations.js`, which runs before the new version goes live
 - This connects to the Fly.io database and applies all pending migrations
 - Migrations are tracked in the `typeorm_migrations` table to prevent re-running
@@ -164,6 +180,7 @@ npm run migrate                                # Build + run migrations (used in
 CI pipeline (`.github/workflows/deploy.yml`): lint -> type-check -> build API -> build frontend -> deploy to Fly.io.
 
 ### Fly.io Deploy Notes
+
 - Config: `fly.toml` at repo root
 - Migrations run automatically via `release_command` before each deploy
 - `auto_stop_machines = "stop"` and `min_machines_running = 0` - machine sleeps when idle to stay in free tier (cold start ~1-3s)

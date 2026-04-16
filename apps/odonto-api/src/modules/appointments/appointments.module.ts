@@ -9,13 +9,13 @@ import { Clinic } from '../clinics/entities/clinic.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Appointment, Patient, Clinic]),
-        AuthModule,
-        NotificationsModule
-    ],
-    controllers: [AppointmentsController],
-    providers: [AppointmentsService],
-    exports: [AppointmentsService],
+  imports: [
+    TypeOrmModule.forFeature([Appointment, Patient, Clinic]),
+    AuthModule,
+    NotificationsModule,
+  ],
+  controllers: [AppointmentsController],
+  providers: [AppointmentsService],
+  exports: [AppointmentsService],
 })
-export class AppointmentsModule { }
+export class AppointmentsModule {}

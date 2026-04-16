@@ -6,12 +6,8 @@ import { PatientsModule } from '../patients/patients.module';
 import { TreatmentPlansModule } from '../treatment-plans/treatment-plans.module';
 
 @Module({
-    imports: [
-        AppointmentsModule,
-        PatientsModule,
-        TreatmentPlansModule
-    ],
-    controllers: [DashboardController],
-    providers: [DashboardService],
+  imports: [AppointmentsModule, PatientsModule, TreatmentPlansModule],
+  controllers: [DashboardController],
+  providers: [DashboardService],
 })
-export class DashboardModule { }
+export class DashboardModule {}

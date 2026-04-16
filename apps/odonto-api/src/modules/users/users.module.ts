@@ -9,9 +9,17 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, UserInvitation, PendingRegistration, Clinic, ClinicMembership])],
-    controllers: [UsersController],
-    providers: [UsersService],
-    exports: [TypeOrmModule, UsersService],
+  imports: [
+    TypeOrmModule.forFeature([
+      User,
+      UserInvitation,
+      PendingRegistration,
+      Clinic,
+      ClinicMembership,
+    ]),
+  ],
+  controllers: [UsersController],
+  providers: [UsersService],
+  exports: [TypeOrmModule, UsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

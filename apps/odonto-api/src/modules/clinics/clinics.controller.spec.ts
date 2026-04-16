@@ -9,7 +9,12 @@ describe('ClinicsController - uploadLogo', () => {
   let mockService: { updateLogo: jest.Mock };
 
   beforeEach(async () => {
-    mockStorage = { upload: jest.fn().mockResolvedValue('https://cdn.example.com/clinics/5/logos/uuid.png'), delete: jest.fn() };
+    mockStorage = {
+      upload: jest
+        .fn()
+        .mockResolvedValue('https://cdn.example.com/clinics/5/logos/uuid.png'),
+      delete: jest.fn(),
+    };
     mockService = { updateLogo: jest.fn().mockResolvedValue({}) };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -25,7 +30,11 @@ describe('ClinicsController - uploadLogo', () => {
 
   it('uploads logo scoped under clinics/{clinicId}/logos', async () => {
     const req = { user: { userId: 1 }, headers: { 'x-clinic-id': '5' } };
-    const file = { buffer: Buffer.from('img'), originalname: 'logo.png', mimetype: 'image/png' } as Express.Multer.File;
+    const file = {
+      buffer: Buffer.from('img'),
+      originalname: 'logo.png',
+      mimetype: 'image/png',
+    } as Express.Multer.File;
 
     await controller.uploadLogo(req as any, file);
 
