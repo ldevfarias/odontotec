@@ -9,7 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Form } from '@/components/ui/form';
+import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 import { DateField } from './components/DateField';
 import { DentistComboboxField } from './components/DentistComboboxField';
@@ -36,6 +37,13 @@ export function AppointmentModal(props: AppointmentModalProps) {
     setIsPatientPopoverOpen,
     isDentistPopoverOpen,
     setIsDentistPopoverOpen,
+    newPatientName,
+    newPatientPhone,
+    setNewPatientPhone,
+    handleCreateNew,
+    handleClearNewPatient,
+    isFormReady,
+    phoneMask,
   } = useAppointmentForm(props);
 
   return (
@@ -57,7 +65,24 @@ export function AppointmentModal(props: AppointmentModalProps) {
               patients={patients}
               open={isPatientPopoverOpen}
               onOpenChange={setIsPatientPopoverOpen}
+              pendingPatientName={newPatientName ?? undefined}
+              onCreateNew={handleCreateNew}
+              onClearNewPatient={handleClearNewPatient}
             />
+
+            {newPatientName && (
+              <FormItem>
+                <FormLabel>Telefone do novo paciente</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="(00) 00000-0000"
+                    maxLength={15}
+                    value={newPatientPhone}
+                    onChange={(e) => setNewPatientPhone(phoneMask(e.target.value))}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
 
             {!isDentist && (
               <DentistComboboxField
@@ -94,7 +119,7 @@ export function AppointmentModal(props: AppointmentModalProps) {
               </Button>
               <Button
                 type="submit"
-                disabled={isPending || !form.formState.isValid || isFetchingSlots}
+                disabled={isPending || !isFormReady || isFetchingSlots}
                 className="rounded-xl px-8"
               >
                 {isPending ? 'Salvando...' : 'Confirmar'}
