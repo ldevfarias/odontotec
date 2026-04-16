@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntP
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AppointmentsService } from './appointments.service';
-import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
+import { CreateAppointmentDto, CreateAppointmentWithPatientDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -36,6 +36,22 @@ export class AppointmentsController {
             createAppointmentDto.dentistId = userId;
         }
         return this.appointmentsService.create(createAppointmentDto, clinicId);
+    }
+
+    @Post('with-patient')
+    @Roles(UserRole.ADMIN, UserRole.SIMPLE, UserRole.DENTIST)
+    @ApiOperation({ summary: 'Create appointment and register new patient atomically' })
+    @ApiResponse({ status: 201, description: 'Appointment and patient created successfully.' })
+    createWithPatient(
+        @Body() dto: CreateAppointmentWithPatientDto,
+        @Tenant() clinicId: number,
+        @CurrentUser('role') role: string,
+        @CurrentUser('userId') userId: number,
+    ) {
+        if (role === UserRole.DENTIST) {
+            dto.dentistId = userId;
+        }
+        return this.appointmentsService.createWithPatient(dto, clinicId);
     }
 
     @Throttle({ default: { limit: 5, ttl: 60000 } })

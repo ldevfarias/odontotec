@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { AppointmentStatus } from '../entities/appointment.entity';
 
 export class CreateAppointmentDto {
@@ -23,6 +23,41 @@ export class CreateAppointmentDto {
     @IsNumber()
     @IsNotEmpty()
     patientId: number;
+}
+
+export class CreateAppointmentWithPatientDto {
+    @ApiProperty({ example: 'João Silva' })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100)
+    patientName: string;
+
+    @ApiProperty({ example: '(11) 99999-9999' })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(20)
+    patientPhone: string;
+
+    @ApiPropertyOptional({ example: 'joao@email.com' })
+    @IsEmail()
+    @IsOptional()
+    patientEmail?: string;
+
+    @ApiProperty({ example: '2026-01-20T10:00:00Z' })
+    @IsDateString()
+    @IsNotEmpty()
+    date: string;
+
+    @ApiProperty({ example: 30 })
+    @IsNumber()
+    @IsOptional()
+    @Min(15)
+    duration?: number;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsNotEmpty()
+    dentistId: number;
 }
 
 export class UpdateAppointmentDto {

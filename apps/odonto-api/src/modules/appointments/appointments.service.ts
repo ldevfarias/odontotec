@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets, DataSource, EntityManager } from 'typeorm';
 import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
-import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
+import { CreateAppointmentDto, CreateAppointmentWithPatientDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { Patient } from '../patients/entities/patient.entity';
@@ -27,49 +27,83 @@ export class AppointmentsService {
 
     async create(createAppointmentDto: CreateAppointmentDto, clinicId: number): Promise<Appointment> {
         return await this.dataSource.transaction(async (manager) => {
-            const { date, duration = 30, dentistId, patientId } = createAppointmentDto;
+            return this._createAppointmentInTransaction(createAppointmentDto, clinicId, manager);
+        });
+    }
 
-            await this.checkConflict(new Date(date), duration, clinicId, dentistId, patientId, undefined, manager);
+    private async _createAppointmentInTransaction(
+        createAppointmentDto: CreateAppointmentDto,
+        clinicId: number,
+        manager: EntityManager,
+    ): Promise<Appointment> {
+        const { date, duration = 30, dentistId, patientId } = createAppointmentDto;
 
-            const appointment = manager.getRepository(Appointment).create({
-                ...createAppointmentDto,
-                duration,
-                clinicId,
-            });
-            const saved = await manager.getRepository(Appointment).save(appointment);
+        await this.checkConflict(new Date(date), duration, clinicId, dentistId, patientId, undefined, manager);
 
-            // Fetch details for email/notifications within transaction to ensure consistency
-            const patient = await manager.getRepository(Patient).findOne({ where: { id: saved.patientId } });
-            const clinic = await manager.getRepository(Clinic).findOne({ where: { id: clinicId } });
-            const dentist = await manager.getRepository('User').findOne({ where: { id: saved.dentistId } }) as any;
+        const appointment = manager.getRepository(Appointment).create({
+            ...createAppointmentDto,
+            duration,
+            clinicId,
+        });
+        const saved = await manager.getRepository(Appointment).save(appointment);
 
-            if (patient?.email) {
-                const token = this.jwtService.sign(
-                    { appointmentId: saved.id, clinicId, action: 'appointment_action' },
-                    { expiresIn: '7d' }
-                );
+        // Fetch details for email/notifications within transaction to ensure consistency
+        const patient = await manager.getRepository(Patient).findOne({ where: { id: saved.patientId } });
+        const clinic = await manager.getRepository(Clinic).findOne({ where: { id: clinicId } });
+        const dentist = await manager.getRepository('User').findOne({ where: { id: saved.dentistId } }) as any;
 
-                this.emailService.sendAppointmentConfirmation(
-                    patient.email,
-                    patient.name,
-                    clinic?.name || 'Clínica',
-                    new Date(saved.date).toLocaleString('pt-BR'),
-                    dentist?.name || 'Profissional',
-                    saved.id,
-                    token
-                );
-            }
-
-            // Notify Dentist
-            const dateStr = new Date(saved.date).toLocaleString('pt-BR');
-            await this.notificationsService.create(
-                `Novo agendamento com ${patient?.name || 'Paciente'} em ${dateStr}.`,
-                clinicId,
-                'INFO',
-                saved.dentistId
+        if (patient?.email) {
+            const token = this.jwtService.sign(
+                { appointmentId: saved.id, clinicId, action: 'appointment_action' },
+                { expiresIn: '7d' }
             );
 
-            return saved;
+            this.emailService.sendAppointmentConfirmation(
+                patient.email,
+                patient.name,
+                clinic?.name || 'Clínica',
+                new Date(saved.date).toLocaleString('pt-BR'),
+                dentist?.name || 'Profissional',
+                saved.id,
+                token
+            );
+        }
+
+        // Notify Dentist
+        const dateStr = new Date(saved.date).toLocaleString('pt-BR');
+        await this.notificationsService.create(
+            `Novo agendamento com ${patient?.name || 'Paciente'} em ${dateStr}.`,
+            clinicId,
+            'INFO',
+            saved.dentistId
+        );
+
+        return saved;
+    }
+
+    async createWithPatient(
+        dto: CreateAppointmentWithPatientDto,
+        clinicId: number,
+    ): Promise<Appointment> {
+        return await this.dataSource.transaction(async (manager) => {
+            const patient = manager.getRepository(Patient).create({
+                name: dto.patientName,
+                phone: dto.patientPhone,
+                email: dto.patientEmail,
+                clinicId,
+            });
+            const savedPatient = await manager.getRepository(Patient).save(patient);
+
+            return this._createAppointmentInTransaction(
+                {
+                    date: dto.date,
+                    duration: dto.duration,
+                    dentistId: dto.dentistId,
+                    patientId: savedPatient.id,
+                },
+                clinicId,
+                manager,
+            );
         });
     }
 

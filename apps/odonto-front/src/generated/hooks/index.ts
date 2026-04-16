@@ -10,6 +10,7 @@ export type { AppControllerGetHelloSuspenseQueryKey } from "./useAppControllerGe
 export type { AppointmentsControllerCheckAvailabilityQueryKey } from "./useAppointmentsControllerCheckAvailability.ts";
 export type { AppointmentsControllerCheckAvailabilitySuspenseQueryKey } from "./useAppointmentsControllerCheckAvailabilitySuspense.ts";
 export type { AppointmentsControllerCreateMutationKey } from "./useAppointmentsControllerCreate.ts";
+export type { AppointmentsControllerCreateWithPatientMutationKey } from "./useAppointmentsControllerCreateWithPatient.ts";
 export type { AppointmentsControllerFindAllQueryKey } from "./useAppointmentsControllerFindAll.ts";
 export type { AppointmentsControllerFindAllSuspenseQueryKey } from "./useAppointmentsControllerFindAllSuspense.ts";
 export type { AppointmentsControllerFindOneQueryKey } from "./useAppointmentsControllerFindOne.ts";
@@ -159,6 +160,9 @@ export { useAppointmentsControllerCheckAvailabilitySuspense } from "./useAppoint
 export { appointmentsControllerCreateMutationKey } from "./useAppointmentsControllerCreate.ts";
 export { appointmentsControllerCreateMutationOptions } from "./useAppointmentsControllerCreate.ts";
 export { useAppointmentsControllerCreate } from "./useAppointmentsControllerCreate.ts";
+export { appointmentsControllerCreateWithPatientMutationKey } from "./useAppointmentsControllerCreateWithPatient.ts";
+export { appointmentsControllerCreateWithPatientMutationOptions } from "./useAppointmentsControllerCreateWithPatient.ts";
+export { useAppointmentsControllerCreateWithPatient } from "./useAppointmentsControllerCreateWithPatient.ts";
 export { appointmentsControllerFindAllQueryKey } from "./useAppointmentsControllerFindAll.ts";
 export { appointmentsControllerFindAllQueryOptions } from "./useAppointmentsControllerFindAll.ts";
 export { useAppointmentsControllerFindAll } from "./useAppointmentsControllerFindAll.ts";

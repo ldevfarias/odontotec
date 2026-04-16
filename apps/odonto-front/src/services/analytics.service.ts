@@ -8,31 +8,31 @@ export const EVENT_NAMES = {
   USER_LOGGED_IN: 'user_logged_in',
   USER_LOGIN_FAILED: 'user_login_failed',
   USER_REGISTERED: 'user_registered',
-  
+
   // Onboarding
   CLINIC_SETUP_COMPLETED: 'clinic_setup_completed',
-  
+
   // Pacientes
   PATIENT_CREATED: 'patient_created',
   PATIENT_DELETED: 'patient_deleted',
-  
+
   // Agendamentos
   APPOINTMENT_CREATED: 'appointment_created',
   APPOINTMENT_UPDATED: 'appointment_updated',
-  
+
   // Financeiro
   PAYMENT_REGISTERED: 'payment_registered',
   TREATMENT_PLAN_STATUS_UPDATED: 'treatment_plan_status_updated',
-  
+
   // SaaS / Assinaturas
   SUBSCRIPTION_CHECKOUT_INITIATED: 'subscription_checkout_initiated',
   SUBSCRIPTION_PORTAL_OPENED: 'subscription_portal_opened',
-  
+
   // Time / Profissionais
   PROFESSIONAL_INVITED: 'professional_invited',
 } as const;
 
-export type EventName = typeof EVENT_NAMES[keyof typeof EVENT_NAMES];
+export type EventName = (typeof EVENT_NAMES)[keyof typeof EVENT_NAMES];
 
 /**
  * Definições de payloads para cada evento (Type Safety)
@@ -44,10 +44,30 @@ interface EventPayloads {
   [EVENT_NAMES.CLINIC_SETUP_COMPLETED]: { clinic_name: string; plan?: string };
   [EVENT_NAMES.PATIENT_CREATED]: { patient_id: number; has_address: boolean };
   [EVENT_NAMES.PATIENT_DELETED]: { patient_id: number };
-  [EVENT_NAMES.APPOINTMENT_CREATED]: { patient_id: number; dentist_id: number; duration: number; date: string };
-  [EVENT_NAMES.APPOINTMENT_UPDATED]: { patient_id: number; dentist_id: number; duration: number; date: string };
-  [EVENT_NAMES.PAYMENT_REGISTERED]: { amount: number; method: string; patient_id: number; treatment_plan_id?: number | null };
-  [EVENT_NAMES.TREATMENT_PLAN_STATUS_UPDATED]: { status: string; patient_id: number; treatment_plan_id: number; new_status?: string };
+  [EVENT_NAMES.APPOINTMENT_CREATED]: {
+    patient_id: number;
+    dentist_id: number;
+    duration: number;
+    date: string;
+  };
+  [EVENT_NAMES.APPOINTMENT_UPDATED]: {
+    patient_id: number;
+    dentist_id: number;
+    duration: number;
+    date: string;
+  };
+  [EVENT_NAMES.PAYMENT_REGISTERED]: {
+    amount: number;
+    method: string;
+    patient_id: number;
+    treatment_plan_id?: number | null;
+  };
+  [EVENT_NAMES.TREATMENT_PLAN_STATUS_UPDATED]: {
+    status: string;
+    patient_id: number;
+    treatment_plan_id: number;
+    new_status?: string;
+  };
   [EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED]: { plan: string };
   [EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED]: Record<string, never>;
   [EVENT_NAMES.PROFESSIONAL_INVITED]: { email: string; role: string };
@@ -83,5 +103,5 @@ export const analytics = {
    */
   captureException(error: any, properties?: Record<string, any>) {
     posthog.captureException(error, properties);
-  }
+  },
 };

@@ -1,74 +1,73 @@
 'use client';
 
+import { CreditCard, ExternalLink, Lock } from 'lucide-react';
 import { useEffect } from 'react';
-import { Lock, CreditCard, ExternalLink } from 'lucide-react';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export function SubscriptionBlocker() {
-    const { isLocked, upgradeToPro, isLoading } = useSubscription();
-    const { user } = useAuth();
+  const { isLocked, upgradeToPro, isLoading } = useSubscription();
+  const { user } = useAuth();
 
-    // Disable scrolling when locked
-    useEffect(() => {
-        if (isLocked) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isLocked]);
+  // Disable scrolling when locked
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isLocked]);
 
-    if (!isLocked) return null;
+  if (!isLocked) return null;
 
-    const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === 'ADMIN';
 
-    return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-            {/* Backdrop with strong blur */}
-            <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      {/* Backdrop with strong blur */}
+      <div className="bg-background/60 absolute inset-0 backdrop-blur-xl" />
 
-            {/* Modal Content */}
-            <div className="relative z-10 w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl border border-gray-100 text-center animate-in fade-in zoom-in-95 duration-300 mx-4">
-                <div className="mx-auto w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
-                    <Lock className="w-8 h-8 text-red-500" />
-                </div>
-
-                <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                    Acesso Temporariamente Bloqueado
-                </h2>
-
-                <p className="text-gray-600 mb-8 leading-relaxed">
-                    {isAdmin
-                        ? 'O período de teste gratuito da sua conta expirou. Para continuar acessando o sistema e seus dados, ative sua assinatura.'
-                        : 'O período de teste desta conta expirou. Entre em contato com o administrador da clínica para regularizar o acesso.'}
-                </p>
-
-                {isAdmin ? (
-                    <div className="space-y-3">
-                        <button
-                            onClick={upgradeToPro}
-                            disabled={isLoading}
-                            className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02]"
-                        >
-                            <CreditCard className="w-5 h-5" />
-                            {isLoading ? 'Processando...' : 'Reativar Assinatura Agora'}
-                        </button>
-                        <p className="text-xs text-muted-foreground mt-4">
-                            Pagamento seguro e cancelamento a qualquer momento.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                        <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
-                            <ExternalLink className="w-4 h-4" />
-                            Aguardando ativação pelo administrador
-                        </p>
-                    </div>
-                )}
-            </div>
+      {/* Modal Content */}
+      <div className="animate-in fade-in zoom-in-95 relative z-10 mx-4 w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-2xl duration-300">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+          <Lock className="h-8 w-8 text-red-500" />
         </div>
-    );
+
+        <h2 className="mb-3 text-2xl font-bold text-gray-900">Acesso Temporariamente Bloqueado</h2>
+
+        <p className="mb-8 leading-relaxed text-gray-600">
+          {isAdmin
+            ? 'O período de teste gratuito da sua conta expirou. Para continuar acessando o sistema e seus dados, ative sua assinatura.'
+            : 'O período de teste desta conta expirou. Entre em contato com o administrador da clínica para regularizar o acesso.'}
+        </p>
+
+        {isAdmin ? (
+          <div className="space-y-3">
+            <button
+              onClick={upgradeToPro}
+              disabled={isLoading}
+              className="bg-primary hover:bg-primary/90 shadow-primary/20 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white shadow-lg transition-all hover:scale-[1.02]"
+            >
+              <CreditCard className="h-5 w-5" />
+              {isLoading ? 'Processando...' : 'Reativar Assinatura Agora'}
+            </button>
+            <p className="text-muted-foreground mt-4 text-xs">
+              Pagamento seguro e cancelamento a qualquer momento.
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <p className="flex items-center justify-center gap-2 text-sm font-medium text-gray-600">
+              <ExternalLink className="h-4 w-4" />
+              Aguardando ativação pelo administrador
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

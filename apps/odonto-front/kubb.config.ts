@@ -1,9 +1,9 @@
-import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
-import { pluginClient } from '@kubb/plugin-client'
-import { pluginReactQuery } from '@kubb/plugin-react-query'
-import { pluginZod } from '@kubb/plugin-zod'
-import { pluginTs } from '@kubb/plugin-ts'
+import { defineConfig } from '@kubb/core';
+import { pluginClient } from '@kubb/plugin-client';
+import { pluginOas } from '@kubb/plugin-oas';
+import { pluginReactQuery } from '@kubb/plugin-react-query';
+import { pluginTs } from '@kubb/plugin-ts';
+import { pluginZod } from '@kubb/plugin-zod';
 
 export default defineConfig({
   root: '.',
@@ -29,4 +29,4 @@ export default defineConfig({
       },
     }),
   ],
-})
+});

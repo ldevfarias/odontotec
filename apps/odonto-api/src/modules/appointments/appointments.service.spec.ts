@@ -312,3 +312,120 @@ describe('AppointmentsService — conflict checking', () => {
         });
     });
 });
+
+// ── createWithPatient ──────────────────────────────────────────────────────
+
+describe('createWithPatient', () => {
+    const NEW_PATIENT_ID = 99;
+
+    let service: AppointmentsService;
+    let mockDataSource: Record<string, jest.Mock>;
+
+    function makeManagerForWithPatient() {
+        const savedPatient = { id: NEW_PATIENT_ID, name: 'Ana Lima', phone: '(11) 99999-9999', clinicId: CLINIC_ID };
+        const savedAppointment = makeAppointment({ patientId: NEW_PATIENT_ID });
+
+        const appointmentRepo = {
+            create: jest.fn().mockReturnValue(savedAppointment),
+            save: jest.fn().mockResolvedValue(savedAppointment),
+            createQueryBuilder: jest.fn().mockImplementation(() => makeQueryBuilder(null)),
+        };
+
+        const patientRepo = {
+            create: jest.fn().mockReturnValue(savedPatient),
+            save: jest.fn().mockResolvedValue(savedPatient),
+            findOne: jest.fn().mockResolvedValue(savedPatient),
+        };
+
+        const manager: any = {
+            getRepository: jest.fn().mockImplementation((entity: any) => {
+                const name = typeof entity === 'string' ? entity : entity?.name;
+                if (name === 'Patient') return patientRepo;
+                if (name === 'Appointment') return appointmentRepo;
+                // Clinic, User
+                return { findOne: jest.fn().mockResolvedValue(null) };
+            }),
+        };
+
+        return { manager, patientRepo, appointmentRepo };
+    }
+
+    it('creates patient and appointment atomically and returns the appointment', async () => {
+        const { manager, patientRepo, appointmentRepo } = makeManagerForWithPatient();
+
+        mockDataSource = {
+            transaction: jest.fn(async (cb: any) => cb(manager)),
+        };
+
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                AppointmentsService,
+                { provide: getRepositoryToken(Appointment), useValue: appointmentRepo },
+                { provide: getRepositoryToken(Patient), useValue: patientRepo },
+                { provide: getRepositoryToken(Clinic), useValue: { findOne: jest.fn().mockResolvedValue(null) } },
+                { provide: NotificationsService, useValue: { create: jest.fn().mockResolvedValue({}) } },
+                { provide: EmailService, useValue: { sendAppointmentConfirmation: jest.fn() } },
+                { provide: JwtService, useValue: { sign: jest.fn().mockReturnValue('tok') } },
+                { provide: DataSource, useValue: mockDataSource },
+            ],
+        }).compile();
+
+        service = module.get(AppointmentsService);
+
+        const result = await service.createWithPatient(
+            {
+                patientName: 'Ana Lima',
+                patientPhone: '(11) 99999-9999',
+                date: '2026-05-01T10:00:00.000Z',
+                duration: 30,
+                dentistId: DENTIST_ID,
+            },
+            CLINIC_ID,
+        );
+
+        expect(patientRepo.create).toHaveBeenCalledWith({
+            name: 'Ana Lima',
+            phone: '(11) 99999-9999',
+            clinicId: CLINIC_ID,
+        });
+        expect(patientRepo.save).toHaveBeenCalled();
+        expect(appointmentRepo.create).toHaveBeenCalledWith(
+            expect.objectContaining({ patientId: NEW_PATIENT_ID, clinicId: CLINIC_ID }),
+        );
+        expect(result.patientId).toBe(NEW_PATIENT_ID);
+    });
+
+    it('rolls back (transaction never commits) if patient save throws', async () => {
+        const { manager, patientRepo, appointmentRepo } = makeManagerForWithPatient();
+        patientRepo.save = jest.fn().mockRejectedValue(new Error('DB error'));
+
+        mockDataSource = {
+            transaction: jest.fn(async (cb: any) => cb(manager)),
+        };
+
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                AppointmentsService,
+                { provide: getRepositoryToken(Appointment), useValue: appointmentRepo },
+                { provide: getRepositoryToken(Patient), useValue: patientRepo },
+                { provide: getRepositoryToken(Clinic), useValue: { findOne: jest.fn().mockResolvedValue(null) } },
+                { provide: NotificationsService, useValue: { create: jest.fn().mockResolvedValue({}) } },
+                { provide: EmailService, useValue: { sendAppointmentConfirmation: jest.fn() } },
+                { provide: JwtService, useValue: { sign: jest.fn().mockReturnValue('tok') } },
+                { provide: DataSource, useValue: mockDataSource },
+            ],
+        }).compile();
+
+        service = module.get(AppointmentsService);
+
+        await expect(
+            service.createWithPatient(
+                { patientName: 'Ana Lima', patientPhone: '(11) 99999-9999', date: '2026-05-01T10:00:00.000Z', duration: 30, dentistId: DENTIST_ID },
+                CLINIC_ID,
+            ),
+        ).rejects.toThrow('DB error');
+
+        // Appointment should never have been touched
+        expect(appointmentRepo.create).not.toHaveBeenCalled();
+    });
+});

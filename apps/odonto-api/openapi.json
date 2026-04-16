@@ -1662,6 +1662,36 @@
         ]
       }
     },
+    "/appointments/with-patient": {
+      "post": {
+        "operationId": "AppointmentsController_createWithPatient",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppointmentWithPatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Appointment and patient created successfully."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create appointment and register new patient atomically",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
     "/appointments/public/cancel": {
       "get": {
         "operationId": "AppointmentsController_publicCancel",
@@ -3396,6 +3426,41 @@
           "duration",
           "dentistId",
           "patientId"
+        ]
+      },
+      "CreateAppointmentWithPatientDto": {
+        "type": "object",
+        "properties": {
+          "patientName": {
+            "type": "string",
+            "example": "João Silva"
+          },
+          "patientPhone": {
+            "type": "string",
+            "example": "(11) 99999-9999"
+          },
+          "patientEmail": {
+            "type": "string",
+            "example": "joao@email.com"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-01-20T10:00:00Z"
+          },
+          "duration": {
+            "type": "number",
+            "example": 30
+          },
+          "dentistId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "patientName",
+          "patientPhone",
+          "date",
+          "duration",
+          "dentistId"
         ]
       },
       "UpdateAppointmentDto": {

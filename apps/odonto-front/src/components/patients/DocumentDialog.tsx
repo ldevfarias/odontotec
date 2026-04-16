@@ -1,203 +1,219 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { FileText, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
+import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/contexts/AuthContext';
 import { useDocumentsControllerCreate } from '@/generated/hooks/useDocumentsControllerCreate';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { CreatePatientDocumentDtoTypeEnumKey } from '@/generated/ts/CreatePatientDocumentDto';
-import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
-    type: z.enum(['ATESTADO', 'RECEITA', 'OUTRO']),
-    title: z.string().min(3, 'Título é obrigatório'),
-    content: z.string().min(10, 'O conteúdo deve ter pelo menos 10 caracteres'),
-    dentistId: z.string().min(1, 'Profissional é obrigatório'),
+  type: z.enum(['ATESTADO', 'RECEITA', 'OUTRO']),
+  title: z.string().min(3, 'Título é obrigatório'),
+  content: z.string().min(10, 'O conteúdo deve ter pelo menos 10 caracteres'),
+  dentistId: z.string().min(1, 'Profissional é obrigatório'),
 });
 
 interface DocumentDialogProps {
-    isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
-    patientId: number;
-    onSuccess?: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  patientId: number;
+  onSuccess?: () => void;
 }
 
-export function DocumentDialog({ isOpen, onOpenChange, patientId, onSuccess }: DocumentDialogProps) {
-    const { user } = useAuth();
-    const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
-    const { data: usersResponse } = useUsersControllerFindAll();
-    const dentists = (usersResponse?.data ?? []).filter((u: any) => u.role === 'DENTIST' || u.role === 'ADMIN');
+export function DocumentDialog({
+  isOpen,
+  onOpenChange,
+  patientId,
+  onSuccess,
+}: DocumentDialogProps) {
+  const { user } = useAuth();
+  const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
+  const { data: usersResponse } = useUsersControllerFindAll();
+  const dentists = (usersResponse?.data ?? []).filter(
+    (u: any) => u.role === 'DENTIST' || u.role === 'ADMIN',
+  );
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            type: 'ATESTADO',
-            title: '',
-            content: '',
-            dentistId: '',
-        },
-    });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      type: 'ATESTADO',
+      title: '',
+      content: '',
+      dentistId: '',
+    },
+  });
 
-    const currentType = form.watch('type');
+  const currentType = form.watch('type');
 
-    // Populate templates and dentist based on type
-    useEffect(() => {
-        if (currentType === 'ATESTADO') {
-            form.setValue('title', 'Atestado Médico');
-            form.setValue('content', 'Atesto para os devidos fins que o(a) paciente acima citado(a) esteve em consulta odontológica na data de hoje, necessitando de X dias de repouso por motivo de tratamento dentário.');
-        } else if (currentType === 'RECEITA') {
-            form.setValue('title', 'Receituário');
-            form.setValue('content', 'Uso Oral:\n1. Medicamento X --------- 1 caixa\nTomar 1 comprimido a cada 8 horas por 5 dias.');
+  // Populate templates and dentist based on type
+  useEffect(() => {
+    if (currentType === 'ATESTADO') {
+      form.setValue('title', 'Atestado Médico');
+      form.setValue(
+        'content',
+        'Atesto para os devidos fins que o(a) paciente acima citado(a) esteve em consulta odontológica na data de hoje, necessitando de X dias de repouso por motivo de tratamento dentário.',
+      );
+    } else if (currentType === 'RECEITA') {
+      form.setValue('title', 'Receituário');
+      form.setValue(
+        'content',
+        'Uso Oral:\n1. Medicamento X --------- 1 caixa\nTomar 1 comprimido a cada 8 horas por 5 dias.',
+      );
 
-            // Pre-fill with current logged-in user if they are a dentist/admin
-            if (user && (user.role === 'DENTIST' || user.role === 'ADMIN')) {
-                form.setValue('dentistId', user.id.toString());
-            }
-        }
-    }, [currentType, user, form]);
-
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        createDocument({
-            data: {
-                ...values,
-                type: values.type as CreatePatientDocumentDtoTypeEnumKey,
-                patientId,
-                dentistId: Number(values.dentistId),
-            }
-        }, {
-            onSuccess: () => {
-                onOpenChange(false);
-                form.reset();
-                onSuccess?.();
-            }
-        });
+      // Pre-fill with current logged-in user if they are a dentist/admin
+      if (user && (user.role === 'DENTIST' || user.role === 'ADMIN')) {
+        form.setValue('dentistId', user.id.toString());
+      }
     }
+  }, [currentType, user, form]);
 
-    return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-primary" />
-                        Gerar Documento
-                    </DialogTitle>
-                </DialogHeader>
-
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="type"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Tipo</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Selecione o tipo" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="ATESTADO">Atestado</SelectItem>
-                                                <SelectItem value="RECEITA">Receituário</SelectItem>
-                                                <SelectItem value="OUTRO">Outro</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="dentistId"
-                                render={() => (
-                                    <FormItem className="flex flex-col">
-                                        <FormLabel className="mb-2">Profissional Responsável</FormLabel>
-                                        <FormControl>
-                                            <div className="h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground cursor-not-allowed flex items-center">
-                                                {user?.name || 'Carregando...'}
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Título do Documento</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder="Ex: Atestado de Comparecimento" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="content"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Conteúdo</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            {...field}
-                                            className="min-h-[200px]"
-                                            placeholder="Descreva as orientações ou o atestado..."
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                Cancelar
-                            </Button>
-                            <Button type="submit" disabled={isPending}>
-                                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Salvar e Gerar
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    createDocument(
+      {
+        data: {
+          ...values,
+          type: values.type as CreatePatientDocumentDtoTypeEnumKey,
+          patientId,
+          dentistId: Number(values.dentistId),
+        },
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          form.reset();
+          onSuccess?.();
+        },
+      },
     );
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="text-primary h-5 w-5" />
+            Gerar Documento
+          </DialogTitle>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="ATESTADO">Atestado</SelectItem>
+                        <SelectItem value="RECEITA">Receituário</SelectItem>
+                        <SelectItem value="OUTRO">Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dentistId"
+                render={() => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="mb-2">Profissional Responsável</FormLabel>
+                    <FormControl>
+                      <div className="border-input bg-muted text-muted-foreground flex h-10 w-full cursor-not-allowed items-center rounded-md border px-3 py-2 text-sm">
+                        {user?.name || 'Carregando...'}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Título do Documento</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Ex: Atestado de Comparecimento" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Conteúdo</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      className="min-h-[200px]"
+                      placeholder="Descreva as orientações ou o atestado..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Salvar e Gerar
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 }

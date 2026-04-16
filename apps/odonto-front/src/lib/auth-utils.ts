@@ -8,18 +8,18 @@
  * @returns Decoded payload or null if invalid
  */
 function decodeJWT(token: string): { exp?: number } | null {
-    try {
-        const parts = token.split('.');
-        if (parts.length !== 3) {
-            return null;
-        }
-
-        const payload = parts[1];
-        const decoded = JSON.parse(atob(payload));
-        return decoded;
-    } catch {
-        return null;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return null;
     }
+
+    const payload = parts[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -28,18 +28,18 @@ function decodeJWT(token: string): { exp?: number } | null {
  * @returns true if token is valid and not expired
  */
 export function isTokenValid(token: string | null): boolean {
-    if (!token) {
-        return false;
-    }
+  if (!token) {
+    return false;
+  }
 
-    const decoded = decodeJWT(token);
+  const decoded = decodeJWT(token);
 
-    if (!decoded || !decoded.exp) {
-        // If no expiration, consider invalid for security
-        return false;
-    }
+  if (!decoded || !decoded.exp) {
+    // If no expiration, consider invalid for security
+    return false;
+  }
 
-    // Check if token is expired (exp is in seconds, Date.now() is in milliseconds)
-    const currentTime = Math.floor(Date.now() / 1000);
-    return decoded.exp > currentTime;
+  // Check if token is expired (exp is in seconds, Date.now() is in milliseconds)
+  const currentTime = Math.floor(Date.now() / 1000);
+  return decoded.exp > currentTime;
 }
