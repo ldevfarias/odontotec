@@ -1,21 +1,21 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export function getInvitationEmailTemplate(
-    inviteeName: string,
-    clinicName: string,
-    registrationUrl: string,
-    expiresAt: Date,
+  inviteeName: string,
+  clinicName: string,
+  registrationUrl: string,
+  expiresAt: Date,
 ): { subject: string; html: string } {
-    const expiresInHours = Math.round(
-        (expiresAt.getTime() - Date.now()) / (1000 * 60 * 60),
-    );
+  const expiresInHours = Math.round(
+    (expiresAt.getTime() - Date.now()) / (1000 * 60 * 60),
+  );
 
-    const subject = `Convite para ${clinicName} - Complete seu cadastro`;
+  const subject = `Convite para ${clinicName} - Complete seu cadastro`;
 
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Convite Profissional',
-        content: `
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Convite Profissional',
+    content: `
             <p class="paragraph">Olá!</p>
             
             <p class="paragraph">
@@ -60,7 +60,7 @@ export function getInvitationEmailTemplate(
                 Se você não esperava receber este e-mail, pode ignorá-lo com segurança.
             </p>
         `,
-    });
+  });
 
-    return { subject, html };
+  return { subject, html };
 }

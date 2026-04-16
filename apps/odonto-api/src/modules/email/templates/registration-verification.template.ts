@@ -1,14 +1,14 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export const getRegistrationVerificationEmailTemplate = (
-    userName: string,
-    verificationUrl: string,
+  userName: string,
+  verificationUrl: string,
 ) => {
-    const subject = `Bem-vindo à OdontoEhTec, ${userName}! 👋`;
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Verificação de Conta',
-        content: `
+  const subject = `Bem-vindo à OdontoEhTec, ${userName}! 👋`;
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Verificação de Conta',
+    content: `
             <p class="paragraph">Olá, <strong>${userName}</strong>!</p>
             
             <p class="paragraph">
@@ -34,8 +34,7 @@ export const getRegistrationVerificationEmailTemplate = (
                 Se você não solicitou este cadastro, pode ignorar este e-mail com segurança.
             </p>
         `,
-    });
+  });
 
-    return { subject, html };
+  return { subject, html };
 };
-

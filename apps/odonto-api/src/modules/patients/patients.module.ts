@@ -20,26 +20,32 @@ import { ExamsController } from './controllers/exams.controller';
 import { ToothObservationsController } from './controllers/tooth-observations.controller';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Patient, Procedure, Anamnesis, Payment, Exam, ToothObservation])],
-    controllers: [
-        PatientsController,
-        ProceduresController,
-        AnamnesisController,
-        PaymentsController,
-        ExamsController,
-        ToothObservationsController,
-    ],
-    providers: [
-        PatientsService,
-        ProceduresService,
-        AnamnesisService,
-        PaymentsService,
-        ExamsService,
-        ToothObservationsService,
-    ],
-    exports: [
-        PatientsService,
-        PaymentsService
-    ],
+  imports: [
+    TypeOrmModule.forFeature([
+      Patient,
+      Procedure,
+      Anamnesis,
+      Payment,
+      Exam,
+      ToothObservation,
+    ]),
+  ],
+  controllers: [
+    PatientsController,
+    ProceduresController,
+    AnamnesisController,
+    PaymentsController,
+    ExamsController,
+    ToothObservationsController,
+  ],
+  providers: [
+    PatientsService,
+    ProceduresService,
+    AnamnesisService,
+    PaymentsService,
+    ExamsService,
+    ToothObservationsService,
+  ],
+  exports: [PatientsService, PaymentsService],
 })
-export class PatientsModule { }
+export class PatientsModule {}

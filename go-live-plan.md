@@ -24,11 +24,11 @@ Serviços externos:
 
 ### Mapa de Domínios
 
-| Subdomínio | App | Hospedagem |
-| --- | --- | --- |
-| `seudominio.com.br` + `www.` | Landing page (`apps/landing`) | Vercel — projeto `odontotec-landing` |
-| `app.seudominio.com.br` | Dashboard SaaS (`apps/odonto-front`) | Vercel — projeto `odontotec-app` |
-| `api.seudominio.com.br` | API NestJS (`apps/odonto-api`) | Fly.io — app `odontotec` |
+| Subdomínio                   | App                                  | Hospedagem                           |
+| ---------------------------- | ------------------------------------ | ------------------------------------ |
+| `seudominio.com.br` + `www.` | Landing page (`apps/landing`)        | Vercel — projeto `odontotec-landing` |
+| `app.seudominio.com.br`      | Dashboard SaaS (`apps/odonto-front`) | Vercel — projeto `odontotec-app`     |
+| `api.seudominio.com.br`      | API NestJS (`apps/odonto-api`)       | Fly.io — app `odontotec`             |
 
 > **Como funciona no Vercel:** você cria dois projetos separados no mesmo monorepo, cada um apontando para o seu `Root Directory` (`apps/landing` e `apps/odonto-front`). Cada projeto recebe seu próprio domínio.
 
@@ -36,15 +36,15 @@ Serviços externos:
 
 ## Custo Estimado
 
-| Serviço | Plano | Custo/mês |
-|---------|-------|-----------|
-| Vercel | Hobby | **Grátis** |
-| Fly.io | Pay-as-you-go (shared-cpu-1x) | ~R$ 30–60 |
-| Cloudflare R2 | Free tier (10GB) | **Grátis** |
-| Cloudflare DNS / CDN | Free | **Grátis** |
-| Resend | Free (3.000 emails/mês) | **Grátis** |
-| Domínio | ~R$ 50/ano | ~R$ 5/mês |
-| **Total** | | **~R$ 35–65/mês** |
+| Serviço              | Plano                         | Custo/mês         |
+| -------------------- | ----------------------------- | ----------------- |
+| Vercel               | Hobby                         | **Grátis**        |
+| Fly.io               | Pay-as-you-go (shared-cpu-1x) | ~R$ 30–60         |
+| Cloudflare R2        | Free tier (10GB)              | **Grátis**        |
+| Cloudflare DNS / CDN | Free                          | **Grátis**        |
+| Resend               | Free (3.000 emails/mês)       | **Grátis**        |
+| Domínio              | ~R$ 50/ano                    | ~R$ 5/mês         |
+| **Total**            |                               | **~R$ 35–65/mês** |
 
 ---
 
@@ -137,12 +137,12 @@ Setar via `flyctl secrets set CHAVE=valor` ou pelo dashboard do Fly.io:
 
 Se algo der errado após o go-live:
 
-| Problema | Ação |
-|----------|------|
-| API down | `flyctl releases list` → `flyctl deploy --image <image-id>` para versão anterior |
-| Frontend quebrado | Vercel → Deployments → Promote anterior |
-| Bug crítico no código | `git revert` + push na `main` → pipeline re-deploya |
-| Banco corrompido | Restaurar backup do provedor PostgreSQL |
+| Problema              | Ação                                                                             |
+| --------------------- | -------------------------------------------------------------------------------- |
+| API down              | `flyctl releases list` → `flyctl deploy --image <image-id>` para versão anterior |
+| Frontend quebrado     | Vercel → Deployments → Promote anterior                                          |
+| Bug crítico no código | `git revert` + push na `main` → pipeline re-deploya                              |
+| Banco corrompido      | Restaurar backup do provedor PostgreSQL                                          |
 
 ---
 

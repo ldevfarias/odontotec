@@ -8,28 +8,35 @@ import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 
 @Injectable()
 export class PatientsService {
-    constructor(
-        @InjectRepository(Patient)
-        private patientsRepository: Repository<Patient>,
-        private anamnesisService: AnamnesisService,
-    ) { }
+  constructor(
+    @InjectRepository(Patient)
+    private patientsRepository: Repository<Patient>,
+    private anamnesisService: AnamnesisService,
+  ) {}
 
-    async create(createPatientDto: CreatePatientDto, clinicId: number): Promise<Patient> {
-        const patient = this.patientsRepository.create({
-            ...createPatientDto,
-            clinicId,
-        });
-        return this.patientsRepository.save(patient);
-    }
+  async create(
+    createPatientDto: CreatePatientDto,
+    clinicId: number,
+  ): Promise<Patient> {
+    const patient = this.patientsRepository.create({
+      ...createPatientDto,
+      clinicId,
+    });
+    return this.patientsRepository.save(patient);
+  }
 
-    async findAll(clinicId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<any>> {
-        const offset = (page - 1) * limit;
-        const countQuery = `
+  async findAll(
+    clinicId: number,
+    page = 1,
+    limit = 50,
+  ): Promise<PaginatedResponseDto<any>> {
+    const offset = (page - 1) * limit;
+    const countQuery = `
             SELECT COUNT(*) AS total
             FROM patients p
             WHERE p.clinic_id = $1 AND p.deleted_at IS NULL
         `;
-        const dataQuery = `
+    const dataQuery = `
             SELECT
                 p.id, p.name, p.birth_date AS "birthDate", p.email, p.phone, p.address, p.document, p.clinic_id AS "clinicId", p.created_at AS "createdAt", p.updated_at AS "updatedAt",
                 MAX(pr.date) AS "lastProcedureDate",
@@ -42,31 +49,37 @@ export class PatientsService {
             ORDER BY p.name ASC
             LIMIT $2 OFFSET $3;
         `;
-        const [countResult, data] = await Promise.all([
-            this.patientsRepository.query(countQuery, [clinicId]),
-            this.patientsRepository.query(dataQuery, [clinicId, limit, offset]),
-        ]);
-        const total = parseInt(countResult[0]?.total ?? '0', 10);
-        return { data, total, page, limit };
-    }
+    const [countResult, data] = await Promise.all([
+      this.patientsRepository.query(countQuery, [clinicId]),
+      this.patientsRepository.query(dataQuery, [clinicId, limit, offset]),
+    ]);
+    const total = parseInt(countResult[0]?.total ?? '0', 10);
+    return { data, total, page, limit };
+  }
 
-    async findOne(id: number, clinicId: number): Promise<any> {
-        const patient = await this.patientsRepository.findOne({ where: { id, clinicId } });
-        if (!patient) {
-            throw new NotFoundException(`Patient with ID ${id} not found`);
-        }
-        const alerts = await this.anamnesisService.getActiveAlerts(id, clinicId);
-        return { ...patient, alerts };
+  async findOne(id: number, clinicId: number): Promise<any> {
+    const patient = await this.patientsRepository.findOne({
+      where: { id, clinicId },
+    });
+    if (!patient) {
+      throw new NotFoundException(`Patient with ID ${id} not found`);
     }
+    const alerts = await this.anamnesisService.getActiveAlerts(id, clinicId);
+    return { ...patient, alerts };
+  }
 
-    async update(id: number, updatePatientDto: UpdatePatientDto, clinicId: number): Promise<Patient> {
-        const patient = await this.findOne(id, clinicId);
-        this.patientsRepository.merge(patient, updatePatientDto);
-        return this.patientsRepository.save(patient);
-    }
+  async update(
+    id: number,
+    updatePatientDto: UpdatePatientDto,
+    clinicId: number,
+  ): Promise<Patient> {
+    const patient = await this.findOne(id, clinicId);
+    this.patientsRepository.merge(patient, updatePatientDto);
+    return this.patientsRepository.save(patient);
+  }
 
-    async remove(id: number, clinicId: number): Promise<void> {
-        const patient = await this.findOne(id, clinicId);
-        await this.patientsRepository.softRemove(patient);
-    }
+  async remove(id: number, clinicId: number): Promise<void> {
+    const patient = await this.findOne(id, clinicId);
+    await this.patientsRepository.softRemove(patient);
+  }
 }

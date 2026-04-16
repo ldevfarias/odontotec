@@ -1,16 +1,16 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export function getSubscriptionCancelledEmailTemplate(
-    adminName: string,
-    clinicName: string,
-    landingUrl: string,
+  adminName: string,
+  clinicName: string,
+  landingUrl: string,
 ): { subject: string; html: string } {
-    const subject = `Assinatura encerrada — sentiremos sua falta`;
+  const subject = `Assinatura encerrada — sentiremos sua falta`;
 
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Assinatura Encerrada',
-        content: `
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Assinatura Encerrada',
+    content: `
             <p class="paragraph">Olá, <strong>${adminName}</strong>.</p>
 
             <p class="paragraph">
@@ -44,8 +44,9 @@ export function getSubscriptionCancelledEmailTemplate(
                 Agradecemos por ter feito parte da OdontoEhTec.
             </p>
         `,
-        footerNote: 'Você recebeu este e-mail porque sua assinatura PRO foi encerrada.',
-    });
+    footerNote:
+      'Você recebeu este e-mail porque sua assinatura PRO foi encerrada.',
+  });
 
-    return { subject, html };
+  return { subject, html };
 }

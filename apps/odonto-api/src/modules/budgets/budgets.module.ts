@@ -7,9 +7,9 @@ import { BudgetItem } from './entities/budget-item.entity';
 import { ClinicProcedure } from '../clinic-procedures/entities/clinic-procedure.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Budget, BudgetItem, ClinicProcedure])],
-    controllers: [BudgetsController],
-    providers: [BudgetsService],
-    exports: [BudgetsService],
+  imports: [TypeOrmModule.forFeature([Budget, BudgetItem, ClinicProcedure])],
+  controllers: [BudgetsController],
+  providers: [BudgetsService],
+  exports: [BudgetsService],
 })
-export class BudgetsModule { }
+export class BudgetsModule {}

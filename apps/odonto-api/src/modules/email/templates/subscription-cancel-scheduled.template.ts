@@ -1,24 +1,24 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export function getSubscriptionCancelScheduledEmailTemplate(
-    adminName: string,
-    clinicName: string,
-    landingUrl: string,
-    periodEnd: Date,
+  adminName: string,
+  clinicName: string,
+  landingUrl: string,
+  periodEnd: Date,
 ): { subject: string; html: string } {
-    const formattedDate = periodEnd.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'America/Sao_Paulo',
-    });
+  const formattedDate = periodEnd.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
+  });
 
-    const subject = `Cancelamento agendado para ${formattedDate} — ${clinicName}`;
+  const subject = `Cancelamento agendado para ${formattedDate} — ${clinicName}`;
 
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Cancelamento Agendado',
-        content: `
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Cancelamento Agendado',
+    content: `
             <p class="paragraph">Olá, <strong>${adminName}</strong>.</p>
 
             <p class="paragraph">
@@ -44,8 +44,9 @@ export function getSubscriptionCancelScheduledEmailTemplate(
                 </a>
             </div>
         `,
-        footerNote: 'Você recebeu este e-mail porque um cancelamento foi agendado para sua conta.',
-    });
+    footerNote:
+      'Você recebeu este e-mail porque um cancelamento foi agendado para sua conta.',
+  });
 
-    return { subject, html };
+  return { subject, html };
 }

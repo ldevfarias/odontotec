@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
@@ -10,96 +14,103 @@ import { ClinicProcedure } from '../clinic-procedures/entities/clinic-procedure.
 
 @Injectable()
 export class BudgetsService {
-    constructor(
-        @InjectRepository(Budget)
-        private budgetsRepository: Repository<Budget>,
-        @InjectRepository(ClinicProcedure)
-        private clinicProceduresRepository: Repository<ClinicProcedure>,
-    ) { }
+  constructor(
+    @InjectRepository(Budget)
+    private budgetsRepository: Repository<Budget>,
+    @InjectRepository(ClinicProcedure)
+    private clinicProceduresRepository: Repository<ClinicProcedure>,
+  ) {}
 
-    async create(clinicId: number, createBudgetDto: CreateBudgetDto) {
-        let total = 0;
-        const budgetItems: BudgetItem[] = [];
+  async create(clinicId: number, createBudgetDto: CreateBudgetDto) {
+    let total = 0;
+    const budgetItems: BudgetItem[] = [];
 
-        for (const itemDto of createBudgetDto.items) {
-            const procedure = await this.clinicProceduresRepository.findOne({
-                where: { id: itemDto.clinicProcedureId, clinicId },
-            });
+    for (const itemDto of createBudgetDto.items) {
+      const procedure = await this.clinicProceduresRepository.findOne({
+        where: { id: itemDto.clinicProcedureId, clinicId },
+      });
 
-            if (!procedure) {
-                throw new NotFoundException(`Clinic procedure with ID ${itemDto.clinicProcedureId} not found`);
-            }
+      if (!procedure) {
+        throw new NotFoundException(
+          `Clinic procedure with ID ${itemDto.clinicProcedureId} not found`,
+        );
+      }
 
-            const unitPrice = procedure.baseValue;
-            const subtotal = unitPrice * itemDto.quantity;
-            total += subtotal;
+      const unitPrice = procedure.baseValue;
+      const subtotal = unitPrice * itemDto.quantity;
+      total += subtotal;
 
-            const item = new BudgetItem();
-            item.clinicProcedureId = procedure.id;
-            item.quantity = itemDto.quantity;
-            item.unitPrice = unitPrice;
-            item.subtotal = subtotal;
+      const item = new BudgetItem();
+      item.clinicProcedureId = procedure.id;
+      item.quantity = itemDto.quantity;
+      item.unitPrice = unitPrice;
+      item.subtotal = subtotal;
 
-            budgetItems.push(item);
-        }
-
-        const budget = this.budgetsRepository.create({
-            clinicId,
-            patientId: createBudgetDto.patientId,
-            notes: createBudgetDto.notes,
-            total,
-            items: budgetItems,
-        });
-
-        return this.budgetsRepository.save(budget);
+      budgetItems.push(item);
     }
 
-    async findAllByPatient(clinicId: number, patientId: number, page = 1, limit = 50): Promise<PaginatedResponseDto<Budget>> {
-        const [data, total] = await this.budgetsRepository.findAndCount({
-            where: { clinicId, patientId },
-            order: { createdAt: 'DESC' },
-            relations: ['items', 'items.clinicProcedure'],
-            skip: (page - 1) * limit,
-            take: limit,
-        });
-        return { data, total, page, limit };
+    const budget = this.budgetsRepository.create({
+      clinicId,
+      patientId: createBudgetDto.patientId,
+      notes: createBudgetDto.notes,
+      total,
+      items: budgetItems,
+    });
+
+    return this.budgetsRepository.save(budget);
+  }
+
+  async findAllByPatient(
+    clinicId: number,
+    patientId: number,
+    page = 1,
+    limit = 50,
+  ): Promise<PaginatedResponseDto<Budget>> {
+    const [data, total] = await this.budgetsRepository.findAndCount({
+      where: { clinicId, patientId },
+      order: { createdAt: 'DESC' },
+      relations: ['items', 'items.clinicProcedure'],
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { data, total, page, limit };
+  }
+
+  async findOne(id: number, clinicId: number) {
+    const budget = await this.budgetsRepository.findOne({
+      where: { id, clinicId },
+      relations: ['items', 'items.clinicProcedure'],
+    });
+
+    if (!budget) {
+      throw new NotFoundException(`Budget with ID ${id} not found`);
     }
 
-    async findOne(id: number, clinicId: number) {
-        const budget = await this.budgetsRepository.findOne({
-            where: { id, clinicId },
-            relations: ['items', 'items.clinicProcedure'],
-        });
+    return budget;
+  }
 
-        if (!budget) {
-            throw new NotFoundException(`Budget with ID ${id} not found`);
-        }
+  async update(id: number, clinicId: number, updateBudgetDto: UpdateBudgetDto) {
+    const budget = await this.findOne(id, clinicId);
 
-        return budget;
+    if (updateBudgetDto.status && updateBudgetDto.status !== budget.status) {
+      // Business rule: Can't change status once it's something final, or maybe just simple update.
+      budget.status = updateBudgetDto.status;
     }
 
-    async update(id: number, clinicId: number, updateBudgetDto: UpdateBudgetDto) {
-        const budget = await this.findOne(id, clinicId);
-
-        if (updateBudgetDto.status && updateBudgetDto.status !== budget.status) {
-            // Business rule: Can't change status once it's something final, or maybe just simple update.
-            budget.status = updateBudgetDto.status;
-        }
-
-        if (updateBudgetDto.notes !== undefined) {
-            budget.notes = updateBudgetDto.notes;
-        }
-
-        return this.budgetsRepository.save(budget);
+    if (updateBudgetDto.notes !== undefined) {
+      budget.notes = updateBudgetDto.notes;
     }
 
-    async remove(id: number, clinicId: number) {
-        const budget = await this.findOne(id, clinicId);
+    return this.budgetsRepository.save(budget);
+  }
 
-        if (budget.status === BudgetStatus.APPROVED) {
-            throw new BadRequestException('Cannot delete an approved budget');
-        }
+  async remove(id: number, clinicId: number) {
+    const budget = await this.findOne(id, clinicId);
 
-        return this.budgetsRepository.softRemove(budget);
+    if (budget.status === BudgetStatus.APPROVED) {
+      throw new BadRequestException('Cannot delete an approved budget');
     }
+
+    return this.budgetsRepository.softRemove(budget);
+  }
 }

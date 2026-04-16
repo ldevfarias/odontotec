@@ -6,11 +6,11 @@ PostHog was integrated into the OdontoTec Next.js 16.1.4 (App Router) project. T
 
 ### Integration Files
 
-| File | Change |
-|------|--------|
-| `instrumentation-client.ts` | Created — PostHog client-side initialization |
-| `next.config.ts` | Updated — added reverse proxy rewrites and `skipTrailingSlashRedirect` |
-| `.env.local` | Updated — added `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` |
+| File                        | Change                                                                             |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| `instrumentation-client.ts` | Created — PostHog client-side initialization                                       |
+| `next.config.ts`            | Updated — added reverse proxy rewrites and `skipTrailingSlashRedirect`             |
+| `.env.local`                | Updated — added `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` |
 
 ### Key Integration Details
 
@@ -23,21 +23,21 @@ PostHog was integrated into the OdontoTec Next.js 16.1.4 (App Router) project. T
 
 ## Tracked Events
 
-| Event Name | Description | File |
-|---|---|---|
-| `user_logged_in` | User successfully logs in | `src/app/login/page.tsx` |
-| `user_login_failed` | Login attempt fails (wrong credentials, network error) | `src/app/login/page.tsx` |
-| `user_registered` | New user completes registration via invite link | `src/app/register/page.tsx` |
-| `clinic_setup_completed` | User finishes onboarding by setting up their clinic | `src/app/onboarding/clinic/page.tsx` |
-| `patient_created` | A new patient is added to the system | `src/components/patients/CreatePatientDialog.tsx` |
-| `patient_deleted` | A patient record is deleted | `src/components/patients/DeletePatientDialog.tsx` |
-| `appointment_created` | A new appointment is scheduled | `src/components/appointments/AppointmentModal.tsx` |
-| `appointment_updated` | An existing appointment is edited | `src/components/appointments/AppointmentModal.tsx` |
-| `payment_registered` | A payment is recorded for a patient | `src/components/patients/PaymentsTab.tsx` |
-| `treatment_plan_status_updated` | A treatment plan status changes (e.g., in progress → completed) | `src/components/patients/PaymentsTab.tsx` |
-| `subscription_checkout_initiated` | User clicks "Assinar Agora" and is redirected to Stripe checkout | `src/app/(app)/settings/billing/page.tsx` |
-| `subscription_portal_opened` | User opens the Stripe billing portal | `src/app/(app)/settings/billing/page.tsx` |
-| `professional_invited` | A new team member is invited to the clinic | `src/app/(app)/professionals/page.tsx` |
+| Event Name                        | Description                                                      | File                                               |
+| --------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
+| `user_logged_in`                  | User successfully logs in                                        | `src/app/login/page.tsx`                           |
+| `user_login_failed`               | Login attempt fails (wrong credentials, network error)           | `src/app/login/page.tsx`                           |
+| `user_registered`                 | New user completes registration via invite link                  | `src/app/register/page.tsx`                        |
+| `clinic_setup_completed`          | User finishes onboarding by setting up their clinic              | `src/app/onboarding/clinic/page.tsx`               |
+| `patient_created`                 | A new patient is added to the system                             | `src/components/patients/CreatePatientDialog.tsx`  |
+| `patient_deleted`                 | A patient record is deleted                                      | `src/components/patients/DeletePatientDialog.tsx`  |
+| `appointment_created`             | A new appointment is scheduled                                   | `src/components/appointments/AppointmentModal.tsx` |
+| `appointment_updated`             | An existing appointment is edited                                | `src/components/appointments/AppointmentModal.tsx` |
+| `payment_registered`              | A payment is recorded for a patient                              | `src/components/patients/PaymentsTab.tsx`          |
+| `treatment_plan_status_updated`   | A treatment plan status changes (e.g., in progress → completed)  | `src/components/patients/PaymentsTab.tsx`          |
+| `subscription_checkout_initiated` | User clicks "Assinar Agora" and is redirected to Stripe checkout | `src/app/(app)/settings/billing/page.tsx`          |
+| `subscription_portal_opened`      | User opens the Stripe billing portal                             | `src/app/(app)/settings/billing/page.tsx`          |
+| `professional_invited`            | A new team member is invited to the clinic                       | `src/app/(app)/professionals/page.tsx`             |
 
 ---
 
@@ -45,9 +45,9 @@ PostHog was integrated into the OdontoTec Next.js 16.1.4 (App Router) project. T
 
 **Dashboard**: [Analytics basics](https://us.posthog.com/project/341552/dashboard/1358844)
 
-| Insight | Description | Link |
-|---|---|---|
-| User Onboarding Funnel | Funnel from registration → clinic setup → first patient created | [View](https://us.posthog.com/project/341552/insights/yQj6l4M7) |
-| Daily Active Users & Login Failures | Trend of daily logins alongside login failures | [View](https://us.posthog.com/project/341552/insights/UIFsZOFD) |
-| Core Platform Activity | Trend of core actions: appointments, patients, payments | [View](https://us.posthog.com/project/341552/insights/qbDbKIs2) |
-| Subscription Funnel & Revenue Actions | Funnel from checkout initiated → portal opened | [View](https://us.posthog.com/project/341552/insights/8fm929tF) |
+| Insight                               | Description                                                     | Link                                                            |
+| ------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| User Onboarding Funnel                | Funnel from registration → clinic setup → first patient created | [View](https://us.posthog.com/project/341552/insights/yQj6l4M7) |
+| Daily Active Users & Login Failures   | Trend of daily logins alongside login failures                  | [View](https://us.posthog.com/project/341552/insights/UIFsZOFD) |
+| Core Platform Activity                | Trend of core actions: appointments, patients, payments         | [View](https://us.posthog.com/project/341552/insights/qbDbKIs2) |
+| Subscription Funnel & Revenue Actions | Funnel from checkout initiated → portal opened                  | [View](https://us.posthog.com/project/341552/insights/8fm929tF) |

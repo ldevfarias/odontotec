@@ -1,19 +1,19 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export const getAppointmentEmailTemplate = (
-    patientName: string,
-    clinicName: string,
-    appointmentDate: string,
-    dentistName: string,
-    cancelUrl: string,
-    rescheduleUrl: string,
+  patientName: string,
+  clinicName: string,
+  appointmentDate: string,
+  dentistName: string,
+  cancelUrl: string,
+  rescheduleUrl: string,
 ) => {
-    const subject = `Agendamento Confirmado - ${clinicName}`;
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Consulta Agendada',
-        headerSubtitle: clinicName,
-        content: `
+  const subject = `Agendamento Confirmado - ${clinicName}`;
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Consulta Agendada',
+    headerSubtitle: clinicName,
+    content: `
             <p class="paragraph">Olá, <strong>${patientName}</strong>!</p>
             <p class="paragraph">Seu agendamento foi realizado com sucesso. Confira os detalhes abaixo:</p>
             
@@ -37,8 +37,7 @@ export const getAppointmentEmailTemplate = (
                 Por favor, tente chegar com 10 minutos de antecedência.
             </p>
         `,
-        footerNote: `Este é um e-mail automático de ${clinicName}. Por favor, não responda.`,
-    });
-    return { subject, html };
+    footerNote: `Este é um e-mail automático de ${clinicName}. Por favor, não responda.`,
+  });
+  return { subject, html };
 };
-

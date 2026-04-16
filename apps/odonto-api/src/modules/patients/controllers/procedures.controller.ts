@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ProceduresService } from '../services/procedures.service';
 import { CreateProcedureDto } from '../dto/create-procedure.dto';
 import { UpdateProcedureDto } from '../dto/update-procedure.dto';
@@ -14,35 +24,45 @@ import { Tenant } from '../../../common/decorators/tenant.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('procedures')
 export class ProceduresController {
-    constructor(private readonly proceduresService: ProceduresService) { }
+  constructor(private readonly proceduresService: ProceduresService) {}
 
-    @Post()
-    @Roles(UserRole.ADMIN, UserRole.DENTIST)
-    create(@Body() createProcedureDto: CreateProcedureDto, @Tenant() clinicId: number) {
-        return this.proceduresService.create(createProcedureDto, clinicId);
-    }
+  @Post()
+  @Roles(UserRole.ADMIN, UserRole.DENTIST)
+  create(
+    @Body() createProcedureDto: CreateProcedureDto,
+    @Tenant() clinicId: number,
+  ) {
+    return this.proceduresService.create(createProcedureDto, clinicId);
+  }
 
-    @Get('patient/:patientId')
-    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
-    findAllByPatient(@Param('patientId', ParseIntPipe) patientId: number, @Tenant() clinicId: number) {
-        return this.proceduresService.findAllByPatient(patientId, clinicId);
-    }
+  @Get('patient/:patientId')
+  @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
+  findAllByPatient(
+    @Param('patientId', ParseIntPipe) patientId: number,
+    @Tenant() clinicId: number,
+  ) {
+    return this.proceduresService.findAllByPatient(patientId, clinicId);
+  }
 
-    @Get(':id')
-    @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
-    findOne(@Param('id', ParseIntPipe) id: number, @Tenant() clinicId: number) {
-        return this.proceduresService.findOne(id, clinicId);
-    }
+  @Get(':id')
+  @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
+  findOne(@Param('id', ParseIntPipe) id: number, @Tenant() clinicId: number) {
+    return this.proceduresService.findOne(id, clinicId);
+  }
 
-    @Patch(':id')
-    @Roles(UserRole.ADMIN, UserRole.DENTIST)
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateProcedureDto: UpdateProcedureDto, @Tenant() clinicId: number) {
-        return this.proceduresService.update(id, updateProcedureDto, clinicId);
-    }
+  @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.DENTIST)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProcedureDto: UpdateProcedureDto,
+    @Tenant() clinicId: number,
+  ) {
+    return this.proceduresService.update(id, updateProcedureDto, clinicId);
+  }
 
-    @Delete(':id')
-    @Roles(UserRole.ADMIN, UserRole.DENTIST)
-    remove(@Param('id', ParseIntPipe) id: number, @Tenant() clinicId: number) {
-        return this.proceduresService.remove(id, clinicId);
-    }
+  @Delete(':id')
+  @Roles(UserRole.ADMIN, UserRole.DENTIST)
+  remove(@Param('id', ParseIntPipe) id: number, @Tenant() clinicId: number) {
+    return this.proceduresService.remove(id, clinicId);
+  }
 }

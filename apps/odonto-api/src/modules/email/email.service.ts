@@ -12,331 +12,360 @@ import { getSubscriptionCancelledEmailTemplate } from './templates/subscription-
 
 @Injectable()
 export class EmailService {
-    private readonly logger = new Logger(EmailService.name);
-    private resend: Resend;
-    private fromEmail: string;
-    private frontendUrl: string;
-    private landingUrl: string;
+  private readonly logger = new Logger(EmailService.name);
+  private resend: Resend;
+  private fromEmail: string;
+  private frontendUrl: string;
+  private landingUrl: string;
 
-    constructor(private configService: ConfigService) {
-        const apiKey = this.configService.get<string>('RESEND_API_KEY');
-        if (!apiKey) {
-            this.logger.warn(
-                'RESEND_API_KEY not configured. Email sending will be disabled.',
-            );
-        }
-
-        this.resend = new Resend(apiKey);
-        this.fromEmail =
-            this.configService.get<string>('RESEND_FROM_EMAIL') ||
-            'onboarding@resend.dev';
-        this.frontendUrl =
-            this.configService.get<string>('FRONTEND_URL') ||
-            'http://localhost:3001';
-        this.landingUrl =
-            this.configService.get<string>('LANDING_URL') ||
-            this.configService.get<string>('FRONTEND_URL') ||
-            'http://localhost:3001';
+  constructor(private configService: ConfigService) {
+    const apiKey = this.configService.get<string>('RESEND_API_KEY');
+    if (!apiKey) {
+      this.logger.warn(
+        'RESEND_API_KEY not configured. Email sending will be disabled.',
+      );
     }
 
-    async sendInvitationEmail(
-        toEmail: string,
-        clinicName: string,
-        token: string,
-        expiresAt: Date,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) {
-                this.logger.warn(
-                    'Resend not initialized. Skipping email send to ' + toEmail,
-                );
-                return false;
-            }
+    this.resend = new Resend(apiKey);
+    this.fromEmail =
+      this.configService.get<string>('RESEND_FROM_EMAIL') ||
+      'onboarding@resend.dev';
+    this.frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+    this.landingUrl =
+      this.configService.get<string>('LANDING_URL') ||
+      this.configService.get<string>('FRONTEND_URL') ||
+      'http://localhost:3001';
+  }
 
-            const registrationUrl = `${this.frontendUrl}/register/${token}`;
-            const { subject, html } = getInvitationEmailTemplate(
-                toEmail,
-                clinicName,
-                registrationUrl,
-                expiresAt,
-            );
+  async sendInvitationEmail(
+    toEmail: string,
+    clinicName: string,
+    token: string,
+    expiresAt: Date,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) {
+        this.logger.warn(
+          'Resend not initialized. Skipping email send to ' + toEmail,
+        );
+        return false;
+      }
 
-            this.logger.log(`Sending invitation email to ${toEmail}`);
+      const registrationUrl = `${this.frontendUrl}/register/${token}`;
+      const { subject, html } = getInvitationEmailTemplate(
+        toEmail,
+        clinicName,
+        registrationUrl,
+        expiresAt,
+      );
 
-            const { data, error } = await this.resend.emails.send({
-                from: `${clinicName} <${this.fromEmail}>`,
-                to: toEmail,
-                subject: subject,
-                html: html,
-            });
+      this.logger.log(`Sending invitation email to ${toEmail}`);
 
-            if (error) {
-                this.logger.error(
-                    `Failed to send invitation email to ${toEmail}:`,
-                    error,
-                );
-                return false;
-            }
+      const { data, error } = await this.resend.emails.send({
+        from: `${clinicName} <${this.fromEmail}>`,
+        to: toEmail,
+        subject: subject,
+        html: html,
+      });
 
-            this.logger.log(`Successfully sent invitation email to ${toEmail}`, {
-                emailId: data?.id,
-            });
-            return true;
-        } catch (error) {
-            this.logger.error(
-                `Error sending invitation email to ${toEmail}:`,
-                error,
-            );
-            return false;
-        }
+      if (error) {
+        this.logger.error(
+          `Failed to send invitation email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
+
+      this.logger.log(`Successfully sent invitation email to ${toEmail}`, {
+        emailId: data?.id,
+      });
+      return true;
+    } catch (error) {
+      this.logger.error(`Error sending invitation email to ${toEmail}:`, error);
+      return false;
     }
+  }
 
-    async sendAppointmentConfirmation(
-        toEmail: string,
-        patientName: string,
-        clinicName: string,
-        appointmentDate: string,
-        dentistName: string,
-        appointmentId: number,
-        token: string,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendAppointmentConfirmation(
+    toEmail: string,
+    patientName: string,
+    clinicName: string,
+    appointmentDate: string,
+    dentistName: string,
+    appointmentId: number,
+    token: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const cancelUrl = `${this.frontendUrl}/public/appointment/cancel?token=${token}&id=${appointmentId}`;
-            const rescheduleUrl = `${this.frontendUrl}/public/appointment/reschedule?token=${token}&id=${appointmentId}`;
+      const cancelUrl = `${this.frontendUrl}/public/appointment/cancel?token=${token}&id=${appointmentId}`;
+      const rescheduleUrl = `${this.frontendUrl}/public/appointment/reschedule?token=${token}&id=${appointmentId}`;
 
-            const { subject, html } = getAppointmentEmailTemplate(
-                patientName,
-                clinicName,
-                appointmentDate,
-                dentistName,
-                cancelUrl,
-                rescheduleUrl,
-            );
+      const { subject, html } = getAppointmentEmailTemplate(
+        patientName,
+        clinicName,
+        appointmentDate,
+        dentistName,
+        cancelUrl,
+        rescheduleUrl,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `${clinicName} <${this.fromEmail}>`,
-                to: toEmail,
-                subject: subject,
-                html: html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `${clinicName} <${this.fromEmail}>`,
+        to: toEmail,
+        subject: subject,
+        html: html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send appointment email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(
+          `Failed to send appointment email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
 
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending appointment email to ${toEmail}:`, error);
-            return false;
-        }
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error sending appointment email to ${toEmail}:`,
+        error,
+      );
+      return false;
     }
+  }
 
-    async sendWelcomeEmail(
-        toEmail: string,
-        adminName: string,
-        clinicName: string,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendWelcomeEmail(
+    toEmail: string,
+    adminName: string,
+    clinicName: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const { subject, html } = getWelcomeEmailTemplate(
-                adminName,
-                clinicName,
-                `${this.frontendUrl}/dashboard`,
-            );
+      const { subject, html } = getWelcomeEmailTemplate(
+        adminName,
+        clinicName,
+        `${this.frontendUrl}/dashboard`,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `${clinicName} <${this.fromEmail}>`,
-                to: toEmail,
-                subject: subject,
-                html: html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `${clinicName} <${this.fromEmail}>`,
+        to: toEmail,
+        subject: subject,
+        html: html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send welcome email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(`Failed to send welcome email to ${toEmail}:`, error);
+        return false;
+      }
 
-            this.logger.log(`Welcome email sent to ${toEmail}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending welcome email to ${toEmail}:`, error);
-            return false;
-        }
+      this.logger.log(`Welcome email sent to ${toEmail}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Error sending welcome email to ${toEmail}:`, error);
+      return false;
     }
+  }
 
-    async sendRegistrationVerificationEmail(
-        toEmail: string,
-        userName: string,
-        token: string,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendRegistrationVerificationEmail(
+    toEmail: string,
+    userName: string,
+    token: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const verificationUrl = `${this.frontendUrl}/register/verify/${token}`;
-            const { subject, html } = getRegistrationVerificationEmailTemplate(
-                userName,
-                verificationUrl,
-            );
+      const verificationUrl = `${this.frontendUrl}/register/verify/${token}`;
+      const { subject, html } = getRegistrationVerificationEmailTemplate(
+        userName,
+        verificationUrl,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `OdontoTec <${this.fromEmail}>`,
-                to: toEmail,
-                subject: subject,
-                html: html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `OdontoTec <${this.fromEmail}>`,
+        to: toEmail,
+        subject: subject,
+        html: html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send registration verification email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(
+          `Failed to send registration verification email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
 
-            this.logger.log(`Registration verification email sent to ${toEmail}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending registration verification email to ${toEmail}:`, error);
-            return false;
-        }
+      this.logger.log(`Registration verification email sent to ${toEmail}`);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error sending registration verification email to ${toEmail}:`,
+        error,
+      );
+      return false;
     }
+  }
 
-    async sendPasswordResetEmail(
-        toEmail: string,
-        userName: string,
-        token: string,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendPasswordResetEmail(
+    toEmail: string,
+    userName: string,
+    token: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const resetUrl = `${this.frontendUrl}/auth/reset-password?token=${token}`;
-            const { subject, html } = getResetPasswordEmailTemplate(
-                userName,
-                resetUrl,
-            );
+      const resetUrl = `${this.frontendUrl}/auth/reset-password?token=${token}`;
+      const { subject, html } = getResetPasswordEmailTemplate(
+        userName,
+        resetUrl,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `OdontoTec Security <${this.fromEmail}>`,
-                to: toEmail,
-                subject: subject,
-                html: html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `OdontoTec Security <${this.fromEmail}>`,
+        to: toEmail,
+        subject: subject,
+        html: html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send password reset email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(
+          `Failed to send password reset email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
 
-            this.logger.log(`Password reset email sent to ${toEmail}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending password reset email to ${toEmail}:`, error);
-            return false;
-        }
+      this.logger.log(`Password reset email sent to ${toEmail}`);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error sending password reset email to ${toEmail}:`,
+        error,
+      );
+      return false;
     }
+  }
 
-    async sendSubscriptionProActivatedEmail(
-        toEmail: string,
-        adminName: string,
-        clinicName: string,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendSubscriptionProActivatedEmail(
+    toEmail: string,
+    adminName: string,
+    clinicName: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const { subject, html } = getSubscriptionProActivatedEmailTemplate(
-                adminName,
-                clinicName,
-                `${this.frontendUrl}/dashboard`,
-            );
+      const { subject, html } = getSubscriptionProActivatedEmailTemplate(
+        adminName,
+        clinicName,
+        `${this.frontendUrl}/dashboard`,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `OdontoEhTec <${this.fromEmail}>`,
-                to: toEmail,
-                subject,
-                html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `OdontoEhTec <${this.fromEmail}>`,
+        to: toEmail,
+        subject,
+        html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send PRO activated email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(
+          `Failed to send PRO activated email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
 
-            this.logger.log(`PRO activated email sent to ${toEmail}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending PRO activated email to ${toEmail}:`, error);
-            return false;
-        }
+      this.logger.log(`PRO activated email sent to ${toEmail}`);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error sending PRO activated email to ${toEmail}:`,
+        error,
+      );
+      return false;
     }
+  }
 
-    async sendSubscriptionCancelScheduledEmail(
-        toEmail: string,
-        adminName: string,
-        clinicName: string,
-        periodEnd: Date,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendSubscriptionCancelScheduledEmail(
+    toEmail: string,
+    adminName: string,
+    clinicName: string,
+    periodEnd: Date,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const { subject, html } = getSubscriptionCancelScheduledEmailTemplate(
-                adminName,
-                clinicName,
-                this.landingUrl,
-                periodEnd,
-            );
+      const { subject, html } = getSubscriptionCancelScheduledEmailTemplate(
+        adminName,
+        clinicName,
+        this.landingUrl,
+        periodEnd,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `OdontoEhTec <${this.fromEmail}>`,
-                to: toEmail,
-                subject,
-                html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `OdontoEhTec <${this.fromEmail}>`,
+        to: toEmail,
+        subject,
+        html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send cancel scheduled email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(
+          `Failed to send cancel scheduled email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
 
-            this.logger.log(`Cancel scheduled email sent to ${toEmail}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending cancel scheduled email to ${toEmail}:`, error);
-            return false;
-        }
+      this.logger.log(`Cancel scheduled email sent to ${toEmail}`);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Error sending cancel scheduled email to ${toEmail}:`,
+        error,
+      );
+      return false;
     }
+  }
 
-    async sendSubscriptionCancelledEmail(
-        toEmail: string,
-        adminName: string,
-        clinicName: string,
-    ): Promise<boolean> {
-        try {
-            if (!this.resend) return false;
+  async sendSubscriptionCancelledEmail(
+    toEmail: string,
+    adminName: string,
+    clinicName: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.resend) return false;
 
-            const { subject, html } = getSubscriptionCancelledEmailTemplate(
-                adminName,
-                clinicName,
-                this.landingUrl,
-            );
+      const { subject, html } = getSubscriptionCancelledEmailTemplate(
+        adminName,
+        clinicName,
+        this.landingUrl,
+      );
 
-            const { error } = await this.resend.emails.send({
-                from: `OdontoEhTec <${this.fromEmail}>`,
-                to: toEmail,
-                subject,
-                html,
-            });
+      const { error } = await this.resend.emails.send({
+        from: `OdontoEhTec <${this.fromEmail}>`,
+        to: toEmail,
+        subject,
+        html,
+      });
 
-            if (error) {
-                this.logger.error(`Failed to send cancelled email to ${toEmail}:`, error);
-                return false;
-            }
+      if (error) {
+        this.logger.error(
+          `Failed to send cancelled email to ${toEmail}:`,
+          error,
+        );
+        return false;
+      }
 
-            this.logger.log(`Subscription cancelled email sent to ${toEmail}`);
-            return true;
-        } catch (error) {
-            this.logger.error(`Error sending cancelled email to ${toEmail}:`, error);
-            return false;
-        }
+      this.logger.log(`Subscription cancelled email sent to ${toEmail}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Error sending cancelled email to ${toEmail}:`, error);
+      return false;
     }
+  }
 }

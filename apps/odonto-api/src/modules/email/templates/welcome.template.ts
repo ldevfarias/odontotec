@@ -1,16 +1,16 @@
 import { renderEmailLayout } from './base-layout.template';
 
 export function getWelcomeEmailTemplate(
-    adminName: string,
-    clinicName: string,
-    dashboardUrl: string,
+  adminName: string,
+  clinicName: string,
+  dashboardUrl: string,
 ): { subject: string; html: string } {
-    const subject = `Bem-vindo(a) à OdontoEhTec! 🚀`;
+  const subject = `Bem-vindo(a) à OdontoEhTec! 🚀`;
 
-    const html = renderEmailLayout({
-        title: subject,
-        headerTitle: 'Bem-vindo ao Futuro',
-        content: `
+  const html = renderEmailLayout({
+    title: subject,
+    headerTitle: 'Bem-vindo ao Futuro',
+    content: `
             <p class="paragraph">Olá, <strong>${adminName}</strong>!</p>
             
             <p class="paragraph">
@@ -39,8 +39,7 @@ export function getWelcomeEmailTemplate(
                 Se precisar de ajuda, nossa equipe de suporte está à disposição para garantir que sua experiência seja impecável.
             </p>
         `,
-    });
+  });
 
-    return { subject, html };
+  return { subject, html };
 }
-

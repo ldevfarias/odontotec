@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -33,11 +33,17 @@ export function Footer() {
               Redefinindo a gestão odontológica com design inteligente e transparência de preços.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-gray-50 transition-colors">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-gray-50 transition-colors"
+              >
                 <span className="sr-only">Instagram</span>
                 <InstagramIcon className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-gray-50 transition-colors">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-gray-50 transition-colors"
+              >
                 <span className="sr-only">LinkedIn</span>
                 <LinkedInIcon className="w-4 h-4" />
               </a>
@@ -47,18 +53,45 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-4">Produto</h4>
             <ul className="space-y-3">
-              <li><Link href="/funcionalidades" className="body-small hover:text-foreground transition-colors">Funcionalidades</Link></li>
-              <li><Link href="/precos" className="body-small hover:text-foreground transition-colors">Planos & Preços</Link></li>
-              <li><Link href="/#faq" className="body-small hover:text-foreground transition-colors">FAQ</Link></li>
+              <li>
+                <Link
+                  href="/funcionalidades"
+                  className="body-small hover:text-foreground transition-colors"
+                >
+                  Funcionalidades
+                </Link>
+              </li>
+              <li>
+                <Link href="/precos" className="body-small hover:text-foreground transition-colors">
+                  Planos & Preços
+                </Link>
+              </li>
+              <li>
+                <Link href="/#faq" className="body-small hover:text-foreground transition-colors">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold mb-4">Empresa</h4>
             <ul className="space-y-3">
-              <li><Link href="/sobre" className="body-small hover:text-foreground transition-colors">Sobre</Link></li>
-              <li><a href="#" className="body-small hover:text-foreground transition-colors">Termos de Uso</a></li>
-              <li><a href="#" className="body-small hover:text-foreground transition-colors">Privacidade</a></li>
+              <li>
+                <Link href="/sobre" className="body-small hover:text-foreground transition-colors">
+                  Sobre
+                </Link>
+              </li>
+              <li>
+                <a href="#" className="body-small hover:text-foreground transition-colors">
+                  Termos de Uso
+                </a>
+              </li>
+              <li>
+                <a href="#" className="body-small hover:text-foreground transition-colors">
+                  Privacidade
+                </a>
+              </li>
             </ul>
           </div>
         </div>

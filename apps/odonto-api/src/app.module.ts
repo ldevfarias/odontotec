@@ -35,16 +35,30 @@ import { StorageModule } from './common/providers/storage/storage.module';
         const password = configService.get<string>('POSTGRES_PASSWORD');
 
         if (isProd && !password) {
-          throw new Error('FATAL SECURITY ERROR: POSTGRES_PASSWORD is required in production environments to prevent fallback vulnerabilities.');
+          throw new Error(
+            'FATAL SECURITY ERROR: POSTGRES_PASSWORD is required in production environments to prevent fallback vulnerabilities.',
+          );
         }
 
         return {
           type: 'postgres',
-          host: configService.get<string>('POSTGRES_HOST') || configService.get<string>('PGHOST') || 'localhost',
-          port: configService.get<number>('POSTGRES_PORT') || configService.get<number>('PGPORT') || 5434,
-          username: configService.get<string>('POSTGRES_USER') || configService.get<string>('PGUSER') || 'postgres',
+          host:
+            configService.get<string>('POSTGRES_HOST') ||
+            configService.get<string>('PGHOST') ||
+            'localhost',
+          port:
+            configService.get<number>('POSTGRES_PORT') ||
+            configService.get<number>('PGPORT') ||
+            5434,
+          username:
+            configService.get<string>('POSTGRES_USER') ||
+            configService.get<string>('PGUSER') ||
+            'postgres',
           password: password || 'postgres_password',
-          database: configService.get<string>('POSTGRES_DB') || configService.get<string>('PGDATABASE') || 'odonto_tec',
+          database:
+            configService.get<string>('POSTGRES_DB') ||
+            configService.get<string>('PGDATABASE') ||
+            'odonto_tec',
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           migrations: [__dirname + '/migrations/*{.ts,.js}'],
           synchronize: !isProd,
@@ -68,10 +82,12 @@ import { StorageModule } from './common/providers/storage/storage.module';
     SubscriptionModule,
     BudgetsModule,
     StorageModule,
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100, // Increased to 100 to prevent 429 errors from normal usage
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100, // Increased to 100 to prevent 429 errors from normal usage
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [
@@ -90,4 +106,4 @@ import { StorageModule } from './common/providers/storage/storage.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

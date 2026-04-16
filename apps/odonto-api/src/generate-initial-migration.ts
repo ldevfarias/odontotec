@@ -69,11 +69,17 @@ export class ${migrationClass}${timestamp} implements MigrationInterface {
     console.log('⚠️  Next steps:');
     console.log('1. Ensure your database is running and accessible');
     console.log('2. Check that all environment variables are set correctly');
-    console.log('3. The migration file has been created but needs to be populated');
+    console.log(
+      '3. The migration file has been created but needs to be populated',
+    );
     console.log('4. You can either:');
-    console.log('   a) Use TypeORM CLI: npx typeorm migration:generate -d dist/typeorm.config.js -n MigrationName');
+    console.log(
+      '   a) Use TypeORM CLI: npx typeorm migration:generate -d dist/typeorm.config.js -n MigrationName',
+    );
     console.log('   b) Manually write the SQL in the up() method');
-    console.log('   c) Or let TypeORM sync handle it in development (synchronize: true)');
+    console.log(
+      '   c) Or let TypeORM sync handle it in development (synchronize: true)',
+    );
 
     await AppDataSource.destroy();
     process.exit(0);

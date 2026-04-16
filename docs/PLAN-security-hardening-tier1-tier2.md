@@ -13,13 +13,16 @@
 ## Arquivos modificados
 
 ### Tarefa 1 — Throttle em endpoints públicos
+
 - Modify: `apps/odonto-api/src/modules/auth/auth.controller.ts`
 
 ### Tarefa 2 — CORS + Trust Proxy
+
 - Modify: `apps/odonto-api/src/main.ts`
 - Test: `apps/odonto-api/src/main.spec.ts` (novo arquivo)
 
 ### Tarefa 3 — Remover tokens do JSON body
+
 - Modify: `apps/odonto-api/src/modules/auth/auth.controller.ts`
 - Modify: `apps/odonto-api/src/modules/auth/auth.service.ts`
 - Modify: `apps/odonto-front/src/services/auth.ts`
@@ -28,6 +31,7 @@
 - Modify: `apps/odonto-front/src/app/onboarding/clinic/page.tsx`
 
 ### Tarefa 4 — Padronizar @Tenant()
+
 - Modify: `apps/odonto-api/src/modules/budgets/budgets.controller.ts`
 - Modify: `apps/odonto-api/src/modules/dashboard/dashboard.controller.ts`
 - Modify: `apps/odonto-api/src/modules/treatment-plans/treatment-plans.controller.ts`
@@ -42,9 +46,11 @@
 ## Task 1: Throttle em todos os endpoints públicos de auth
 
 **Files:**
+
 - Modify: `apps/odonto-api/src/modules/auth/auth.controller.ts`
 
 Endpoints que não têm `@Throttle` customizado ainda:
+
 - `POST /auth/register-invitation`
 - `POST /auth/register-tenant`
 - `POST /auth/initiate-registration`
@@ -63,33 +69,33 @@ import { AuthController } from './auth.controller';
 const THROTTLER_METADATA_KEY = 'THROTTLER:default';
 
 function getThrottle(controller: any, methodName: string) {
-    return Reflect.getMetadata(THROTTLER_METADATA_KEY, controller.prototype[methodName]);
+  return Reflect.getMetadata(THROTTLER_METADATA_KEY, controller.prototype[methodName]);
 }
 
 describe('AuthController — Throttle decorators on public endpoints', () => {
-    it('register-invitation has throttle limit ≤ 10', () => {
-        const meta = getThrottle(AuthController, 'register');
-        expect(meta).toBeDefined();
-        expect(meta[0].limit).toBeLessThanOrEqual(10);
-    });
+  it('register-invitation has throttle limit ≤ 10', () => {
+    const meta = getThrottle(AuthController, 'register');
+    expect(meta).toBeDefined();
+    expect(meta[0].limit).toBeLessThanOrEqual(10);
+  });
 
-    it('register-tenant has throttle limit ≤ 10', () => {
-        const meta = getThrottle(AuthController, 'registerTenant');
-        expect(meta).toBeDefined();
-        expect(meta[0].limit).toBeLessThanOrEqual(10);
-    });
+  it('register-tenant has throttle limit ≤ 10', () => {
+    const meta = getThrottle(AuthController, 'registerTenant');
+    expect(meta).toBeDefined();
+    expect(meta[0].limit).toBeLessThanOrEqual(10);
+  });
 
-    it('initiate-registration has throttle limit ≤ 10', () => {
-        const meta = getThrottle(AuthController, 'initiateRegistration');
-        expect(meta).toBeDefined();
-        expect(meta[0].limit).toBeLessThanOrEqual(10);
-    });
+  it('initiate-registration has throttle limit ≤ 10', () => {
+    const meta = getThrottle(AuthController, 'initiateRegistration');
+    expect(meta).toBeDefined();
+    expect(meta[0].limit).toBeLessThanOrEqual(10);
+  });
 
-    it('verify-email has throttle limit ≤ 10', () => {
-        const meta = getThrottle(AuthController, 'verifyEmail');
-        expect(meta).toBeDefined();
-        expect(meta[0].limit).toBeLessThanOrEqual(10);
-    });
+  it('verify-email has throttle limit ≤ 10', () => {
+    const meta = getThrottle(AuthController, 'verifyEmail');
+    expect(meta).toBeDefined();
+    expect(meta[0].limit).toBeLessThanOrEqual(10);
+  });
 });
 ```
 
@@ -152,10 +158,12 @@ git commit -m "feat(security): add rate limiting to all public auth registration
 ## Task 2: CORS — validação de origem e trust proxy
 
 **Files:**
+
 - Modify: `apps/odonto-api/src/main.ts`
 - Create: `apps/odonto-api/src/cors.config.spec.ts`
 
 Problemas atuais:
+
 1. Origens CORS não são validadas (aceita qualquer string no env, inclusive wildcards)
 2. Em produção, sem `trust proxy = 1`, o throttler vê o IP do nginx, não o IP real
 
@@ -165,26 +173,26 @@ Crie `apps/odonto-api/src/cors.config.ts`:
 
 ```typescript
 export function buildCorsOrigins(frontendUrl: string, nodeEnv: string): string[] {
-    return frontendUrl
-        .split(',')
-        .map((raw) => raw.trim())
-        .map((url) => {
-            if (!url) throw new Error('CORS origin cannot be empty');
-            if (url.includes('*')) throw new Error(`Wildcard CORS origins are not allowed: "${url}"`);
+  return frontendUrl
+    .split(',')
+    .map((raw) => raw.trim())
+    .map((url) => {
+      if (!url) throw new Error('CORS origin cannot be empty');
+      if (url.includes('*')) throw new Error(`Wildcard CORS origins are not allowed: "${url}"`);
 
-            let parsed: URL;
-            try {
-                parsed = new URL(url);
-            } catch {
-                throw new Error(`Invalid CORS origin (not a valid URL): "${url}"`);
-            }
+      let parsed: URL;
+      try {
+        parsed = new URL(url);
+      } catch {
+        throw new Error(`Invalid CORS origin (not a valid URL): "${url}"`);
+      }
 
-            if (nodeEnv === 'production' && parsed.protocol !== 'https:') {
-                throw new Error(`Production CORS origins must use HTTPS: "${url}"`);
-            }
+      if (nodeEnv === 'production' && parsed.protocol !== 'https:') {
+        throw new Error(`Production CORS origins must use HTTPS: "${url}"`);
+      }
 
-            return parsed.origin;
-        });
+      return parsed.origin;
+    });
 }
 ```
 
@@ -196,43 +204,46 @@ Crie `apps/odonto-api/src/cors.config.spec.ts`:
 import { buildCorsOrigins } from './cors.config';
 
 describe('buildCorsOrigins', () => {
-    it('parses a single valid origin', () => {
-        const result = buildCorsOrigins('http://localhost:3001', 'development');
-        expect(result).toEqual(['http://localhost:3001']);
-    });
+  it('parses a single valid origin', () => {
+    const result = buildCorsOrigins('http://localhost:3001', 'development');
+    expect(result).toEqual(['http://localhost:3001']);
+  });
 
-    it('parses multiple comma-separated origins', () => {
-        const result = buildCorsOrigins('http://localhost:3001,http://localhost:3002', 'development');
-        expect(result).toEqual(['http://localhost:3001', 'http://localhost:3002']);
-    });
+  it('parses multiple comma-separated origins', () => {
+    const result = buildCorsOrigins('http://localhost:3001,http://localhost:3002', 'development');
+    expect(result).toEqual(['http://localhost:3001', 'http://localhost:3002']);
+  });
 
-    it('trims whitespace around origins', () => {
-        const result = buildCorsOrigins(' http://localhost:3001 , http://localhost:3002 ', 'development');
-        expect(result).toEqual(['http://localhost:3001', 'http://localhost:3002']);
-    });
+  it('trims whitespace around origins', () => {
+    const result = buildCorsOrigins(
+      ' http://localhost:3001 , http://localhost:3002 ',
+      'development',
+    );
+    expect(result).toEqual(['http://localhost:3001', 'http://localhost:3002']);
+  });
 
-    it('throws when a wildcard origin is provided', () => {
-        expect(() => buildCorsOrigins('*.example.com', 'development')).toThrow('Wildcard');
-    });
+  it('throws when a wildcard origin is provided', () => {
+    expect(() => buildCorsOrigins('*.example.com', 'development')).toThrow('Wildcard');
+  });
 
-    it('throws when origin is not a valid URL', () => {
-        expect(() => buildCorsOrigins('not-a-url', 'development')).toThrow('not a valid URL');
-    });
+  it('throws when origin is not a valid URL', () => {
+    expect(() => buildCorsOrigins('not-a-url', 'development')).toThrow('not a valid URL');
+  });
 
-    it('throws when production origin uses HTTP', () => {
-        expect(() =>
-            buildCorsOrigins('http://app.odontotec.com', 'production')
-        ).toThrow('must use HTTPS');
-    });
+  it('throws when production origin uses HTTP', () => {
+    expect(() => buildCorsOrigins('http://app.odontotec.com', 'production')).toThrow(
+      'must use HTTPS',
+    );
+  });
 
-    it('accepts HTTPS origin in production', () => {
-        const result = buildCorsOrigins('https://app.odontotec.com', 'production');
-        expect(result).toEqual(['https://app.odontotec.com']);
-    });
+  it('accepts HTTPS origin in production', () => {
+    const result = buildCorsOrigins('https://app.odontotec.com', 'production');
+    expect(result).toEqual(['https://app.odontotec.com']);
+  });
 
-    it('throws when origin is empty string', () => {
-        expect(() => buildCorsOrigins(',', 'development')).toThrow('empty');
-    });
+  it('throws when origin is empty string', () => {
+    expect(() => buildCorsOrigins(',', 'development')).toThrow('empty');
+  });
 });
 ```
 
@@ -272,18 +283,18 @@ import { buildCorsOrigins } from './cors.config';
 
 // No bootstrap(), substituir:
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3001')
-    .split(',')
-    .map((url) => url.trim());
+  .split(',')
+  .map((url) => url.trim());
 
 // Por:
 const allowedOrigins = buildCorsOrigins(
-    process.env.FRONTEND_URL || 'http://localhost:3001',
-    process.env.NODE_ENV || 'development',
+  process.env.FRONTEND_URL || 'http://localhost:3001',
+  process.env.NODE_ENV || 'development',
 );
 
 // E adicionar ANTES do app.enableCors():
 if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1);
+  app.set('trust proxy', 1);
 }
 ```
 
@@ -301,6 +312,7 @@ git commit -m "feat(security): validate CORS origins and enable trust proxy in p
 ## Task 3: Remover tokens JWT do JSON body nas respostas de auth
 
 **Files:**
+
 - Modify: `apps/odonto-api/src/modules/auth/auth.service.ts` (tipo de retorno)
 - Modify: `apps/odonto-api/src/modules/auth/auth.controller.ts` (strip tokens do return)
 - Modify: `apps/odonto-front/src/services/auth.ts` (remover campos de tipo)
@@ -316,23 +328,23 @@ Adicionar ao final de `apps/odonto-api/src/modules/auth/auth.service.spec.ts`:
 
 ```typescript
 describe('Login response — token exposure', () => {
-    it('login response does NOT include access_token in JSON body', async () => {
-        // Arrange
-        const user = buildUser();
-        mockUsersService.findByEmail.mockResolvedValue(user);
-        bcryptMock.compare.mockResolvedValue(true);
-        mockClinicsService.findAllByUser.mockResolvedValue([]);
-        mockJwtService.signAsync.mockResolvedValue('token-value');
+  it('login response does NOT include access_token in JSON body', async () => {
+    // Arrange
+    const user = buildUser();
+    mockUsersService.findByEmail.mockResolvedValue(user);
+    bcryptMock.compare.mockResolvedValue(true);
+    mockClinicsService.findAllByUser.mockResolvedValue([]);
+    mockJwtService.signAsync.mockResolvedValue('token-value');
 
-        // Act
-        const result = await service.login({ email: 'ana@clinic.com', password: 'pass123' });
+    // Act
+    const result = await service.login({ email: 'ana@clinic.com', password: 'pass123' });
 
-        // Assert
-        expect(result).not.toHaveProperty('access_token');
-        expect(result).not.toHaveProperty('refresh_token');
-        expect(result).toHaveProperty('user');
-        expect(result).toHaveProperty('clinics');
-    });
+    // Assert
+    expect(result).not.toHaveProperty('access_token');
+    expect(result).not.toHaveProperty('refresh_token');
+    expect(result).toHaveProperty('user');
+    expect(result).toHaveProperty('clinics');
+  });
 });
 ```
 
@@ -351,22 +363,32 @@ Em `apps/odonto-api/src/modules/auth/auth.service.ts`, localizar o método `logi
 ```typescript
 // ANTES (retorna tokens + user + clinics):
 return {
-    ...tokens,
-    user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role, avatarUrl: c.avatarUrl ?? null })),
+  ...tokens,
+  user: { id: user.id, name: user.name, email: user.email, role: user.role },
+  clinics: clinics.map((c) => ({
+    id: c.clinic.id,
+    name: c.clinic.name,
+    role: c.role,
+    avatarUrl: c.avatarUrl ?? null,
+  })),
 };
 
 // DEPOIS (retorna apenas user + clinics, tokens passados separadamente):
 return {
-    _tokens: tokens,  // interno, usado pelo controller para setar cookies
-    user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    clinics: clinics.map(c => ({ id: c.clinic.id, name: c.clinic.name, role: c.role, avatarUrl: c.avatarUrl ?? null })),
+  _tokens: tokens, // interno, usado pelo controller para setar cookies
+  user: { id: user.id, name: user.name, email: user.email, role: user.role },
+  clinics: clinics.map((c) => ({
+    id: c.clinic.id,
+    name: c.clinic.name,
+    role: c.role,
+    avatarUrl: c.avatarUrl ?? null,
+  })),
 };
 ```
 
 Fazer o mesmo para: `registerTenant()`, `registerByInvitation()`, `verifyEmailAndSetPassword()`, `completeClinicSetup()`, `refreshTokens()`. Em todos esses métodos, renomear o campo `access_token`/`refresh_token` no objeto de retorno para `_tokens: { access_token, refresh_token }`.
 
-- [ ] **Step 4: Modificar auth.controller.ts — extrair tokens de _tokens antes de retornar**
+- [ ] **Step 4: Modificar auth.controller.ts — extrair tokens de \_tokens antes de retornar**
 
 Para cada endpoint que seta cookies, alterar:
 
@@ -437,8 +459,8 @@ onSuccess: (response) => {
 ```typescript
 // ANTES:
 if (response.access_token) {
-    notificationService.success('E-mail verificado e conta criada com sucesso!');
-    login(response.access_token, response.user.clinicName, response.user as any, []);
+  notificationService.success('E-mail verificado e conta criada com sucesso!');
+  login(response.access_token, response.user.clinicName, response.user as any, []);
 }
 
 // DEPOIS:
@@ -461,28 +483,28 @@ login('', values.clinicName, user, res.clinics);
 ```typescript
 // ANTES:
 export interface RegisterTenantResponse {
-    user: { id: number; name: string; email: string; role: string; clinicName?: string; };
-    clinics?: ClinicInfo[];
-    access_token: string;
-    refresh_token: string;
+  user: { id: number; name: string; email: string; role: string; clinicName?: string };
+  clinics?: ClinicInfo[];
+  access_token: string;
+  refresh_token: string;
 }
 
 export interface CompleteClinicResponse {
-    message: string;
-    access_token: string;
-    refresh_token: string;
-    clinics: ClinicInfo[];
+  message: string;
+  access_token: string;
+  refresh_token: string;
+  clinics: ClinicInfo[];
 }
 
 // DEPOIS:
 export interface RegisterTenantResponse {
-    user: { id: number; name: string; email: string; role: string; clinicName?: string; };
-    clinics?: ClinicInfo[];
+  user: { id: number; name: string; email: string; role: string; clinicName?: string };
+  clinics?: ClinicInfo[];
 }
 
 export interface CompleteClinicResponse {
-    message: string;
-    clinics: ClinicInfo[];
+  message: string;
+  clinics: ClinicInfo[];
 }
 ```
 
@@ -504,6 +526,7 @@ git commit -m "feat(security): remove JWT tokens from JSON response body — coo
 ## Task 4: Padronizar @Tenant() — remover getClinicId()
 
 **Files:**
+
 - Modify: `apps/odonto-api/src/modules/budgets/budgets.controller.ts`
 - Modify: `apps/odonto-api/src/modules/dashboard/dashboard.controller.ts`
 - Modify: `apps/odonto-api/src/modules/treatment-plans/treatment-plans.controller.ts`
@@ -527,20 +550,20 @@ import * as glob from 'glob';
 
 // Verifica que nenhum controller usa getClinicId()
 describe('Tenant isolation conformance', () => {
-    it('no controller file should import getClinicId', () => {
-        const controllersDir = path.join(__dirname, '../modules');
-        const files = glob.sync('**/*.controller.ts', { cwd: controllersDir, absolute: true });
+  it('no controller file should import getClinicId', () => {
+    const controllersDir = path.join(__dirname, '../modules');
+    const files = glob.sync('**/*.controller.ts', { cwd: controllersDir, absolute: true });
 
-        const violators: string[] = [];
-        for (const file of files) {
-            const content = fs.readFileSync(file, 'utf-8');
-            if (content.includes('getClinicId')) {
-                violators.push(path.relative(process.cwd(), file));
-            }
-        }
+    const violators: string[] = [];
+    for (const file of files) {
+      const content = fs.readFileSync(file, 'utf-8');
+      if (content.includes('getClinicId')) {
+        violators.push(path.relative(process.cwd(), file));
+      }
+    }
 
-        expect(violators).toEqual([]);
-    });
+    expect(violators).toEqual([]);
+  });
 });
 ```
 
@@ -561,10 +584,12 @@ Abra `apps/odonto-api/src/modules/budgets/budgets.controller.ts`.
 Remover: `import { getClinicId } from '../../common/get-clinic-id';`
 
 Para cada método que usa `@Request() req` e `getClinicId(req)`:
+
 - Substituir `@Request() req` por `@Tenant() clinicId: number`
 - Substituir `getClinicId(req)` por `clinicId`
 
 Exemplo:
+
 ```typescript
 // ANTES:
 @Post()
@@ -654,6 +679,7 @@ git commit -m "refactor(security): standardize @Tenant() decorator across all co
 ## Self-Review
 
 ### Spec coverage
+
 - ✅ Throttle em register endpoints (Task 1)
 - ✅ CORS validation + trust proxy (Task 2)
 - ✅ Tokens removidos do JSON body (Task 3)
@@ -662,8 +688,10 @@ git commit -m "refactor(security): standardize @Tenant() decorator across all co
 - ⏩ Prototype pollution em query params — baixo risco real, descartado por YAGNI
 
 ### Placeholder scan
+
 Nenhum placeholder encontrado. Todos os steps têm código real.
 
 ### Type consistency
+
 - `_tokens` introduzido em Task 3 é usado consistentemente no service e no controller.
 - `buildCorsOrigins` definida em Task 2, Step 1 e importada no Step 6.

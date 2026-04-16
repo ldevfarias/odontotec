@@ -49,7 +49,9 @@ export function PatientComboboxField({
         <div className="flex items-center justify-between rounded-xl border px-3 py-2">
           <div className="flex items-center gap-2">
             <span className="text-sm">{pendingPatientName}</span>
-            <Badge variant="secondary" className="text-xs">Novo paciente</Badge>
+            <Badge variant="secondary" className="text-xs">
+              Novo paciente
+            </Badge>
           </div>
           <Button
             type="button"

@@ -7,9 +7,9 @@ import { Clinic } from '../clinics/entities/clinic.entity';
 import { ProcessedStripeEvent } from './entities/processed-stripe-event.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Clinic, ProcessedStripeEvent])],
-    controllers: [SubscriptionController, StripeWebhookController],
-    providers: [SubscriptionService],
-    exports: [SubscriptionService],
+  imports: [TypeOrmModule.forFeature([Clinic, ProcessedStripeEvent])],
+  controllers: [SubscriptionController, StripeWebhookController],
+  providers: [SubscriptionService],
+  exports: [SubscriptionService],
 })
-export class SubscriptionModule { }
+export class SubscriptionModule {}

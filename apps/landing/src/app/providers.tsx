@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { ProgressProvider } from "@bprogress/next/app";
+import { useEffect } from 'react';
+import { ProgressProvider } from '@bprogress/next/app';
 
 // @bprogress/react's useAnchorProgress attaches click handlers to anchors only
 // via MutationObserver — it never calls the handler immediately on mount.
@@ -12,7 +12,7 @@ import { ProgressProvider } from "@bprogress/next/app";
 function ProgressBootstrap() {
   useEffect(() => {
     const id = setTimeout(() => {
-      const el = document.createElement("x");
+      const el = document.createElement('x');
       document.body.appendChild(el);
       document.body.removeChild(el);
     }, 0);
@@ -23,12 +23,7 @@ function ProgressBootstrap() {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ProgressProvider
-      height="3px"
-      color="#41b883"
-      options={{ showSpinner: false }}
-      shallowRouting
-    >
+    <ProgressProvider height="3px" color="#41b883" options={{ showSpinner: false }} shallowRouting>
       <ProgressBootstrap />
       {children}
     </ProgressProvider>

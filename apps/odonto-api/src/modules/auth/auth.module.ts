@@ -11,28 +11,28 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { EmailModule } from '../email/email.module';
 
 @Module({
-    imports: [
-        UsersModule,
-        ClinicsModule,
-        PassportModule,
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => {
-                const secret = configService.get<string>('JWT_SECRET');
-                if (!secret) {
-                    throw new Error('JWT_SECRET environment variable is required');
-                }
-                return {
-                    secret,
-                    signOptions: { expiresIn: '15m' },
-                };
-            },
-            inject: [ConfigService],
-        }),
-        EmailModule,
-    ],
-    providers: [AuthService, JwtStrategy, RefreshTokenStrategy],
-    controllers: [AuthController],
-    exports: [AuthService, JwtModule],
+  imports: [
+    UsersModule,
+    ClinicsModule,
+    PassportModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error('JWT_SECRET environment variable is required');
+        }
+        return {
+          secret,
+          signOptions: { expiresIn: '15m' },
+        };
+      },
+      inject: [ConfigService],
+    }),
+    EmailModule,
+  ],
+  providers: [AuthService, JwtStrategy, RefreshTokenStrategy],
+  controllers: [AuthController],
+  exports: [AuthService, JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}
