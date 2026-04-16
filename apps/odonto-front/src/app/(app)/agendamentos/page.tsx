@@ -64,6 +64,7 @@ export default function AgendamentosPage() {
       name: user.name,
       role: roleLabels[user.role?.toUpperCase()] || user.role,
       color: PROFESSIONAL_COLORS[index % PROFESSIONAL_COLORS.length],
+      avatarUrl: user.avatarUrl || undefined,
     }));
   }, [userData, currentUser]);
 

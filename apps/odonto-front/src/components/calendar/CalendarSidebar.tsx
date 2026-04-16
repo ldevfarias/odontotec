@@ -1,9 +1,8 @@
-import { Tag, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 import { Calendar } from '@/components/ui/calendar';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
-import { CategoryChip } from './CategoryChip';
 import { ProfessionalCard } from './ProfessionalCard';
 import { CalendarEvent, CalendarState, EventCategory, Professional } from './types';
 
@@ -77,26 +76,6 @@ export function CalendarSidebar({
                 accentColor={pro.color}
                 currentDate={state.currentDate}
                 view={state.view}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="px-3 pb-4">
-          <div className="mb-2.5 flex items-center gap-2 px-1">
-            <Tag className="text-muted-foreground h-3.5 w-3.5" />
-            <span className="text-muted-foreground text-[11px] font-bold tracking-widest uppercase">
-              Categorias
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {categories.map((category) => (
-              <CategoryChip
-                key={category.id}
-                category={category}
-                isActive={state.selectedCategories.includes(category.id)}
-                onToggle={() => toggleCategory(category.id)}
               />
             ))}
           </div>
