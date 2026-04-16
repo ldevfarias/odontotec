@@ -17,10 +17,7 @@ import { DurationField } from './components/DurationField';
 import { PatientComboboxField } from './components/PatientComboboxField';
 import { StatusField } from './components/StatusField';
 import { TimeSlotField } from './components/TimeSlotField';
-import {
-  type AppointmentModalProps,
-  useAppointmentForm,
-} from './hooks/useAppointmentForm';
+import { type AppointmentModalProps, useAppointmentForm } from './hooks/useAppointmentForm';
 
 export function AppointmentModal(props: AppointmentModalProps) {
   const {

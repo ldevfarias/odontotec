@@ -1,12 +1,6 @@
 import { type Control } from 'react-hook-form';
 
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -29,10 +23,7 @@ export function DurationField({ control }: DurationFieldProps) {
       render={({ field }) => (
         <FormItem className="pt-2">
           <FormLabel>Duração</FormLabel>
-          <Select
-            onValueChange={(v) => field.onChange(parseInt(v))}
-            value={field.value.toString()}
-          >
+          <Select onValueChange={(v) => field.onChange(parseInt(v))} value={field.value.toString()}>
             <FormControl>
               <SelectTrigger className="rounded-xl">
                 <SelectValue placeholder="Selecione a duração" />

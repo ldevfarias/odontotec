@@ -8,14 +8,15 @@
  * To retire this workaround: upgrade Node to >=20.12, restore `"kubb": "kubb"`
  * in package.json scripts, and delete this file.
  */
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
 import { build } from '../../node_modules/@kubb/core/dist/index.js';
+import { pluginClient } from '../../node_modules/@kubb/plugin-client/dist/index.js';
 import { pluginOas } from '../../node_modules/@kubb/plugin-oas/dist/index.js';
+import { pluginReactQuery } from '../../node_modules/@kubb/plugin-react-query/dist/index.js';
 import { pluginTs } from '../../node_modules/@kubb/plugin-ts/dist/index.js';
 import { pluginZod } from '../../node_modules/@kubb/plugin-zod/dist/index.js';
-import { pluginClient } from '../../node_modules/@kubb/plugin-client/dist/index.js';
-import { pluginReactQuery } from '../../node_modules/@kubb/plugin-react-query/dist/index.js';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

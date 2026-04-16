@@ -24,10 +24,7 @@ import { notificationService } from '@/services/notification.service';
 export const appointmentFormSchema = z.object({
   patientId: z.number().min(1, 'Selecione o paciente'),
   dentistId: z.number().min(1, 'Selecione o dentista'),
-  duration: z
-    .number()
-    .min(15, 'Duração mínima é 15 minutos')
-    .max(480, 'Duração máxima é 8 horas'),
+  duration: z.number().min(15, 'Duração mínima é 15 minutos').max(480, 'Duração máxima é 8 horas'),
   dateOnly: z.string().min(10, 'Selecione uma data'),
   timeOnly: z.string().min(5, 'Selecione um horário'),
   status: z.string().optional(),

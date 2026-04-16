@@ -80,5 +80,5 @@ export const notificationService = {
   apiError: (error: any, defaultMessage: string = 'Ocorreu um erro inesperado') => {
     const message = error?.response?.data?.message || error?.message || defaultMessage;
     toast.error(message);
-  }
+  },
 };
