@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppointmentsControllerCreate } from '@/generated/hooks/useAppointmentsControllerCreate';
+import { useAppointmentsControllerCreateWithPatient } from '@/generated/hooks/useAppointmentsControllerCreateWithPatient';
 import { useAppointmentsControllerGetAvailableSlots } from '@/generated/hooks/useAppointmentsControllerGetAvailableSlots';
 import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
 import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
@@ -20,9 +21,10 @@ import type {
 } from '@/generated/ts/UpdateAppointmentDto';
 import { analytics, EVENT_NAMES } from '@/services/analytics.service';
 import { notificationService } from '@/services/notification.service';
+import { phoneMask } from '@/utils/masks';
 
 export const appointmentFormSchema = z.object({
-  patientId: z.number().min(1, 'Selecione o paciente'),
+  patientId: z.number(),
   dentistId: z.number().min(1, 'Selecione o dentista'),
   duration: z.number().min(15, 'Duração mínima é 15 minutos').max(480, 'Duração máxima é 8 horas'),
   dateOnly: z.string().min(10, 'Selecione uma data'),
@@ -67,13 +69,19 @@ export function useAppointmentForm({
   const [isPatientPopoverOpen, setIsPatientPopoverOpen] = useState(false);
   const [isDentistPopoverOpen, setIsDentistPopoverOpen] = useState(false);
 
+  // New-patient mode — lives outside the form schema
+  const [newPatientName, setNewPatientName] = useState<string | null>(null);
+  const [newPatientPhone, setNewPatientPhone] = useState('');
+
   const { data: patientsResponse } = usePatientsControllerFindAll();
-  const patients = (patientsResponse?.data ?? []) as PatientRecord[];
+  const patients = (patientsResponse?.data ?? []) as unknown as PatientRecord[];
   const { data: professionalsResponse } = useUsersControllerFindAll();
   const { mutate: createAppointment, isPending: isCreating } = useAppointmentsControllerCreate();
+  const { mutate: createAppointmentWithPatient, isPending: isCreatingWithPatient } =
+    useAppointmentsControllerCreateWithPatient();
   const { mutate: updateAppointment, isPending: isUpdating } = useAppointmentsControllerUpdate();
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isCreatingWithPatient || isUpdating;
 
   const dentists = useMemo(
     () =>
@@ -134,8 +142,32 @@ export function useAppointmentForm({
     return slots;
   }, [slotsResponse, isEditing, originalTime, watchDate, watchDentist, appointmentToEdit]);
 
+  // Ready when:
+  //   editing   → form fields valid
+  //   new patient mode → form valid + phone has ≥10 digits
+  //   existing patient → form valid + a patient is selected
+  const isFormReady = isEditing
+    ? form.formState.isValid
+    : newPatientName
+      ? form.formState.isValid && newPatientPhone.replace(/\D/g, '').length >= 10
+      : form.formState.isValid && watchPatient > 0;
+
+  function handleCreateNew(name: string) {
+    setNewPatientName(name);
+    setNewPatientPhone('');
+    form.setValue('patientId', 0);
+  }
+
+  function handleClearNewPatient() {
+    setNewPatientName(null);
+    setNewPatientPhone('');
+    form.setValue('patientId', 0);
+  }
+
   useEffect(() => {
     if (open) {
+      setNewPatientName(null);
+      setNewPatientPhone('');
       if (appointmentToEdit) {
         const dateObj = parseISO(appointmentToEdit.date);
         form.reset({
@@ -161,16 +193,7 @@ export function useAppointmentForm({
 
   function onSubmit(values: AppointmentFormValues) {
     const combinedDateTime = new Date(`${values.dateOnly}T${values.timeOnly}:00.000`);
-
-    const payload = {
-      patientId: values.patientId,
-      duration: values.duration,
-      date: combinedDateTime.toISOString(),
-      dentistId: isDentist && user?.id ? user.id : values.dentistId,
-      ...(isEditing && values.status
-        ? { status: values.status as UpdateAppointmentDtoStatusEnumKey }
-        : {}),
-    };
+    const resolvedDentistId = isDentist && user?.id ? user.id : values.dentistId;
 
     const successCallback = () => {
       notificationService.success(
@@ -179,10 +202,10 @@ export function useAppointmentForm({
       analytics.capture(
         isEditing ? EVENT_NAMES.APPOINTMENT_UPDATED : EVENT_NAMES.APPOINTMENT_CREATED,
         {
-          patient_id: payload.patientId,
-          dentist_id: payload.dentistId,
-          duration: payload.duration,
-          date: payload.date,
+          patient_id: values.patientId,
+          dentist_id: resolvedDentistId,
+          duration: values.duration,
+          date: combinedDateTime.toISOString(),
         },
       );
       onOpenChange(false);
@@ -198,16 +221,43 @@ export function useAppointmentForm({
     };
 
     if (isEditing) {
+      const payload: UpdateAppointmentDto = {
+        patientId: values.patientId || undefined,
+        duration: values.duration,
+        date: combinedDateTime.toISOString(),
+        dentistId: resolvedDentistId,
+        ...(values.status ? { status: values.status as UpdateAppointmentDtoStatusEnumKey } : {}),
+      };
       updateAppointment(
-        { id: appointmentToEdit.id, data: payload as UpdateAppointmentDto },
+        { id: appointmentToEdit.id, data: payload },
         { onSuccess: successCallback, onError: errorCallback },
       );
-    } else {
-      createAppointment(
-        { data: payload as CreateAppointmentDto },
-        { onSuccess: successCallback, onError: errorCallback },
-      );
+      return;
     }
+
+    if (newPatientName) {
+      createAppointmentWithPatient(
+        {
+          data: {
+            patientName: newPatientName,
+            patientPhone: newPatientPhone,
+            date: combinedDateTime.toISOString(),
+            duration: values.duration,
+            dentistId: resolvedDentistId,
+          },
+        },
+        { onSuccess: successCallback, onError: errorCallback },
+      );
+      return;
+    }
+
+    const payload: CreateAppointmentDto = {
+      patientId: values.patientId,
+      duration: values.duration,
+      date: combinedDateTime.toISOString(),
+      dentistId: resolvedDentistId,
+    };
+    createAppointment({ data: payload }, { onSuccess: successCallback, onError: errorCallback });
   }
 
   return {
@@ -226,5 +276,12 @@ export function useAppointmentForm({
     setIsPatientPopoverOpen,
     isDentistPopoverOpen,
     setIsDentistPopoverOpen,
+    newPatientName,
+    newPatientPhone,
+    setNewPatientPhone,
+    handleCreateNew,
+    handleClearNewPatient,
+    isFormReady,
+    phoneMask,
   };
 }
