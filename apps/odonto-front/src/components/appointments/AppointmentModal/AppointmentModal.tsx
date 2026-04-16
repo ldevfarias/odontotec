@@ -40,6 +40,8 @@ export function AppointmentModal(props: AppointmentModalProps) {
     newPatientName,
     newPatientPhone,
     setNewPatientPhone,
+    newPatientEmail,
+    setNewPatientEmail,
     handleCreateNew,
     handleClearNewPatient,
     isFormReady,
@@ -71,17 +73,33 @@ export function AppointmentModal(props: AppointmentModalProps) {
             />
 
             {newPatientName && (
-              <FormItem>
-                <FormLabel>Telefone do novo paciente</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="(00) 00000-0000"
-                    maxLength={15}
-                    value={newPatientPhone}
-                    onChange={(e) => setNewPatientPhone(phoneMask(e.target.value))}
-                  />
-                </FormControl>
-              </FormItem>
+              <>
+                <FormItem>
+                  <FormLabel>Telefone do novo paciente</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="(00) 00000-0000"
+                      maxLength={15}
+                      value={newPatientPhone}
+                      onChange={(e) => setNewPatientPhone(phoneMask(e.target.value))}
+                    />
+                  </FormControl>
+                </FormItem>
+                <FormItem>
+                  <FormLabel>
+                    Email do novo paciente{' '}
+                    <span className="text-muted-foreground font-normal">(opcional)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="paciente@email.com"
+                      value={newPatientEmail}
+                      onChange={(e) => setNewPatientEmail(e.target.value)}
+                    />
+                  </FormControl>
+                </FormItem>
+              </>
             )}
 
             {!isDentist && (

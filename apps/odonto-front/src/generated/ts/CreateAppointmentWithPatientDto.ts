@@ -14,6 +14,10 @@ export type CreateAppointmentWithPatientDto = {
     */
     patientPhone: string;
     /**
+     * @type string | undefined
+    */
+    patientEmail?: string;
+    /**
      * @type string
     */
     date: string;

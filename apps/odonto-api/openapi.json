@@ -3439,6 +3439,10 @@
             "type": "string",
             "example": "(11) 99999-9999"
           },
+          "patientEmail": {
+            "type": "string",
+            "example": "joao@email.com"
+          },
           "date": {
             "type": "string",
             "example": "2026-01-20T10:00:00Z"

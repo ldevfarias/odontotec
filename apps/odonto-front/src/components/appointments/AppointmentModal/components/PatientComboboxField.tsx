@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -39,6 +38,10 @@ export function PatientComboboxField({
 }: PatientComboboxFieldProps) {
   const [searchValue, setSearchValue] = useState('');
 
+  const filteredPatients = patients.filter((p) =>
+    p.name.toLowerCase().includes(searchValue.toLowerCase().trim()),
+  );
+
   if (pendingPatientName) {
     return (
       <div className="flex flex-col gap-1.5">
@@ -46,7 +49,7 @@ export function PatientComboboxField({
         <div className="flex items-center justify-between rounded-xl border px-3 py-2">
           <div className="flex items-center gap-2">
             <span className="text-sm">{pendingPatientName}</span>
-            <Badge variant="secondary" className="text-xs">Novo</Badge>
+            <Badge variant="secondary" className="text-xs">Novo paciente</Badge>
           </div>
           <Button
             type="button"
@@ -88,18 +91,42 @@ export function PatientComboboxField({
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-[450px] p-0" align="start">
-              <Command>
+              <Command shouldFilter={false}>
                 <CommandInput
                   placeholder="Buscar paciente..."
                   value={searchValue}
                   onValueChange={setSearchValue}
                 />
                 <CommandList>
-                  <CommandEmpty>
-                    {searchValue.trim() ? (
+                  {filteredPatients.length > 0 && (
+                    <CommandGroup>
+                      {filteredPatients.map((patient) => (
+                        <CommandItem
+                          key={patient.id}
+                          value={String(patient.id)}
+                          onSelect={() => {
+                            field.onChange(patient.id);
+                            setSearchValue('');
+                            onOpenChange(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              patient.id === field.value ? 'opacity-100' : 'opacity-0',
+                            )}
+                          />
+                          {patient.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                  {searchValue.trim() && (
+                    <CommandGroup>
                       <CommandItem
-                        value={`__create__${searchValue}`}
+                        value="__create__"
                         onSelect={() => {
+                          field.onChange(0);
                           onCreateNew?.(searchValue.trim());
                           setSearchValue('');
                           onOpenChange(false);
@@ -107,35 +134,10 @@ export function PatientComboboxField({
                         className="cursor-pointer"
                       >
                         <Plus className="mr-2 h-4 w-4" />
-                        Criar &quot;{searchValue.trim()}&quot; como novo paciente
+                        Cadastrar &quot;{searchValue.trim()}&quot; como novo paciente
                       </CommandItem>
-                    ) : (
-                      <p className="py-6 text-center text-sm text-muted-foreground">
-                        Paciente não encontrado.
-                      </p>
-                    )}
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {patients.map((patient) => (
-                      <CommandItem
-                        value={patient.name}
-                        key={patient.id}
-                        onSelect={() => {
-                          field.onChange(patient.id);
-                          setSearchValue('');
-                          onOpenChange(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            'mr-2 h-4 w-4',
-                            patient.id === field.value ? 'opacity-100' : 'opacity-0',
-                          )}
-                        />
-                        {patient.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                    </CommandGroup>
+                  )}
                 </CommandList>
               </Command>
             </PopoverContent>

@@ -72,6 +72,7 @@ export function useAppointmentForm({
   // New-patient mode — lives outside the form schema
   const [newPatientName, setNewPatientName] = useState<string | null>(null);
   const [newPatientPhone, setNewPatientPhone] = useState('');
+  const [newPatientEmail, setNewPatientEmail] = useState('');
 
   const { data: patientsResponse } = usePatientsControllerFindAll();
   const patients = (patientsResponse?.data ?? []) as unknown as PatientRecord[];
@@ -152,15 +153,17 @@ export function useAppointmentForm({
       ? form.formState.isValid && newPatientPhone.replace(/\D/g, '').length >= 10
       : form.formState.isValid && watchPatient > 0;
 
+
   function handleCreateNew(name: string) {
     setNewPatientName(name);
     setNewPatientPhone('');
-    form.setValue('patientId', 0);
+    setNewPatientEmail('');
   }
 
   function handleClearNewPatient() {
     setNewPatientName(null);
     setNewPatientPhone('');
+    setNewPatientEmail('');
     form.setValue('patientId', 0);
   }
 
@@ -168,6 +171,7 @@ export function useAppointmentForm({
     if (open) {
       setNewPatientName(null);
       setNewPatientPhone('');
+      setNewPatientEmail('');
       if (appointmentToEdit) {
         const dateObj = parseISO(appointmentToEdit.date);
         form.reset({
@@ -241,6 +245,7 @@ export function useAppointmentForm({
           data: {
             patientName: newPatientName,
             patientPhone: newPatientPhone,
+            patientEmail: newPatientEmail || undefined,
             date: combinedDateTime.toISOString(),
             duration: values.duration,
             dentistId: resolvedDentistId,
@@ -279,6 +284,8 @@ export function useAppointmentForm({
     newPatientName,
     newPatientPhone,
     setNewPatientPhone,
+    newPatientEmail,
+    setNewPatientEmail,
     handleCreateNew,
     handleClearNewPatient,
     isFormReady,

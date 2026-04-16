@@ -89,6 +89,7 @@ export class AppointmentsService {
             const patient = manager.getRepository(Patient).create({
                 name: dto.patientName,
                 phone: dto.patientPhone,
+                email: dto.patientEmail,
                 clinicId,
             });
             const savedPatient = await manager.getRepository(Patient).save(patient);

@@ -8,6 +8,7 @@ import { z } from "zod/v4";
 export const createAppointmentWithPatientDtoSchema = z.object({
     "patientName": z.string(),
 "patientPhone": z.string(),
+"patientEmail": z.optional(z.string()),
 "date": z.string(),
 "duration": z.number(),
 "dentistId": z.number()
