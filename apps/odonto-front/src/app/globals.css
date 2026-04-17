@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "driver.js/dist/driver.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -475,4 +476,112 @@
   font-size: 12px;
   line-height: 1.4;
   color: var(--color-muted-foreground);
+}
+/* =========================================
+   Driver.js — Tour Guiado Overrides
+   ========================================= */
+
+.driver-popover {
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+  font-family: var(--font-sans, Inter, sans-serif);
+  padding: 20px;
+  min-width: 280px;
+  max-width: 360px;
+}
+
+.driver-popover-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.driver-popover-description {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.driver-popover-progress-text {
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.driver-popover-navigation-btns {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.driver-popover-prev-btn,
+.driver-popover-next-btn,
+.driver-popover-close-btn {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.driver-popover-prev-btn {
+  background-color: #f9fafb;
+  color: #374151;
+  border-color: #e5e7eb;
+}
+
+.driver-popover-prev-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.driver-popover-next-btn {
+  background-color: #0d9488;
+  color: white;
+  border-color: #0d9488;
+}
+
+.driver-popover-next-btn:hover {
+  background-color: #0f766e;
+}
+
+.driver-popover-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  color: #9ca3af;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.driver-popover-close-btn:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: white;
+}
+
+.driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: white;
+}
+
+.driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: white;
+}
+
+.driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: white;
 }
