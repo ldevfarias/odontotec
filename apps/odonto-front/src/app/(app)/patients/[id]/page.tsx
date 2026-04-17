@@ -1,18 +1,6 @@
 'use client';
 
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import {
-  AlertCircle,
-  Calendar,
-  CreditCard,
-  FileText,
-  Mail,
-  MapPin,
-  Phone,
-  Plus,
-  User,
-} from 'lucide-react';
+import { Calendar, CreditCard, FileText } from 'lucide-react';
 import { Banknote } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
@@ -23,12 +11,8 @@ import { ExamsTab } from '@/components/patients/ExamsTab';
 import { OdontogramTab } from '@/components/patients/OdontogramTab';
 import { PatientCard } from '@/components/patients/PatientCard';
 import { PaymentsTab } from '@/components/patients/PaymentsTab';
-import { TreatmentPlansTab } from '@/components/patients/TreatmentPlansTab';
 import { PatientPageSkeleton } from '@/components/skeletons';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePatientsControllerFindOne } from '@/generated/hooks/usePatientsControllerFindOne';

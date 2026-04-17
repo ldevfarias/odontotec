@@ -4,12 +4,11 @@ import { Calendar } from '@/components/ui/calendar';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
 import { ProfessionalCard } from './ProfessionalCard';
-import { CalendarEvent, CalendarState, EventCategory, Professional } from './types';
+import { CalendarEvent, CalendarState, Professional } from './types';
 
 interface CalendarSidebarProps {
   state: CalendarState;
   onStateChange: (state: Partial<CalendarState>) => void;
-  categories: EventCategory[];
   professionals: Professional[];
   events: CalendarEvent[];
   mobileOpen?: boolean;
@@ -19,20 +18,11 @@ interface CalendarSidebarProps {
 export function CalendarSidebar({
   state,
   onStateChange,
-  categories,
   professionals,
   events,
   mobileOpen,
   onMobileClose,
 }: CalendarSidebarProps) {
-  const toggleCategory = (categoryId: string) => {
-    const isSelected = state.selectedCategories.includes(categoryId);
-    const newCategories = isSelected
-      ? state.selectedCategories.filter((id) => id !== categoryId)
-      : [...state.selectedCategories, categoryId];
-    onStateChange({ selectedCategories: newCategories });
-  };
-
   const toggleProfessional = (proId: string) => {
     const isSelected = state.selectedProfessionals.includes(proId);
     const newProfessionals = isSelected

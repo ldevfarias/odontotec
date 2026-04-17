@@ -1,17 +1,12 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Edit, MoreHorizontal, Trash2, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { TableRowsSkeleton } from '@/components/skeletons';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -21,14 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Form,
   FormControl,
@@ -45,15 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { useUsersControllerFindAllInvitations } from '@/generated/hooks/useUsersControllerFindAllInvitations';
 import { useUsersControllerInvite } from '@/generated/hooks/useUsersControllerInvite';
@@ -65,6 +43,7 @@ import { commonValidations } from '@/utils/validations';
 
 import { DeleteUserDialog } from './components/delete-user-dialog';
 import { EditUserDialog } from './components/edit-user-dialog';
+import { ProfessionalsTable } from './components/ProfessionalsTable';
 
 const localInviteSchema = z.object({
   email: commonValidations.email.min(1, 'Obrigatório'),
@@ -76,10 +55,9 @@ type InviteFormValues = z.infer<typeof localInviteSchema>;
 
 export default function ProfessionalsPage() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-
-  const [userToEdit, setUserToEdit] = useState<any>(null);
+  const [userToEdit, setUserToEdit] = useState<unknown>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [userToDelete, setUserToDelete] = useState<unknown>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const {
@@ -88,22 +66,20 @@ export default function ProfessionalsPage() {
     refetch: refetchUsers,
   } = useUsersControllerFindAll();
   const users = usersResponse?.data ?? [];
+
   const {
     data: invitationsResponse,
     isLoading: isLoadingInvitations,
     refetch: refetchInvitations,
   } = useUsersControllerFindAllInvitations();
   const invitations = invitationsResponse?.data ?? [];
+
   const { mutate: inviteUser, isPending: isInviting } = useUsersControllerInvite();
 
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(localInviteSchema),
     mode: 'onChange',
-    defaultValues: {
-      email: '',
-      cpf: '',
-      role: 'DENTIST',
-    },
+    defaultValues: { email: '', cpf: '', role: 'DENTIST' },
   });
 
   function onInvite(values: InviteFormValues) {
@@ -129,52 +105,6 @@ export default function ProfessionalsPage() {
     );
   }
 
-  const handleEdit = (user: unknown) => {
-    setUserToEdit(user);
-    setIsEditOpen(true);
-  };
-
-  const handleDelete = (user: unknown) => {
-    setUserToDelete(user);
-    setIsDeleteOpen(true);
-  };
-
-  const handleSuccess = () => {
-    refetchUsers();
-  };
-
-  const getRoleLabel = (role: string) => {
-    const roles: Record<string, string> = {
-      ADMIN: 'Administrador',
-      DENTIST: 'Dentista',
-      SIMPLE: 'Recepcionista',
-    };
-    return roles[role] || role;
-  };
-
-  const getInvitationStatus = (invitation: unknown) => {
-    if (invitation.acceptedAt)
-      return (
-        <Badge className="border-green-200 bg-green-100 text-green-700 hover:bg-green-100">
-          Aceito
-        </Badge>
-      );
-    const now = new Date();
-    const expiresAt = new Date(invitation.expiresAt);
-    if (expiresAt < now) return <Badge variant="destructive">Expirado</Badge>;
-    return (
-      <Badge
-        variant="secondary"
-        className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50"
-      >
-        Pendente
-      </Badge>
-    );
-  };
-
-  const activeUsers = users.filter((u: unknown) => u.isActive);
-  const inactiveUsers = users.filter((u: unknown) => !u.isActive);
-
   const handleActivate = async (user: unknown) => {
     try {
       await api.patch(`/users/${user.id}`, { isActive: true });
@@ -186,48 +116,11 @@ export default function ProfessionalsPage() {
     }
   };
 
-  const userActionMenu = (user: unknown, isActive: boolean) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Abrir menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-        {isActive ? (
-          <>
-            <DropdownMenuItem onClick={() => handleEdit(user)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Editar
-            </DropdownMenuItem>
-            {user.role !== 'ADMIN' && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => handleDelete(user)}
-                  className="text-red-600 focus:text-red-600"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Desativar
-                </DropdownMenuItem>
-              </>
-            )}
-          </>
-        ) : (
-          <DropdownMenuItem onClick={() => handleActivate(user)}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Reativar
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+  const activeUsers = users.filter((u: unknown) => u.isActive);
+  const inactiveUsers = users.filter((u: unknown) => !u.isActive);
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold tracking-tight sm:text-3xl">Profissionais</h1>
@@ -318,267 +211,35 @@ export default function ProfessionalsPage() {
         </Dialog>
       </div>
 
-      <Tabs defaultValue="active" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 sm:max-w-[600px]">
-          <TabsTrigger value="active">Equipe Ativa</TabsTrigger>
-          <TabsTrigger value="inactive">Inativos</TabsTrigger>
-          <TabsTrigger value="invitations">Convites</TabsTrigger>
-        </TabsList>
-
-        {/* TAB: Equipe Ativa */}
-        <TabsContent value="active" className="mt-4">
-          {/* Desktop table */}
-          <div className="hidden rounded-md border bg-white sm:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[70px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingUsers ? (
-                  <TableRowsSkeleton colCount={5} rowCount={5} />
-                ) : activeUsers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
-                      Nenhum profissional ativo encontrado.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  activeUsers.map((user: unknown) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{getRoleLabel(user.role)}</TableCell>
-                      <TableCell>
-                        <Badge className="border-green-200 bg-green-50 text-green-700 hover:bg-green-50">
-                          Ativo
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{userActionMenu(user, true)}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Mobile card list */}
-          <Card className="sm:hidden">
-            {isLoadingUsers ? (
-              <div className="divide-y">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="bg-muted/30 mx-4 my-2 h-16 animate-pulse rounded-lg" />
-                ))}
-              </div>
-            ) : activeUsers.length === 0 ? (
-              <div className="text-muted-foreground py-10 text-center text-sm">
-                Nenhum profissional ativo encontrado.
-              </div>
-            ) : (
-              <div className="divide-border divide-y">
-                {activeUsers.map((user: unknown) => (
-                  <div key={user.id} className="flex items-center gap-3 px-4 py-3">
-                    <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                      {user.name?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-foreground truncate text-sm font-semibold">{user.name}</p>
-                      <div className="mt-0.5 flex items-center gap-2">
-                        <span className="text-muted-foreground truncate text-xs">{user.email}</span>
-                      </div>
-                      <div className="mt-0.5 flex items-center gap-2">
-                        <Badge variant="secondary" className="text-[10px]">
-                          {getRoleLabel(user.role)}
-                        </Badge>
-                        <Badge className="border-green-200 bg-green-50 text-[10px] text-green-700">
-                          Ativo
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="shrink-0">{userActionMenu(user, true)}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        </TabsContent>
-
-        {/* TAB: Inativos */}
-        <TabsContent value="inactive" className="mt-4">
-          {/* Desktop table */}
-          <div className="hidden rounded-md border bg-white sm:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[70px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingUsers ? (
-                  <TableRowsSkeleton colCount={5} rowCount={5} />
-                ) : inactiveUsers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
-                      Nenhum profissional inativo encontrado.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  inactiveUsers.map((user: unknown) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="text-muted-foreground font-medium">
-                        {user.name}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {getRoleLabel(user.role)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">Inativo</Badge>
-                      </TableCell>
-                      <TableCell>{userActionMenu(user, false)}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Mobile card list */}
-          <Card className="sm:hidden">
-            {isLoadingUsers ? (
-              <div className="divide-y">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="bg-muted/30 mx-4 my-2 h-16 animate-pulse rounded-lg" />
-                ))}
-              </div>
-            ) : inactiveUsers.length === 0 ? (
-              <div className="text-muted-foreground py-10 text-center text-sm">
-                Nenhum profissional inativo encontrado.
-              </div>
-            ) : (
-              <div className="divide-border divide-y">
-                {inactiveUsers.map((user: unknown) => (
-                  <div key={user.id} className="flex items-center gap-3 px-4 py-3 opacity-70">
-                    <div className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                      {user.name?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground truncate text-sm font-semibold">
-                        {user.name}
-                      </p>
-                      <p className="text-muted-foreground truncate text-xs">{user.email}</p>
-                      <div className="mt-0.5 flex items-center gap-2">
-                        <Badge variant="secondary" className="text-[10px]">
-                          {getRoleLabel(user.role)}
-                        </Badge>
-                        <Badge variant="secondary" className="text-[10px]">
-                          Inativo
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="shrink-0">{userActionMenu(user, false)}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        </TabsContent>
-
-        {/* TAB: Convites */}
-        <TabsContent value="invitations" className="mt-4">
-          {/* Desktop table */}
-          <div className="hidden rounded-md border bg-white sm:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Enviado em</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingInvitations ? (
-                  <TableRowsSkeleton colCount={4} rowCount={3} />
-                ) : invitations.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-muted-foreground h-24 text-center">
-                      Nenhum convite pendente.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  invitations.map((inv: unknown) => (
-                    <TableRow key={inv.id}>
-                      <TableCell>{inv.email}</TableCell>
-                      <TableCell>{getRoleLabel(inv.role)}</TableCell>
-                      <TableCell>
-                        {format(new Date(inv.createdAt), 'dd/MM/yyyy', { locale: ptBR })}
-                      </TableCell>
-                      <TableCell>{getInvitationStatus(inv)}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Mobile card list */}
-          <Card className="sm:hidden">
-            {isLoadingInvitations ? (
-              <div className="divide-y">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="bg-muted/30 mx-4 my-2 h-14 animate-pulse rounded-lg" />
-                ))}
-              </div>
-            ) : invitations.length === 0 ? (
-              <div className="text-muted-foreground py-10 text-center text-sm">
-                Nenhum convite pendente.
-              </div>
-            ) : (
-              <div className="divide-border divide-y">
-                {invitations.map((inv: unknown) => (
-                  <div key={inv.id} className="flex items-center gap-3 px-4 py-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-foreground truncate text-sm font-semibold">{inv.email}</p>
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" className="text-[10px]">
-                          {getRoleLabel(inv.role)}
-                        </Badge>
-                        {getInvitationStatus(inv)}
-                      </div>
-                    </div>
-                    <span className="text-muted-foreground shrink-0 text-xs">
-                      {format(new Date(inv.createdAt), 'dd/MM/yy', { locale: ptBR })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <ProfessionalsTable
+        activeUsers={activeUsers}
+        inactiveUsers={inactiveUsers}
+        invitations={invitations}
+        isLoadingUsers={isLoadingUsers}
+        isLoadingInvitations={isLoadingInvitations}
+        onEdit={(user) => {
+          setUserToEdit(user);
+          setIsEditOpen(true);
+        }}
+        onDelete={(user) => {
+          setUserToDelete(user);
+          setIsDeleteOpen(true);
+        }}
+        onActivate={handleActivate}
+      />
 
       <EditUserDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         user={userToEdit}
-        onSuccess={handleSuccess}
+        onSuccess={refetchUsers}
       />
 
       <DeleteUserDialog
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
         user={userToDelete}
-        onSuccess={handleSuccess}
+        onSuccess={refetchUsers}
       />
     </div>
   );

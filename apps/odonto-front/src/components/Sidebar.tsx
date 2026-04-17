@@ -85,10 +85,10 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
 
   const initials = user?.name
     ? user.name
-      .split(' ')
-      .slice(0, 2)
-      .map((n) => n[0].toUpperCase())
-      .join('')
+        .split(' ')
+        .slice(0, 2)
+        .map((n) => n[0].toUpperCase())
+        .join('')
     : '?';
 
   const filteredGroups = menuGroups.filter((group) => {

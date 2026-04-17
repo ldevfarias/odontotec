@@ -33,7 +33,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDocumentsControllerCreate } from '@/generated/hooks/useDocumentsControllerCreate';
-import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerFindAll';
 import { CreatePatientDocumentDtoTypeEnumKey } from '@/generated/ts/CreatePatientDocumentDto';
 
 const formSchema = z.object({
@@ -58,10 +57,6 @@ export function DocumentDialog({
 }: DocumentDialogProps) {
   const { user } = useAuth();
   const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
-  const { data: usersResponse } = useUsersControllerFindAll();
-  const dentists = (usersResponse?.data ?? []).filter(
-    (u: unknown) => u.role === 'DENTIST' || u.role === 'ADMIN',
-  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,6 +68,7 @@ export function DocumentDialog({
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form's watch() cannot be memoized safely; known React Compiler limitation
   const currentType = form.watch('type');
 
   // Populate templates and dentist based on type

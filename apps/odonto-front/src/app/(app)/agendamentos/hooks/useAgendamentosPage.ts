@@ -79,11 +79,8 @@ export function useAgendamentosPage() {
   const { data: appointmentDataResponse } = useAppointmentsControllerFindAll();
   const { mutate: updateAppointment } = useAppointmentsControllerUpdate();
 
-  const allUsers: UserApiItem[] = (userDataResponse as UsersApiResponse | undefined)?.data ?? [];
-  const allAppointments: AppointmentApiItem[] =
-    (appointmentDataResponse as AppointmentsApiResponse | undefined)?.data ?? [];
-
   const professionals = useMemo<Professional[]>(() => {
+    const allUsers: UserApiItem[] = (userDataResponse as UsersApiResponse | undefined)?.data ?? [];
     let filtered = allUsers.filter(
       (u) => u.role && ALLOWED_PROFESSIONAL_ROLES.includes(u.role.toUpperCase()) && u.isActive,
     );
@@ -93,12 +90,13 @@ export function useAgendamentosPage() {
     }
 
     return filtered.map(mapUserToProfessional);
-  }, [allUsers, currentUser]);
+  }, [userDataResponse, currentUser]);
 
-  const events = useMemo<CalendarEvent[]>(
-    () => allAppointments.map(mapAppointmentToEvent),
-    [allAppointments],
-  );
+  const events = useMemo<CalendarEvent[]>(() => {
+    const allAppointments: AppointmentApiItem[] =
+      (appointmentDataResponse as AppointmentsApiResponse | undefined)?.data ?? [];
+    return allAppointments.map(mapAppointmentToEvent);
+  }, [appointmentDataResponse]);
 
   function handleUpdateStatus(id: string, newStatus: UpdateStatus): void {
     updateAppointment(

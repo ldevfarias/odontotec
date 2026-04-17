@@ -72,7 +72,6 @@ export function Calendar({
       <CalendarSidebar
         state={state}
         onStateChange={handleStateChange}
-        categories={categories}
         professionals={professionals}
         events={events}
         mobileOpen={mobileFilterOpen}
@@ -125,7 +124,6 @@ export function Calendar({
               professionals={activeProfessionals}
               onEditAppointment={onEditAppointment}
               onUpdateAppointmentStatus={onUpdateAppointmentStatus}
-              onEventTap={(e) => setMobileSelectedEvent(e)}
               onDayTap={handleDayTap}
             />
           )}

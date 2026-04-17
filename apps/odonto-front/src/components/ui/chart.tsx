@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable max-lines -- shadcn/ui boilerplate, not business logic */
 'use client';
 
 import * as React from 'react';

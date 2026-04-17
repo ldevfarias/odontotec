@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppointmentsControllerFindAll } from '@/generated/hooks/useAppointmentsControllerFindAll';
 import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
+import { UpdateAppointmentDtoStatusEnumKey } from '@/generated/ts/UpdateAppointmentDto';
 import { notificationService } from '@/services/notification.service';
 
 import { DentistRecentPatients } from './DentistRecentPatients';
@@ -30,7 +31,7 @@ export function DentistDashboard() {
 
   const handleStatusChange = (appointment: unknown, status: string) => {
     updateAppointment(
-      { id: appointment.id, data: { status: status as any } },
+      { id: appointment.id, data: { status: status as UpdateAppointmentDtoStatusEnumKey } },
       {
         onSuccess: () => {
           notificationService.success('Status atualizado!');

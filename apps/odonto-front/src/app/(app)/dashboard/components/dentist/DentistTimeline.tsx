@@ -13,14 +13,12 @@ const HOUR_HEIGHT = 72; // px per hour
 interface DentistTimelineProps {
   appointments: unknown[];
   isLoading?: boolean;
-  onStatusChange?: (appointment: unknown, status: string) => void;
   onEditAppointment?: (appointment: unknown) => void;
 }
 
 export function DentistTimeline({
   appointments,
   isLoading,
-  onStatusChange,
   onEditAppointment,
 }: DentistTimelineProps) {
   const scrollRef = React.useRef<HTMLDivElement>(null);

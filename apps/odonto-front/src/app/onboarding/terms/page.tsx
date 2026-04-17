@@ -63,10 +63,10 @@ export default function TermsPage() {
                 <div>
                   <h4 className="font-medium text-gray-900">1. Proteção de Dados (LGPD)</h4>
                   <p className="mt-1 text-gray-600">
-                    Nós atuamos como "Operadores" dos dados. Você ou sua clínica são os
-                    "Controladores". Garantimos a segurança e criptografia das informações dos seus
-                    pacientes, mas você é responsável por obter o consentimento deles para o uso da
-                    plataforma.
+                    Nós atuamos como &ldquo;Operadores&rdquo; dos dados. Você ou sua clínica são os
+                    &ldquo;Controladores&rdquo;. Garantimos a segurança e criptografia das
+                    informações dos seus pacientes, mas você é responsável por obter o consentimento
+                    deles para o uso da plataforma.
                   </p>
                 </div>
 
