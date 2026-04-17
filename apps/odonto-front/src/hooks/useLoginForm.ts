@@ -134,7 +134,6 @@ export function useLoginForm() {
 
             analytics.capture(EVENT_NAMES.USER_LOGIN_FAILED, {
               email: values.email,
-              error_stage: 'auth_context_login',
             });
             analytics.captureException(error, {
               extra: {
@@ -145,7 +144,7 @@ export function useLoginForm() {
 
             notificationService.error(
               AUTH_MESSAGES.LOGIN.ERROR_TOAST_TITLE,
-              AUTH_MESSAGES.LOGIN.DEFAULT_ERROR_MESSAGE,
+              AUTH_MESSAGES.LOGIN.GENERIC_ERROR,
             );
           }
         },
