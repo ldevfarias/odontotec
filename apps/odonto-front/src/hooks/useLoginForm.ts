@@ -94,6 +94,7 @@ export function useLoginForm() {
   const { mutate, isPending } = useAuthControllerLogin();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -125,7 +126,27 @@ export function useLoginForm() {
             role: authUser?.role,
           });
 
-          login('', undefined, authUser, authClinics);
+          setIsRedirecting(true);
+          try {
+            login('', undefined, authUser, authClinics);
+          } catch (error) {
+            setIsRedirecting(false);
+
+            analytics.capture(EVENT_NAMES.USER_LOGIN_FAILED, {
+              email: values.email,
+            });
+            analytics.captureException(error, {
+              extra: {
+                email: values.email,
+                stage: 'auth_context_login',
+              },
+            });
+
+            notificationService.error(
+              AUTH_MESSAGES.LOGIN.ERROR_TOAST_TITLE,
+              AUTH_MESSAGES.LOGIN.GENERIC_ERROR,
+            );
+          }
         },
         onError: (error: unknown) => {
           const statusCode = (error as MutationErrorShape)?.response?.status;
@@ -145,7 +166,7 @@ export function useLoginForm() {
 
   return {
     form,
-    isPending,
+    isLoading: isPending || isRedirecting,
     onSubmit,
     showPassword,
     togglePasswordVisibility: () => setShowPassword((prevState) => !prevState),

@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { UseFormReturn } from 'react-hook-form';
 
@@ -20,7 +20,7 @@ const LANDING_PAGE_URL = process.env.NEXT_PUBLIC_LANDING_URL || 'http://localhos
 
 interface LoginFormPanelProps {
   form: UseFormReturn<LoginFormValues>;
-  isPending: boolean;
+  isLoading: boolean;
   onSubmit: (values: LoginFormValues) => void;
   showPassword: boolean;
   togglePasswordVisibility: () => void;
@@ -28,7 +28,7 @@ interface LoginFormPanelProps {
 
 export function LoginFormPanel({
   form,
-  isPending,
+  isLoading,
   onSubmit,
   showPassword,
   togglePasswordVisibility,
@@ -118,11 +118,16 @@ export function LoginFormPanel({
                 <Button
                   type="submit"
                   className="flex h-12 w-full items-center justify-center rounded-full bg-[#41b883] text-base font-semibold text-white shadow-[#41b883]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#3ba776] hover:shadow-lg focus-visible:ring-4 focus-visible:ring-[#41b883]/30"
-                  disabled={isPending}
+                  disabled={isLoading}
                 >
-                  {isPending
-                    ? AUTH_MESSAGES.LOGIN.SUBMIT_BUTTON_LOADING
-                    : AUTH_MESSAGES.LOGIN.SUBMIT_BUTTON}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {AUTH_MESSAGES.LOGIN.SUBMIT_BUTTON_LOADING}
+                    </>
+                  ) : (
+                    AUTH_MESSAGES.LOGIN.SUBMIT_BUTTON
+                  )}
                 </Button>
               </div>
             </form>
