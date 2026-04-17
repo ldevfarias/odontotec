@@ -13,6 +13,26 @@ export function hasSeenTour(): boolean {
   return localStorage.getItem(TOUR_SEEN_KEY) === 'true';
 }
 
+function waitForElement(selector: string, timeout = 5000): Promise<void> {
+  return new Promise((resolve) => {
+    if (document.querySelector(selector)) {
+      resolve();
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      if (document.querySelector(selector)) {
+        observer.disconnect();
+        resolve();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(() => {
+      observer.disconnect();
+      resolve();
+    }, timeout);
+  });
+}
+
 export function useTour() {
   const router = useRouter();
   const driverRef = useRef<ReturnType<typeof driver> | null>(null);
@@ -21,6 +41,8 @@ export function useTour() {
     if (typeof window === 'undefined') return;
 
     if (window.innerWidth < 768) return;
+
+    if (driverRef.current?.isActive()) return;
 
     localStorage.setItem('sidebar-collapsed', 'false');
     window.dispatchEvent(new CustomEvent('tour:expand-sidebar'));
@@ -65,19 +87,19 @@ export function useTour() {
             align: 'start',
             onNextClick: () => {
               router.push('/patients');
-              setTimeout(() => {
+              waitForElement('[data-tour="create-patient-btn"]').then(() => {
                 driverRef.current?.moveNext();
-              }, 800);
+              });
             },
           },
         },
         {
           element: '[data-tour="create-patient-btn"]',
           popover: {
-            title: '➕ Cadastrar Paciente',
+            title: '➕ Novo Paciente',
             description: 'Clique aqui para cadastrar seu primeiro paciente.',
-            side: 'bottom',
-            align: 'end',
+            side: 'left',
+            align: 'start',
           },
         },
         {
@@ -89,20 +111,20 @@ export function useTour() {
             align: 'start',
             onNextClick: () => {
               router.push('/agendamentos');
-              setTimeout(() => {
+              waitForElement('[data-tour="create-appointment-btn"]').then(() => {
                 driverRef.current?.moveNext();
-              }, 800);
+              });
             },
           },
         },
         {
           element: '[data-tour="create-appointment-btn"]',
           popover: {
-            title: '🗓️ Criar Agendamento',
+            title: '🗓️ Novo Agendamento',
             description:
               'Crie seu primeiro agendamento e comece a usar o OdontoTec!',
-            side: 'bottom',
-            align: 'end',
+            side: 'left',
+            align: 'start',
             onNextClick: () => {
               completedAllSteps = true;
               driverRef.current?.destroy();
