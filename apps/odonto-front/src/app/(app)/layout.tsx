@@ -5,8 +5,8 @@ import { RouteGuard } from '@/components/RouteGuard';
 import { Sidebar } from '@/components/Sidebar';
 import { AppLayoutSkeleton } from '@/components/skeletons';
 import { SubscriptionBlocker } from '@/components/SubscriptionBlocker';
-import { TourProvider } from '@/contexts/TourContext';
 import { SubscriptionProvider, useSubscription } from '@/contexts/SubscriptionContext';
+import { TourProvider } from '@/contexts/TourContext';
 import { cn } from '@/lib/utils';
 
 function DashboardContent({ children }: { children: React.ReactNode }) {

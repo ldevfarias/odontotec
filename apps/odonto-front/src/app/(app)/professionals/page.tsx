@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Edit, Loader2, MoreHorizontal, Trash2, UserPlus } from 'lucide-react';
+import { Edit, MoreHorizontal, Trash2, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -129,12 +129,12 @@ export default function ProfessionalsPage() {
     );
   }
 
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: unknown) => {
     setUserToEdit(user);
     setIsEditOpen(true);
   };
 
-  const handleDelete = (user: any) => {
+  const handleDelete = (user: unknown) => {
     setUserToDelete(user);
     setIsDeleteOpen(true);
   };
@@ -152,7 +152,7 @@ export default function ProfessionalsPage() {
     return roles[role] || role;
   };
 
-  const getInvitationStatus = (invitation: any) => {
+  const getInvitationStatus = (invitation: unknown) => {
     if (invitation.acceptedAt)
       return (
         <Badge className="border-green-200 bg-green-100 text-green-700 hover:bg-green-100">
@@ -172,10 +172,10 @@ export default function ProfessionalsPage() {
     );
   };
 
-  const activeUsers = users.filter((u: any) => u.isActive);
-  const inactiveUsers = users.filter((u: any) => !u.isActive);
+  const activeUsers = users.filter((u: unknown) => u.isActive);
+  const inactiveUsers = users.filter((u: unknown) => !u.isActive);
 
-  const handleActivate = async (user: any) => {
+  const handleActivate = async (user: unknown) => {
     try {
       await api.patch(`/users/${user.id}`, { isActive: true });
       notificationService.success('Usuário reativado com sucesso!');
@@ -186,7 +186,7 @@ export default function ProfessionalsPage() {
     }
   };
 
-  const userActionMenu = (user: any, isActive: boolean) => (
+  const userActionMenu = (user: unknown, isActive: boolean) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -349,7 +349,7 @@ export default function ProfessionalsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  activeUsers.map((user: any) => (
+                  activeUsers.map((user: unknown) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
@@ -381,7 +381,7 @@ export default function ProfessionalsPage() {
               </div>
             ) : (
               <div className="divide-border divide-y">
-                {activeUsers.map((user: any) => (
+                {activeUsers.map((user: unknown) => (
                   <div key={user.id} className="flex items-center gap-3 px-4 py-3">
                     <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                       {user.name?.charAt(0)?.toUpperCase() || '?'}
@@ -432,7 +432,7 @@ export default function ProfessionalsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  inactiveUsers.map((user: any) => (
+                  inactiveUsers.map((user: unknown) => (
                     <TableRow key={user.id}>
                       <TableCell className="text-muted-foreground font-medium">
                         {user.name}
@@ -466,7 +466,7 @@ export default function ProfessionalsPage() {
               </div>
             ) : (
               <div className="divide-border divide-y">
-                {inactiveUsers.map((user: any) => (
+                {inactiveUsers.map((user: unknown) => (
                   <div key={user.id} className="flex items-center gap-3 px-4 py-3 opacity-70">
                     <div className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                       {user.name?.charAt(0)?.toUpperCase() || '?'}
@@ -516,7 +516,7 @@ export default function ProfessionalsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  invitations.map((inv: any) => (
+                  invitations.map((inv: unknown) => (
                     <TableRow key={inv.id}>
                       <TableCell>{inv.email}</TableCell>
                       <TableCell>{getRoleLabel(inv.role)}</TableCell>
@@ -545,7 +545,7 @@ export default function ProfessionalsPage() {
               </div>
             ) : (
               <div className="divide-border divide-y">
-                {invitations.map((inv: any) => (
+                {invitations.map((inv: unknown) => (
                   <div key={inv.id} className="flex items-center gap-3 px-4 py-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-foreground truncate text-sm font-semibold">{inv.email}</p>

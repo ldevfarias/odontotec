@@ -2,8 +2,7 @@
 
 import { format, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Download, Eye, FileText, Plus, Printer, Trash2 } from 'lucide-react';
-import { Loader2 } from 'lucide-react';
+import { FileText, Plus, Printer, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { DocumentsTabSkeleton } from '@/components/skeletons';
@@ -29,6 +28,17 @@ interface DocumentsTabProps {
   patientId: number;
 }
 
+interface PatientDocumentItem {
+  id: number;
+  date?: string;
+  type: 'ATESTADO' | 'RECEITA' | 'OUTRO' | string;
+  title: string;
+  content: string;
+  dentist?: {
+    name?: string;
+  };
+}
+
 export function DocumentsTab({ patientId }: DocumentsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
@@ -36,7 +46,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
     refetch,
     isLoading,
   } = useDocumentsControllerFindAll({ patientId: String(patientId) });
-  const documents = documentsResponse?.data ?? [];
+  const documents = (documentsResponse?.data ?? []) as PatientDocumentItem[];
   const { mutate: removeDocument } = useDocumentsControllerRemove();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -142,7 +152,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {documents.map((doc: any) => (
+                  {documents.map((doc) => (
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">
                         {doc.date &&
@@ -156,7 +166,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
                         </Badge>
                       </TableCell>
                       <TableCell>{doc.title}</TableCell>
-                      <TableCell>{(doc as any).dentist?.name || 'N/A'}</TableCell>
+                      <TableCell>{doc.dentist?.name || 'N/A'}</TableCell>
                       <TableCell className="space-x-2 text-right">
                         <Button
                           variant="ghost"
@@ -186,7 +196,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
 
             {/* Mobile card list */}
             <div className="divide-border border-border flex flex-col divide-y overflow-hidden rounded-xl border sm:hidden">
-              {documents.map((doc: any) => (
+              {documents.map((doc) => (
                 <div key={doc.id} className="bg-card flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -204,9 +214,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
                     <p className="text-foreground mt-0.5 truncate text-sm font-semibold">
                       {doc.title}
                     </p>
-                    <p className="text-muted-foreground text-xs">
-                      {(doc as any).dentist?.name || 'N/A'}
-                    </p>
+                    <p className="text-muted-foreground text-xs">{doc.dentist?.name || 'N/A'}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <Button

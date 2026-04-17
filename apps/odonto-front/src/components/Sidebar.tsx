@@ -1,7 +1,8 @@
 'use client';
 
 import {
-  Building2, CalendarDays,
+  Building2,
+  CalendarDays,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -9,7 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
-  Users
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -26,7 +27,12 @@ const menuGroups = [
     label: 'Principal',
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', exact: true },
-      { icon: CalendarDays, label: 'Agendamentos', href: '/agendamentos', dataTour: 'nav-appointments' },
+      {
+        icon: CalendarDays,
+        label: 'Agendamentos',
+        href: '/agendamentos',
+        dataTour: 'nav-appointments',
+      },
       { icon: Users, label: 'Pacientes', href: '/patients', dataTour: 'nav-patients' },
     ],
   },
@@ -47,7 +53,10 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
   const router = useRouter();
   const { logout, activeClinic, setActiveClinic, clinics, user } = useAuth();
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === 'undefined' || isMobile) return false;
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
   const [clinicOpen, setClinicOpen] = useState(false);
 
   const handleClinicSwitch = (clinic: typeof activeClinic) => {
@@ -61,13 +70,6 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
       setClinicOpen(false);
     }
   };
-
-  // Persist collapsed state after hydration
-  useEffect(() => {
-    if (isMobile) return;
-    const stored = localStorage.getItem('sidebar-collapsed');
-    if (stored === 'true') setCollapsed(true);
-  }, [isMobile]);
 
   useEffect(() => {
     if (isMobile) return;
@@ -262,7 +264,6 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
           ))}
         </div>
 
-        {/* Upgrade card stacking right below the menu */}
         {!isCollapsed && (
           <div className="mt-8 mb-2">
             <UpgradePlanCard />

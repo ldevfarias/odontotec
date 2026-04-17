@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { notificationService } from '@/services/notification.service';
 
 interface DeleteUserDialogProps {
-  user: any;
+  user: unknown;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;

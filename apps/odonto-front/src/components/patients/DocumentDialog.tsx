@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FileText, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -60,7 +60,7 @@ export function DocumentDialog({
   const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
   const { data: usersResponse } = useUsersControllerFindAll();
   const dentists = (usersResponse?.data ?? []).filter(
-    (u: any) => u.role === 'DENTIST' || u.role === 'ADMIN',
+    (u: unknown) => u.role === 'DENTIST' || u.role === 'ADMIN',
   );
 
   const form = useForm<z.infer<typeof formSchema>>({

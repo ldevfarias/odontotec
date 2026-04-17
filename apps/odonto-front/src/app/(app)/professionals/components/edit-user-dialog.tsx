@@ -42,7 +42,7 @@ const editUserSchema = z.object({
 type EditUserFormValues = z.infer<typeof editUserSchema>;
 
 interface EditUserDialogProps {
-  user: any;
+  user: unknown;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;

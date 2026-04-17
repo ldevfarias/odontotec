@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
 import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -62,11 +63,14 @@ export default function VerifyEmailPage() {
       notificationService.success('E-mail verificado e conta criada com sucesso!');
       // Pass the newly created user to login so AuthContext upgrades the session.
       // Empty clinics array signals a new onboarding user — login() will route to /onboarding/terms.
-      login('', response.user.clinicName, response.user as any, []);
-    } catch (error: any) {
+      login('', response.user.clinicName, response.user, []);
+    } catch (error: unknown) {
       console.error(error);
+      const apiMessage = isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message
+        : undefined;
       notificationService.error(
-        error.response?.data?.message || 'Link inválido ou expirado. Solicite um novo cadastro.',
+        apiMessage || 'Link inválido ou expirado. Solicite um novo cadastro.',
       );
     } finally {
       setIsLoading(false);

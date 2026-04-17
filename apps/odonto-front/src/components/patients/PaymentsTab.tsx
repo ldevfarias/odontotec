@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -12,7 +13,6 @@ import {
   ChevronDown,
   ChevronUp,
   ClipboardList,
-  Clock,
   CreditCard,
   DollarSign,
   Plus,
@@ -28,7 +28,6 @@ import * as z from 'zod';
 import { PaymentsTabSkeleton } from '@/components/skeletons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import {
   Dialog,
@@ -65,15 +64,54 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePaymentsControllerCreate } from '@/generated/hooks/usePaymentsControllerCreate';
-import { usePaymentsControllerFindAllByPatient } from '@/generated/hooks/usePaymentsControllerFindAllByPatient';
-import { paymentsControllerFindAllByPatientQueryKey } from '@/generated/hooks/usePaymentsControllerFindAllByPatient';
+import {
+  paymentsControllerFindAllByPatientQueryKey,
+  usePaymentsControllerFindAllByPatient,
+} from '@/generated/hooks/usePaymentsControllerFindAllByPatient';
 import {
   treatmentPlansControllerFindAllQueryKey,
   useTreatmentPlansControllerFindAll,
 } from '@/generated/hooks/useTreatmentPlansControllerFindAll';
 import { useTreatmentPlansControllerUpdate } from '@/generated/hooks/useTreatmentPlansControllerUpdate';
+import {
+  CreatePaymentDtoMethodEnumKey,
+  CreatePaymentDtoStatusEnumKey,
+} from '@/generated/ts/CreatePaymentDto';
+import { UpdateTreatmentPlanDtoStatusEnumKey } from '@/generated/ts/UpdateTreatmentPlanDto';
 import { analytics, EVENT_NAMES } from '@/services/analytics.service';
 import { notificationService } from '@/services/notification.service';
+
+interface TreatmentPlanItem {
+  id?: number;
+  description: string;
+  value: number;
+  toothNumber?: number;
+}
+
+interface TreatmentPlan {
+  id: number;
+  patientId: number;
+  status: string;
+  createdAt?: string;
+  totalAmount: number;
+  discount?: number;
+  notes?: string;
+  title?: string;
+  dentist?: { name: string };
+  items?: TreatmentPlanItem[];
+}
+
+type EnrichedPlan = TreatmentPlan & { totalPaid: number; balance: number };
+
+interface Payment {
+  id: number;
+  amount: number;
+  method: CreatePaymentDtoMethodEnumKey;
+  date?: string;
+  treatmentPlanId?: number;
+}
+
+type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -100,7 +138,7 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 };
 
 const paymentSchema = z.object({
-  amount: z.string().transform((val) => Number(val)),
+  amount: z.string().min(1),
   method: z.enum(['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'PIX', 'INSURANCE']),
   date: z.string(),
   treatmentPlanId: z.number().optional(),
@@ -124,14 +162,20 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
 
   const { data: treatmentPlansResponse, isLoading: loadingPlans } =
     useTreatmentPlansControllerFindAll();
-  const treatmentPlans = treatmentPlansResponse?.data ?? [];
   const { data: paymentsResponse, isLoading: loadingPayments } =
     usePaymentsControllerFindAllByPatient(patientId);
-  const payments = paymentsResponse?.data ?? [];
+  const treatmentPlans = useMemo<TreatmentPlan[]>(
+    () => (treatmentPlansResponse?.data ?? []) as TreatmentPlan[],
+    [treatmentPlansResponse],
+  );
+  const payments = useMemo<Payment[]>(
+    () => (paymentsResponse?.data ?? []) as Payment[],
+    [paymentsResponse],
+  );
   const { mutate: createPayment, isPending: isCreating } = usePaymentsControllerCreate();
   const { mutate: updateTreatmentPlan } = useTreatmentPlansControllerUpdate();
 
-  const form = useForm<any>({
+  const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
       amount: '',
@@ -141,7 +185,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
   });
 
   const patientTreatmentPlans = useMemo(() => {
-    return (treatmentPlans as any[])
+    return treatmentPlans
       .filter((plan) => plan.patientId === patientId)
       .sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -150,8 +194,8 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
       });
   }, [treatmentPlans, patientId]);
 
-  const enrichedPlans = useMemo(() => {
-    const paymentsByPlan = (payments as any[]).reduce(
+  const enrichedPlans = useMemo<EnrichedPlan[]>(() => {
+    const paymentsByPlan = payments.reduce(
       (acc, p) => {
         if (p.treatmentPlanId) {
           acc[p.treatmentPlanId] = (acc[p.treatmentPlanId] || 0) + Number(p.amount);
@@ -170,7 +214,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
   const totalDebt = enrichedPlans
     .filter((p) => p.status === 'APPROVED')
     .reduce((sum, p) => sum + Math.max(p.balance, 0), 0);
-  const totalPaid = (payments as any[]).reduce((sum, p) => sum + Number(p.amount), 0);
+  const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0);
   const totalBudgeted = enrichedPlans.reduce((sum, p) => sum + Number(p.totalAmount), 0);
 
   const toggleExpand = (id: number) => {
@@ -183,14 +227,15 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
     setIsDialogOpen(true);
   };
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: PaymentFormValues) => {
     createPayment(
       {
         data: {
           ...values,
+          amount: Number(values.amount),
           patientId,
           treatmentPlanId: selectedPlanId || undefined,
-          status: 'COMPLETED',
+          status: 'COMPLETED' as CreatePaymentDtoStatusEnumKey,
         },
       },
       {
@@ -214,7 +259,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
               updateTreatmentPlan(
                 {
                   id: plan.id,
-                  data: { status: 'COMPLETED' } as any,
+                  data: { status: 'COMPLETED' as UpdateTreatmentPlanDtoStatusEnumKey },
                 },
                 {
                   onSuccess: () => {
@@ -230,14 +275,17 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
           setIsDialogOpen(false);
           form.reset();
         },
-        onError: (err: any) => {
-          notificationService.error(err?.response?.data?.message || 'Erro ao registrar pagamento');
+        onError: (err: unknown) => {
+          const msg = isAxiosError(err)
+            ? (err.response?.data?.message as string | undefined)
+            : undefined;
+          notificationService.error(msg || 'Erro ao registrar pagamento');
         },
       },
     );
   };
 
-  const handleStatusUpdate = (id: number, status: string) => {
+  const handleStatusUpdate = (id: number, status: UpdateTreatmentPlanDtoStatusEnumKey) => {
     const actionText =
       status === 'APPROVED' ? 'aprovar' : status === 'CANCELLED' ? 'cancelar' : 'finalizar';
 
@@ -249,7 +297,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
         updateTreatmentPlan(
           {
             id,
-            data: { status } as any,
+            data: { status },
           },
           {
             onSuccess: () => {
@@ -269,8 +317,11 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
               });
               queryClient.invalidateQueries({ queryKey: ['PatientsControllerFindOne', patientId] });
             },
-            onError: (err: any) => {
-              notificationService.error(err?.response?.data?.message || 'Erro ao atualizar status');
+            onError: (err: unknown) => {
+              const msg = isAxiosError(err)
+                ? (err.response?.data?.message as string | undefined)
+                : undefined;
+              notificationService.error(msg || 'Erro ao atualizar status');
             },
           },
         );
@@ -329,7 +380,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
 
       {/* Tabs Layout */}
       <Tabs defaultValue="budgets" className="w-full">
-        <TabsList className="bg-muted/50 grid h-10 w-full grid-cols-2 p-1 lg:w-[400px]">
+        <TabsList className="bg-muted/50 grid h-10 w-full grid-cols-2 p-1 lg:w-100">
           <TabsTrigger
             value="budgets"
             className="flex cursor-pointer items-center gap-2 transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm"
@@ -482,7 +533,7 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {(plan.items || []).map((item: any, idx: number) => (
+                              {(plan.items ?? []).map((item, idx) => (
                                 <TableRow
                                   key={idx}
                                   className="border-border/40 hover:bg-transparent"
@@ -577,14 +628,14 @@ export function PaymentsTab({ patientId }: PaymentsTabProps) {
             </Button>
           </div>
 
-          {(payments as any[]).length === 0 ? (
+          {payments.length === 0 ? (
             <div className="text-muted-foreground rounded-lg border-2 border-dashed py-10 text-center italic">
               <Receipt className="mx-auto mb-2 h-8 w-8 opacity-20" />
               Nenhum pagamento registrado.
             </div>
           ) : (
             <div className="card-surface divide-y">
-              {(payments as any[]).map((payment: any) => {
+              {payments.map((payment) => {
                 const method = methodLabels[payment.method] || {
                   label: payment.method,
                   icon: <DollarSign className="h-3.5 w-3.5" />,

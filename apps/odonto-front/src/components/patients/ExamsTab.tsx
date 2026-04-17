@@ -2,16 +2,7 @@
 
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import {
-  Download,
-  File,
-  FileUp,
-  Image as ImageIcon,
-  Loader2,
-  Search,
-  Trash2,
-  X,
-} from 'lucide-react';
+import { Download, File, FileUp, Image as ImageIcon, Loader2, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
 import { ExamsTabSkeleton } from '@/components/skeletons';
@@ -22,6 +13,14 @@ import { Progress } from '@/components/ui/progress';
 import { useExamsControllerFindAllByPatient } from '@/generated/hooks/useExamsControllerFindAllByPatient';
 import { useExamsControllerUpload } from '@/generated/hooks/useExamsControllerUpload';
 import { notificationService } from '@/services/notification.service';
+
+interface ExamItem {
+  id: number;
+  title: string;
+  createdAt?: string;
+  fileType?: string;
+  fileUrl: string;
+}
 
 export function ExamsTab({ patientId }: { patientId: number }) {
   const { data: exams, isLoading, refetch } = useExamsControllerFindAllByPatient(patientId);
@@ -50,7 +49,7 @@ export function ExamsTab({ patientId }: { patientId: number }) {
         data: {
           title,
           patientId,
-          files: files as unknown as Blob[],
+          files,
         },
       },
       {
@@ -91,7 +90,7 @@ export function ExamsTab({ patientId }: { patientId: number }) {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (error) {
+    } catch {
       notificationService.error('Erro ao baixar arquivo');
     }
   };
@@ -146,7 +145,7 @@ export function ExamsTab({ patientId }: { patientId: number }) {
                         key={`${f.name}-${i}`}
                         className="bg-muted/40 border-border/50 group hover:bg-muted/60 flex items-center gap-3 rounded-md border px-3 py-2 transition-colors"
                       >
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           {isImage ? (
                             <ImageIcon className="h-4 w-4 text-emerald-500" />
                           ) : (
@@ -154,13 +153,13 @@ export function ExamsTab({ patientId }: { patientId: number }) {
                           )}
                         </div>
                         <span className="flex-1 truncate text-sm">{f.name}</span>
-                        <span className="text-muted-foreground flex-shrink-0 text-[10px]">
+                        <span className="text-muted-foreground shrink-0 text-[10px]">
                           {sizeKB} KB
                         </span>
                         <button
                           type="button"
                           onClick={() => setFiles((prev) => prev.filter((_, index) => index !== i))}
-                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -195,14 +194,14 @@ export function ExamsTab({ patientId }: { patientId: number }) {
           </div>
         ) : exams && exams.length > 0 ? (
           <div className="space-y-2">
-            {(exams as any[]).map((exam: any) => {
+            {(exams as ExamItem[]).map((exam) => {
               const isImage = exam.fileType?.includes('image');
               return (
                 <div
                   key={exam.id}
                   className="border-border/60 bg-card hover:bg-muted/30 group flex items-center gap-4 rounded-lg border px-4 py-3 transition-colors"
                 >
-                  <div className="bg-muted flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md">
+                  <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-md">
                     {isImage ? (
                       <ImageIcon className="h-4 w-4 text-emerald-500" />
                     ) : (

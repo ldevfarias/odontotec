@@ -95,7 +95,7 @@ export const analytics = {
   /**
    * Identifica o usuário no PostHog após login
    */
-  identify(distinctId: string, properties?: Record<string, any>) {
+  identify(distinctId: string, properties?: Record<string, unknown>) {
     posthog.identify(distinctId, properties);
   },
 
@@ -109,7 +109,7 @@ export const analytics = {
   /**
    * Captura uma exceção manualmente
    */
-  captureException(error: any, properties?: Record<string, any>) {
+  captureException(error: unknown, properties?: Record<string, unknown>) {
     posthog.captureException(error, properties);
   },
 };

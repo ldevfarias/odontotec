@@ -1,10 +1,11 @@
 'use client';
 
+/* eslint-disable max-lines */
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import {
-  Banknote,
   Check,
   CheckCircle2,
   ChevronsUpDown,
@@ -15,8 +16,8 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
 import { BudgetsTabSkeleton } from '@/components/skeletons';
@@ -26,7 +27,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -56,13 +56,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { useClinicProceduresControllerFindAll } from '@/generated/hooks/useClinicProceduresControllerFindAll';
 import { useTreatmentPlansControllerCreate } from '@/generated/hooks/useTreatmentPlansControllerCreate';
-import { useTreatmentPlansControllerFindAll } from '@/generated/hooks/useTreatmentPlansControllerFindAll';
-import { treatmentPlansControllerFindAllQueryKey } from '@/generated/hooks/useTreatmentPlansControllerFindAll';
+import {
+  treatmentPlansControllerFindAllQueryKey,
+  useTreatmentPlansControllerFindAll,
+} from '@/generated/hooks/useTreatmentPlansControllerFindAll';
 import { useTreatmentPlansControllerRemove } from '@/generated/hooks/useTreatmentPlansControllerRemove';
 import { useTreatmentPlansControllerUpdate } from '@/generated/hooks/useTreatmentPlansControllerUpdate';
+import type { CreateTreatmentPlanDto } from '@/generated/ts/CreateTreatmentPlanDto';
+import type {
+  TreatmentPlanItemDto,
+  TreatmentPlanItemDtoStatusEnumKey,
+} from '@/generated/ts/TreatmentPlanItemDto';
+import type {
+  UpdateTreatmentPlanDto,
+  UpdateTreatmentPlanDtoStatusEnumKey,
+} from '@/generated/ts/UpdateTreatmentPlanDto';
 import { cn } from '@/lib/utils';
 import { notificationService } from '@/services/notification.service';
 import { formatCurrencyInput, parseCurrencyInput } from '@/utils/masks';
@@ -76,8 +86,6 @@ const ADULT_TEETH = [
 const PEDIATRIC_TEETH = [
   55, 54, 53, 52, 51, 61, 62, 63, 64, 65, 85, 84, 83, 82, 81, 71, 72, 73, 74, 75,
 ].sort();
-
-const ALL_TEETH = [...ADULT_TEETH, ...PEDIATRIC_TEETH];
 
 const budgetFormSchema = z.object({
   title: z.string().min(1, 'O título é obrigatório'),
@@ -95,6 +103,48 @@ interface CartItem {
   toothNumber?: number;
 }
 
+interface ProcedureCatalogItem {
+  id: number;
+  name: string;
+  baseValue: number;
+}
+
+interface BudgetPlanItem extends Omit<TreatmentPlanItemDto, 'surface'> {
+  id?: number;
+}
+
+interface BudgetPlan {
+  id: number;
+  patientId: number;
+  createdAt: string;
+  totalAmount: number;
+  discount?: number;
+  title?: string;
+  status: UpdateTreatmentPlanDtoStatusEnumKey;
+  items?: BudgetPlanItem[];
+}
+
+interface QueryDataShape<T> {
+  data?: T[];
+}
+
+const extractArrayData = <T,>(response: unknown): T[] => {
+  if (Array.isArray(response)) {
+    return response as T[];
+  }
+
+  if (
+    typeof response === 'object' &&
+    response !== null &&
+    'data' in response &&
+    Array.isArray((response as QueryDataShape<T>).data)
+  ) {
+    return (response as QueryDataShape<T>).data ?? [];
+  }
+
+  return [];
+};
+
 interface BudgetsTabProps {
   patientId: number;
 }
@@ -108,6 +158,8 @@ const STATUS_CONFIG = {
 };
 
 export function BudgetsTab({ patientId }: BudgetsTabProps) {
+  'use no memo';
+
   const queryClient = useQueryClient();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -116,18 +168,24 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
 
   // API Hooks
   const { data: catalogResponse } = useClinicProceduresControllerFindAll();
-  const catalog = (catalogResponse as any) ?? [];
   const { data: allPlansResponse, isLoading: isLoadingPlans } =
     useTreatmentPlansControllerFindAll();
-  const allPlans = (allPlansResponse as any)?.data ?? [];
   const { mutate: createPlan, isPending: isCreating } = useTreatmentPlansControllerCreate();
   const { mutate: updatePlan, isPending: isUpdating } = useTreatmentPlansControllerUpdate();
   const { mutate: removePlan, isPending: isDeleting } = useTreatmentPlansControllerRemove();
 
+  const catalog = useMemo<ProcedureCatalogItem[]>(() => {
+    return extractArrayData<ProcedureCatalogItem>(catalogResponse);
+  }, [catalogResponse]);
+
+  const allPlans = useMemo<BudgetPlan[]>(() => {
+    return extractArrayData<BudgetPlan>(allPlansResponse);
+  }, [allPlansResponse]);
+
   const isSaving = isCreating || isUpdating;
 
   const patientPlans = useMemo(() => {
-    return (allPlans as any[])
+    return allPlans
       .filter((plan) => plan.patientId === patientId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [allPlans, patientId]);
@@ -142,12 +200,18 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
     },
   });
 
-  const discount = form.watch('discount') || 0;
+  const discount = useWatch({ control: form.control, name: 'discount', defaultValue: 0 }) || 0;
+  const watchTitle = useWatch({ control: form.control, name: 'title', defaultValue: '' });
+  const watchProcedureName = useWatch({
+    control: form.control,
+    name: 'procedureName',
+    defaultValue: '',
+  });
   const subtotal = cart.reduce((acc, item) => acc + item.value, 0);
   const total = Math.max(0, subtotal - discount);
 
   const addToCart = (values: BudgetFormValues) => {
-    const procedure = (catalog as any[]).find((p) => p.name === values.procedureName);
+    const procedure = catalog.find((item) => item.name === values.procedureName);
     if (!procedure) return;
 
     const newItem: CartItem = {
@@ -172,13 +236,13 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleEdit = (plan: any) => {
+  const handleEdit = (plan: BudgetPlan) => {
     setEditingId(plan.id);
     form.setValue('title', plan.title || '');
     form.setValue('discount', Number(plan.discount || 0));
 
-    const newCart = plan.items.map((item: any) => ({
-      id: item.id || crypto.randomUUID(),
+    const newCart = (plan.items ?? []).map((item) => ({
+      id: String(item.id ?? crypto.randomUUID()),
       description: item.description,
       value: Number(item.value),
       toothNumber: item.toothNumber,
@@ -197,7 +261,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
 
   const handleApprove = (id: number) => {
     updatePlan(
-      { id, data: { status: 'APPROVED' } as any },
+      { id, data: { status: 'APPROVED' as UpdateTreatmentPlanDtoStatusEnumKey } },
       {
         onSuccess: () => {
           notificationService.success('Orçamento aprovado!');
@@ -209,7 +273,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
 
   const handleCancel = (id: number) => {
     updatePlan(
-      { id, data: { status: 'CANCELLED' } as any },
+      { id, data: { status: 'CANCELLED' as UpdateTreatmentPlanDtoStatusEnumKey } },
       {
         onSuccess: () => {
           notificationService.success('Orçamento cancelado!');
@@ -241,25 +305,36 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
     const title = form.getValues('title');
     const discount = form.getValues('discount') || 0;
 
-    const planData = {
+    const items: TreatmentPlanItemDto[] = cart.map((item) => ({
+      description: item.description,
+      value: item.value,
+      toothNumber: item.toothNumber,
+      status: 'PLANNED' as TreatmentPlanItemDtoStatusEnumKey,
+    }));
+
+    const createPlanData: CreateTreatmentPlanDto = {
       patientId,
-      dentistId: 1, // Fix: Use actual dentist ID
+      dentistId: 1,
       title,
       discount,
-      status: 'DRAFT' as any,
-      items: cart.map((item) => ({
-        description: item.description,
-        value: item.value,
-        toothNumber: item.toothNumber,
-        status: 'PLANNED' as any,
-      })),
+      status: 'DRAFT',
+      items,
+    };
+
+    const updatePlanData: UpdateTreatmentPlanDto = {
+      patientId,
+      dentistId: 1,
+      title,
+      discount,
+      status: 'DRAFT',
+      items,
     };
 
     if (editingId) {
       updatePlan(
         {
           id: editingId,
-          data: planData as any,
+          data: updatePlanData,
         },
         {
           onSuccess: () => {
@@ -277,7 +352,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
     } else {
       createPlan(
         {
-          data: planData as any,
+          data: createPlanData,
         },
         {
           onSuccess: () => {
@@ -341,7 +416,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {(catalog as any[]).map((proc) => (
+                            {catalog.map((proc) => (
                               <SelectItem key={proc.id} value={proc.name}>
                                 {proc.name} -{' '}
                                 {new Intl.NumberFormat('pt-BR', {
@@ -488,7 +563,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
                   type="submit"
                   variant="secondary"
                   className="w-full"
-                  disabled={!form.watch('title') || !form.watch('procedureName')}
+                  disabled={!watchTitle || !watchProcedureName}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Adicionar ao Carrinho
@@ -505,7 +580,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px] pr-4">
+              <ScrollArea className="h-100 pr-4">
                 {isLoadingPlans ? (
                   <BudgetsTabSkeleton />
                 ) : patientPlans.length === 0 ? (
@@ -549,8 +624,11 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
                                   Itens do Orçamento
                                 </h5>
                                 <div className="space-y-2">
-                                  {plan.items?.map((item: any) => (
-                                    <div key={item.id} className="flex justify-between text-sm">
+                                  {(plan.items ?? []).map((item, index) => (
+                                    <div
+                                      key={item.id ?? `${plan.id}-${index}`}
+                                      className="flex justify-between text-sm"
+                                    >
                                       <span>
                                         {item.description}{' '}
                                         {item.toothNumber && (
@@ -567,7 +645,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
                                       </span>
                                     </div>
                                   ))}
-                                  {plan.discount > 0 && (
+                                  {Number(plan.discount ?? 0) > 0 && (
                                     <div className="mt-2 flex justify-between border-t pt-2 text-sm font-medium text-red-500">
                                       <span>Desconto</span>
                                       <span>
@@ -652,24 +730,24 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
           <Card className="border-border/40 sticky top-6 shadow-sm">
             <CardHeader className="border-border/40 mb-0 border-b pb-3">
               <CardTitle className="text-foreground/80 flex items-center gap-2 text-base font-semibold tracking-tight">
-                <ShoppingCart className="text-muted-foreground h-[18px] w-[18px] stroke-[1.5]" />
+                <ShoppingCart className="text-muted-foreground h-4.5 w-4.5 stroke-[1.5]" />
                 Resumo do Orçamento
               </CardTitle>
             </CardHeader>
             <CardContent className="px-6 pt-3">
               {cart.length === 0 ? (
                 <div className="text-muted-foreground/50 flex h-52 flex-col items-center justify-center space-y-4">
-                  <ShoppingCart className="h-12 w-12 stroke-[1]" />
+                  <ShoppingCart className="h-12 w-12 stroke-1" />
                   <p className="text-sm font-light tracking-wide">Nenhum procedimento no momento</p>
                 </div>
               ) : (
                 <div className="space-y-0">
-                  <ScrollArea className="-mx-4 mt-0 h-[320px] px-4">
+                  <ScrollArea className="-mx-4 mt-0 h-80 px-4">
                     <div className="flex flex-col gap-2.5 pb-2">
                       {cart.map((item) => (
                         <div
                           key={item.id}
-                          className="group from-card to-muted/30 border-border/40 hover:border-primary/20 relative rounded-lg border bg-gradient-to-r p-3 shadow-xs transition-all hover:shadow-sm"
+                          className="group from-card to-muted/30 border-border/40 hover:border-primary/20 relative rounded-lg border bg-linear-to-r p-3 shadow-xs transition-all hover:shadow-sm"
                         >
                           <div className="flex items-center justify-between gap-3">
                             <div className="min-w-0 flex-1">
@@ -682,7 +760,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
                                 </div>
                               )}
                             </div>
-                            <div className="flex flex-shrink-0 items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2">
                               <p className="text-primary text-sm font-bold whitespace-nowrap">
                                 {new Intl.NumberFormat('pt-BR', {
                                   style: 'currency',

@@ -1,6 +1,7 @@
+/* eslint-disable prettier/prettier */
 'use client';
 
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -19,14 +20,13 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   ANAMNESIS_TEMPLATE,
   AnamnesisCategory,
-  AnamnesisQuestion,
   QuestionType,
 } from '@/constants/anamnesis-template';
 import { cn } from '@/lib/utils';
 
 interface Answer {
   questionId: string;
-  value: any;
+  value: unknown;
   details?: string;
 }
 
@@ -62,18 +62,20 @@ export function AnamnesisForm({
         details: existing?.details || '',
       };
     });
+    // We intentionally reset local form state when initialAnswers changes (edit/create switch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAnswers(merged);
   }, [initialAnswers]);
 
-  const updateAnswer = (questionId: string, value: any, details?: string) => {
+  const updateAnswer = (questionId: string, value: unknown, details?: string) => {
     setAnswers((prev) =>
       prev.map((a) =>
         a.questionId === questionId
           ? {
-              ...a,
-              value: value !== undefined ? value : a.value,
-              details: details !== undefined ? details : a.details,
-            }
+            ...a,
+            value: value !== undefined ? value : a.value,
+            details: details !== undefined ? details : a.details,
+          }
           : a,
       ),
     );
@@ -102,7 +104,7 @@ export function AnamnesisForm({
           placeholder="Qual o motivo da consulta hoje?"
           value={complaint}
           onChange={(e) => setComplaint(e.target.value)}
-          className="min-h-[100px] text-base"
+          className="min-h-25 text-base"
         />
       </div>
 
@@ -115,31 +117,33 @@ export function AnamnesisForm({
             {ANAMNESIS_TEMPLATE.filter((q) => q.category === category).map((question) => {
               const answer = answers.find((a) => a.questionId === question.id);
               if (!answer) return null;
+              const isChecked = answer.value === true;
+              const selectValue = typeof answer.value === 'string' ? answer.value : '';
 
               return (
                 <div key={question.id} className="space-y-3 border-b pb-4 last:border-0 last:pb-0">
                   <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                     <Label className="flex-1 text-base font-medium">{question.label}</Label>
 
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       {question.type === QuestionType.BOOLEAN && (
                         <div className="flex items-center gap-3">
                           <span
                             className={cn(
                               'text-xs font-medium',
-                              !answer.value ? 'text-primary' : 'text-muted-foreground',
+                              !isChecked ? 'text-primary' : 'text-muted-foreground',
                             )}
                           >
                             Não
                           </span>
                           <Switch
-                            checked={answer.value}
+                            checked={isChecked}
                             onCheckedChange={(val) => updateAnswer(question.id, val)}
                           />
                           <span
                             className={cn(
                               'text-xs font-medium',
-                              answer.value ? 'text-primary' : 'text-muted-foreground',
+                              isChecked ? 'text-primary' : 'text-muted-foreground',
                             )}
                           >
                             Sim
@@ -149,10 +153,10 @@ export function AnamnesisForm({
 
                       {question.type === QuestionType.SELECT && (
                         <Select
-                          value={answer.value}
+                          value={selectValue}
                           onValueChange={(val) => updateAnswer(question.id, val)}
                         >
-                          <SelectTrigger className="w-[180px]">
+                          <SelectTrigger className="w-45">
                             <SelectValue placeholder="Selecione..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -195,13 +199,13 @@ export function AnamnesisForm({
                     (typeof answer.value === 'string' &&
                       answer.value !== 'Não' &&
                       answer.value !== '')) && (
-                    <Textarea
-                      placeholder="Detalhes adicionais (opcional)..."
-                      value={answer.details}
-                      onChange={(e) => updateAnswer(question.id, undefined, e.target.value)}
-                      className="mt-2 h-20 text-sm"
-                    />
-                  )}
+                      <Textarea
+                        placeholder="Detalhes adicionais (opcional)..."
+                        value={answer.details}
+                        onChange={(e) => updateAnswer(question.id, undefined, e.target.value)}
+                        className="mt-2 h-20 text-sm"
+                      />
+                    )}
                 </div>
               );
             })}

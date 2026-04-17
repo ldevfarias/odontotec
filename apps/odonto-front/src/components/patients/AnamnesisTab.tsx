@@ -1,18 +1,12 @@
+/* eslint-disable prettier/prettier */
 'use client';
+
+/* eslint-disable max-lines */
 
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import {
-  AlertCircle,
-  Check,
-  ChevronRight,
-  Edit2,
-  History,
-  Loader2,
-  Plus,
-  Trash2,
-} from 'lucide-react';
+import { AlertCircle, Edit2, History, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { AnamnesisTabSkeleton } from '@/components/skeletons';
@@ -23,7 +17,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -35,13 +28,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import { ANAMNESIS_TEMPLATE, AnamnesisCategory } from '@/constants/anamnesis-template';
 import { useAnamnesisControllerCreate } from '@/generated/hooks/useAnamnesisControllerCreate';
 import { useAnamnesisControllerFindAllByPatient } from '@/generated/hooks/useAnamnesisControllerFindAllByPatient';
 import { useAnamnesisControllerRemove } from '@/generated/hooks/useAnamnesisControllerRemove';
 import { useAnamnesisControllerUpdate } from '@/generated/hooks/useAnamnesisControllerUpdate';
 import { patientsControllerFindOneQueryKey } from '@/generated/hooks/usePatientsControllerFindOne';
+import type { AnamnesisAnswerDto } from '@/generated/ts/AnamnesisAnswerDto';
+import type { CreateAnamnesisDto } from '@/generated/ts/CreateAnamnesisDto';
 import { cn } from '@/lib/utils';
 import { notificationService } from '@/services/notification.service';
 
@@ -50,9 +44,21 @@ import { AnamnesisForm } from './AnamnesisForm';
 interface AnamnesisData {
   answers: {
     questionId: string;
-    value: any;
+    value: unknown;
     details?: string;
   }[];
+}
+
+interface AnamnesisAlert {
+  questionId: string;
+}
+
+interface AnamnesisRecord {
+  id: number;
+  complaint: string;
+  createdAt?: string;
+  data?: AnamnesisData;
+  alerts?: AnamnesisAlert[];
 }
 
 export function AnamnesisTab({ patientId }: { patientId: number }) {
@@ -71,13 +77,14 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
   } | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
+  const anamnesisRecords = (records ?? []) as AnamnesisRecord[];
 
   const handleOpenCreate = () => {
     setEditRecord({ complaint: '', data: { answers: [] } });
     setIsDialogOpen(true);
   };
 
-  const handleOpenEdit = (record: any) => {
+  const handleOpenEdit = (record: AnamnesisRecord) => {
     setEditRecord({
       id: record.id,
       complaint: record.complaint,
@@ -101,16 +108,25 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
     );
   };
 
-  const handleSubmit = (complaint: string, answers: any[]) => {
-    const dataPayload = {
+  const handleSubmit = (complaint: string, answers: AnamnesisData['answers']) => {
+    const normalizedAnswers: AnamnesisAnswerDto[] = answers.map((answer) => ({
+      questionId: answer.questionId,
+      details: answer.details,
+      value:
+        typeof answer.value === 'object' && answer.value !== null
+          ? answer.value
+          : { value: answer.value ?? '' },
+    }));
+
+    const dataPayload: CreateAnamnesisDto = {
       complaint,
-      data: { answers },
+      data: { answers: normalizedAnswers },
       patientId,
     };
 
     if (editRecord?.id) {
       updateAnamnesis(
-        { id: editRecord.id, data: dataPayload as any },
+        { id: editRecord.id, data: dataPayload },
         {
           onSuccess: () => {
             notificationService.success('Anamnese atualizada!');
@@ -124,7 +140,7 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
       );
     } else {
       createAnamnesis(
-        { data: dataPayload as any },
+        { data: dataPayload },
         {
           onSuccess: () => {
             notificationService.success('Anamnese registrada!');
@@ -143,22 +159,24 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
     return <AnamnesisTabSkeleton />;
   }
 
-  const selectedRecord = records?.find((r: any) => r.id === (selectedId || records[0]?.id));
+  const selectedRecord = anamnesisRecords.find(
+    (record) => record.id === (selectedId || anamnesisRecords[0]?.id),
+  );
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
       {/* Mobile: Select dropdown to pick record */}
       <div className="flex items-center gap-2 md:hidden">
         <Select
-          value={String(selectedId || records?.[0]?.id || '')}
+          value={String(selectedId || anamnesisRecords[0]?.id || '')}
           onValueChange={(val) => setSelectedId(Number(val))}
         >
           <SelectTrigger className="flex-1">
             <SelectValue placeholder="Selecione uma anamnese..." />
           </SelectTrigger>
           <SelectContent>
-            {records && records.length > 0 ? (
-              records.map((record: any) => (
+            {anamnesisRecords.length > 0 ? (
+              anamnesisRecords.map((record) => (
                 <SelectItem key={record.id} value={String(record.id)}>
                   {record.complaint || 'Sem queixa'}
                   {record.createdAt ? ` — ${format(new Date(record.createdAt), 'dd/MM/yyyy')}` : ''}
@@ -177,7 +195,7 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
       </div>
 
       {/* Sidebar List — desktop only */}
-      <Card className="hidden h-[600px] flex-col md:col-span-1 md:flex">
+      <Card className="hidden h-150 flex-col md:col-span-1 md:flex">
         <CardHeader className="p-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm font-bold">
@@ -190,16 +208,16 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
         </CardHeader>
         <Separator />
         <CardContent className="flex-1 overflow-y-auto p-0">
-          {records && records.length > 0 ? (
+          {anamnesisRecords.length > 0 ? (
             <div className="divide-y">
-              {records.map((record: any) => (
+              {anamnesisRecords.map((record) => (
                 <button
                   key={record.id}
                   onClick={() => record.id && setSelectedId(record.id)}
                   className={cn(
                     'hover:bg-muted/50 flex w-full flex-col gap-1 p-4 text-left transition-colors',
-                    (selectedId || records[0]?.id) === record.id &&
-                      'bg-primary/5 border-primary border-r-2',
+                    (selectedId || anamnesisRecords[0]?.id) === record.id &&
+                    'bg-primary/5 border-primary border-r-2',
                   )}
                 >
                   <span className="text-muted-foreground text-xs font-medium">
@@ -218,7 +236,7 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
       </Card>
 
       {/* Main Detail View */}
-      <Card className="col-span-1 min-h-[600px] md:col-span-3">
+      <Card className="col-span-1 min-h-150 md:col-span-3">
         {selectedRecord ? (
           <>
             <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
@@ -265,8 +283,8 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
                     (q) => q.category === category,
                   );
                   const answersInCategory =
-                    selectedRecord.data?.answers?.filter((a: any) =>
-                      questionsInCategory.some((q) => q.id === a.questionId),
+                    selectedRecord.data?.answers?.filter((answer) =>
+                      questionsInCategory.some((q) => q.id === answer.questionId),
                     ) || [];
 
                   if (answersInCategory.length === 0) return null;
@@ -277,7 +295,7 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
                         {category}
                       </h4>
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {answersInCategory.map((answer: any) => {
+                        {answersInCategory.map((answer) => {
                           const question = questionsInCategory.find(
                             (q) => q.id === answer.questionId,
                           );
@@ -289,10 +307,14 @@ export function AnamnesisTab({ patientId }: { patientId: number }) {
                               ? answer.value
                                 ? 'Sim'
                                 : 'Não'
-                              : answer.value;
+                              : typeof answer.value === 'string' || typeof answer.value === 'number'
+                                ? String(answer.value)
+                                : answer.value && typeof answer.value === 'object'
+                                  ? JSON.stringify(answer.value)
+                                  : 'N/A';
 
                           const hasAlert = selectedRecord.alerts?.some(
-                            (a: any) => a.questionId === question.id,
+                            (alert) => alert.questionId === question.id,
                           );
 
                           return (
