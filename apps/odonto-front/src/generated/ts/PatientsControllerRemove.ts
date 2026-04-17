@@ -17,5 +17,5 @@ export type PatientsControllerRemoveMutationResponse = PatientsControllerRemove2
 export type PatientsControllerRemoveMutation = {
   Response: PatientsControllerRemove200;
   PathParams: PatientsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -18,5 +18,5 @@ export type DashboardControllerGetRevenueHistoryQueryResponse =
 export type DashboardControllerGetRevenueHistoryQuery = {
   Response: DashboardControllerGetRevenueHistory200;
   QueryParams: DashboardControllerGetRevenueHistoryQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

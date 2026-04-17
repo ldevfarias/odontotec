@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { format, setHours, setMinutes } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarCheck, ChevronDown, Clock, User, Zap } from 'lucide-react';
 import { useState } from 'react';
@@ -33,8 +33,8 @@ const DURATIONS = [
 ];
 
 interface DentistCardProps {
-  dentist: any;
-  patients: any[];
+  dentist: unknown;
+  patients: unknown[];
 }
 
 function DentistCard({ dentist, patients }: DentistCardProps) {
@@ -283,7 +283,7 @@ function DentistCard({ dentist, patients }: DentistCardProps) {
                         Nenhum paciente encontrado
                       </div>
                     ) : (
-                      filteredPatients.map((p: any) => (
+                      filteredPatients.map((p: unknown) => (
                         <button
                           key={p.id}
                           onClick={() => {
@@ -377,7 +377,7 @@ export function DentistQuickBook() {
       ) : (
         <TooltipProvider delayDuration={300}>
           <div className="scrollbar-hide -mx-1 flex items-center gap-5 overflow-x-auto px-1 pt-1 pb-3">
-            {professionals.map((dentist: any) => (
+            {professionals.map((dentist: unknown) => (
               <DentistCard key={dentist.id} dentist={dentist} patients={allPatients as any[]} />
             ))}
           </div>

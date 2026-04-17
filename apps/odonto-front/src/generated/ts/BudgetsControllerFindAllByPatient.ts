@@ -34,5 +34,5 @@ export type BudgetsControllerFindAllByPatientQuery = {
   Response: BudgetsControllerFindAllByPatient200;
   PathParams: BudgetsControllerFindAllByPatientPathParams;
   QueryParams: BudgetsControllerFindAllByPatientQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

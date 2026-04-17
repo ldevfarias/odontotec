@@ -9,5 +9,5 @@ export type ClinicsControllerGetActiveQueryResponse = ClinicsControllerGetActive
 
 export type ClinicsControllerGetActiveQuery = {
   Response: ClinicsControllerGetActive200;
-  Errors: any;
+  Errors: unknown;
 };

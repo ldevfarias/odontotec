@@ -22,5 +22,5 @@ export type AppointmentsControllerUpdateMutation = {
   Response: AppointmentsControllerUpdate200;
   Request: AppointmentsControllerUpdateMutationRequest;
   PathParams: AppointmentsControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -18,7 +18,7 @@ export interface AnamnesisQuestion {
   type: QuestionType;
   options?: string[];
   category: AnamnesisCategory;
-  alertIfValue?: any;
+  alertIfValue?: unknown;
   alertLabel?: string;
 }
 

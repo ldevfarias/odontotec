@@ -17,5 +17,5 @@ export type UsersControllerInviteMutationResponse = UsersControllerInvite201;
 export type UsersControllerInviteMutation = {
   Response: UsersControllerInvite201;
   Request: UsersControllerInviteMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

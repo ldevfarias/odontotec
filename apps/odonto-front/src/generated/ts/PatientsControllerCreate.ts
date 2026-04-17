@@ -17,5 +17,5 @@ export type PatientsControllerCreateMutationResponse = PatientsControllerCreate2
 export type PatientsControllerCreateMutation = {
   Response: PatientsControllerCreate201;
   Request: PatientsControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

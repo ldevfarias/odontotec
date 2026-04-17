@@ -1,7 +1,7 @@
 export function buildFormData<T = unknown>(data: T): FormData {
   const formData = new FormData();
 
-  function appendData(key: string, value: any) {
+  function appendData(key: string, value: unknown) {
     if (value instanceof Blob) {
       formData.append(key, value);
       return;

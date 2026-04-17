@@ -19,5 +19,5 @@ export type AppointmentsControllerCreateWithPatientMutationResponse =
 export type AppointmentsControllerCreateWithPatientMutation = {
   Response: AppointmentsControllerCreateWithPatient201;
   Request: AppointmentsControllerCreateWithPatientMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

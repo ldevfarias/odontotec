@@ -17,5 +17,5 @@ export type PatientsControllerFindOneQueryResponse = PatientsControllerFindOne20
 export type PatientsControllerFindOneQuery = {
   Response: PatientsControllerFindOne200;
   PathParams: PatientsControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

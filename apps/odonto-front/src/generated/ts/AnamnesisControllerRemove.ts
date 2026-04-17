@@ -17,5 +17,5 @@ export type AnamnesisControllerRemoveMutationResponse = AnamnesisControllerRemov
 export type AnamnesisControllerRemoveMutation = {
   Response: AnamnesisControllerRemove200;
   PathParams: AnamnesisControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -1,14 +1,14 @@
 // apps/odonto-api/src/modules/appointments/appointments.service.notifications.spec.ts
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { Clinic } from '../clinics/entities/clinic.entity';
+import { EmailService } from '../email/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { Patient } from '../patients/entities/patient.entity';
 import { AppointmentsService } from './appointments.service';
 import { Appointment, AppointmentStatus } from './entities/appointment.entity';
-import { Patient } from '../patients/entities/patient.entity';
-import { NotificationsService } from '../notifications/notifications.service';
-import { EmailService } from '../email/email.service';
-import { JwtService } from '@nestjs/jwt';
-import { Clinic } from '../clinics/entities/clinic.entity';
 
 const CLINIC_ID = 1;
 
@@ -49,7 +49,7 @@ describe('AppointmentsService — update notifications', () => {
     },
     createQueryBuilder: jest.fn().mockImplementation(() => {
       let isLockQuery = false;
-      const qb: any = {
+      const qb: unknown = {
         where: jest.fn().mockImplementation((query) => {
           if (query.includes('appointment.id = :id')) {
             isLockQuery = true;

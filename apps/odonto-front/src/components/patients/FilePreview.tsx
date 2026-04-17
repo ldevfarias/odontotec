@@ -1,5 +1,6 @@
 import { File, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useMemo } from 'react';
 
 interface FilePreviewProps {
   file: File;
@@ -7,25 +8,24 @@ interface FilePreviewProps {
 }
 
 export function FilePreview({ file, onRemove }: FilePreviewProps) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const isImage = file.type.startsWith('image/');
+  const previewUrl = useMemo(() => {
+    return isImage ? URL.createObjectURL(file) : null;
+  }, [file, isImage]);
 
   useEffect(() => {
-    if (!isImage) return;
-
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-
     return () => {
-      URL.revokeObjectURL(url);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
-  }, [file, isImage]);
+  }, [previewUrl]);
 
   return (
     <div className="group bg-background relative overflow-hidden rounded-lg border">
       <div className="bg-muted flex aspect-square items-center justify-center">
         {isImage && previewUrl ? (
-          <img src={previewUrl} alt={file.name} className="h-full w-full object-cover" />
+          <Image src={previewUrl} alt={file.name} fill unoptimized className="object-cover" />
         ) : (
           <File className="text-muted-foreground h-8 w-8" />
         )}

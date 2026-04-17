@@ -17,5 +17,5 @@ export type AuthControllerRegisterMutationResponse = AuthControllerRegister201;
 export type AuthControllerRegisterMutation = {
   Response: AuthControllerRegister201;
   Request: AuthControllerRegisterMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

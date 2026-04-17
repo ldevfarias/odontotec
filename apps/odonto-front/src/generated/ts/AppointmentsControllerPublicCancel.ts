@@ -21,5 +21,5 @@ export type AppointmentsControllerPublicCancelQueryResponse = AppointmentsContro
 export type AppointmentsControllerPublicCancelQuery = {
   Response: AppointmentsControllerPublicCancel200;
   QueryParams: AppointmentsControllerPublicCancelQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

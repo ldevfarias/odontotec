@@ -17,5 +17,5 @@ export type ClinicProceduresControllerFindOneQueryResponse = ClinicProceduresCon
 export type ClinicProceduresControllerFindOneQuery = {
   Response: ClinicProceduresControllerFindOne200;
   PathParams: ClinicProceduresControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

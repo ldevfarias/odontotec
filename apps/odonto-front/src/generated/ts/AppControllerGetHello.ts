@@ -9,5 +9,5 @@ export type AppControllerGetHelloQueryResponse = AppControllerGetHello200;
 
 export type AppControllerGetHelloQuery = {
   Response: AppControllerGetHello200;
-  Errors: any;
+  Errors: unknown;
 };

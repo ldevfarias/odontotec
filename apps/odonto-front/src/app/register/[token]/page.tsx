@@ -24,7 +24,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/contexts/AuthContext';
 import { useAuthControllerRegister } from '@/generated/hooks/useAuthControllerRegister';
 import { useUsersControllerFindInvitation } from '@/generated/hooks/useUsersControllerFindInvitation';
 import { authControllerRegisterMutationRequestSchema } from '@/generated/zod/authControllerRegisterSchema';
@@ -32,10 +31,19 @@ import { notificationService } from '@/services/notification.service';
 
 type RegisterFormValues = z.infer<typeof authControllerRegisterMutationRequestSchema>;
 
+const invitationSchema = z.object({
+  email: z.string(),
+  cpf: z.string().optional(),
+  clinic: z
+    .object({
+      name: z.string(),
+    })
+    .optional(),
+});
+
 export default function RegisterInvitationPage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
-  const { login } = useAuth();
 
   const {
     data: invitation,
@@ -61,7 +69,9 @@ export default function RegisterInvitationPage() {
     );
   }
 
-  if (isError || !invitation) {
+  const parsedInvitation = invitationSchema.safeParse(invitation);
+
+  if (isError || !parsedInvitation.success) {
     return (
       <div className="flex h-screen items-center justify-center p-4">
         <Card className="max-w-md">
@@ -82,11 +92,13 @@ export default function RegisterInvitationPage() {
     );
   }
 
+  const invitationData = parsedInvitation.data;
+
   function onSubmit(values: RegisterFormValues) {
     register(
       { data: values },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           notificationService.success('Cadastro concluído com sucesso!');
           // In a real app, the response would contain the token
           // For now, redirect to login
@@ -106,19 +118,19 @@ export default function RegisterInvitationPage() {
           <CardTitle className="text-2xl font-bold">Completar Cadastro</CardTitle>
           <CardDescription>
             Olá! Você foi convidado para a clínica{' '}
-            <strong>{(invitation as any).clinic?.name || 'OdontoTec'}</strong>. Preencha seus dados
-            para ativar sua conta.
+            <strong>{invitationData.clinic?.name || 'OdontoTec'}</strong>. Preencha seus dados para
+            ativar sua conta.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6 grid grid-cols-2 gap-4 rounded-lg bg-gray-100 p-4 text-sm">
             <div>
               <span className="block text-gray-500">E-mail</span>
-              <span className="font-medium">{(invitation as any).email}</span>
+              <span className="font-medium">{invitationData.email}</span>
             </div>
             <div>
               <span className="block text-gray-500">CPF</span>
-              <span className="font-medium">{(invitation as any).cpf}</span>
+              <span className="font-medium">{invitationData.cpf || 'Nao informado'}</span>
             </div>
           </div>
 

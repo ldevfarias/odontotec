@@ -17,5 +17,5 @@ export type ExamsControllerRemoveMutationResponse = ExamsControllerRemove200;
 export type ExamsControllerRemoveMutation = {
   Response: ExamsControllerRemove200;
   PathParams: ExamsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

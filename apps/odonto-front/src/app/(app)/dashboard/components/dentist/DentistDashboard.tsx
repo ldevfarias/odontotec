@@ -7,7 +7,6 @@ import { ArrowRight, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppointmentsControllerFindAll } from '@/generated/hooks/useAppointmentsControllerFindAll';
 import { useAppointmentsControllerUpdate } from '@/generated/hooks/useAppointmentsControllerUpdate';
@@ -29,7 +28,7 @@ export function DentistDashboard() {
 
   const { mutate: updateAppointment } = useAppointmentsControllerUpdate();
 
-  const handleStatusChange = (appointment: any, status: string) => {
+  const handleStatusChange = (appointment: unknown, status: string) => {
     updateAppointment(
       { id: appointment.id, data: { status: status as any } },
       {

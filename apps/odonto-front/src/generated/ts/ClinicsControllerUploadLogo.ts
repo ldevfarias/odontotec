@@ -9,5 +9,5 @@ export type ClinicsControllerUploadLogoMutationResponse = ClinicsControllerUploa
 
 export type ClinicsControllerUploadLogoMutation = {
   Response: ClinicsControllerUploadLogo200;
-  Errors: any;
+  Errors: unknown;
 };

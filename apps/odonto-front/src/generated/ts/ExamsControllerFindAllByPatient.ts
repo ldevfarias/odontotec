@@ -17,5 +17,5 @@ export type ExamsControllerFindAllByPatientQueryResponse = ExamsControllerFindAl
 export type ExamsControllerFindAllByPatientQuery = {
   Response: ExamsControllerFindAllByPatient200;
   PathParams: ExamsControllerFindAllByPatientPathParams;
-  Errors: any;
+  Errors: unknown;
 };

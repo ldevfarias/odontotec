@@ -34,5 +34,5 @@ export type AppointmentsControllerCheckAvailabilityQueryResponse =
 export type AppointmentsControllerCheckAvailabilityQuery = {
   Response: AppointmentsControllerCheckAvailability200;
   QueryParams: AppointmentsControllerCheckAvailabilityQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -9,5 +9,5 @@ export type DashboardControllerGetStatsQueryResponse = DashboardControllerGetSta
 
 export type DashboardControllerGetStatsQuery = {
   Response: DashboardControllerGetStats200;
-  Errors: any;
+  Errors: unknown;
 };

@@ -17,5 +17,5 @@ export type DocumentsControllerFindOneQueryResponse = DocumentsControllerFindOne
 export type DocumentsControllerFindOneQuery = {
   Response: DocumentsControllerFindOne200;
   PathParams: DocumentsControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -17,5 +17,5 @@ export type TreatmentPlansControllerRemoveMutationResponse = TreatmentPlansContr
 export type TreatmentPlansControllerRemoveMutation = {
   Response: TreatmentPlansControllerRemove200;
   PathParams: TreatmentPlansControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

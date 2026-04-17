@@ -12,5 +12,5 @@ export type AuthControllerLogoutMutationResponse = AuthControllerLogout200;
 
 export type AuthControllerLogoutMutation = {
   Response: AuthControllerLogout200;
-  Errors: any;
+  Errors: unknown;
 };

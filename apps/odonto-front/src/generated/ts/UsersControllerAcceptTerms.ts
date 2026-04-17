@@ -9,5 +9,5 @@ export type UsersControllerAcceptTermsMutationResponse = UsersControllerAcceptTe
 
 export type UsersControllerAcceptTermsMutation = {
   Response: UsersControllerAcceptTerms201;
-  Errors: any;
+  Errors: unknown;
 };

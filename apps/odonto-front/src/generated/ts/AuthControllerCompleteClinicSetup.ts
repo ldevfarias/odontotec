@@ -18,5 +18,5 @@ export type AuthControllerCompleteClinicSetupMutationResponse =
 export type AuthControllerCompleteClinicSetupMutation = {
   Response: AuthControllerCompleteClinicSetup201;
   Request: AuthControllerCompleteClinicSetupMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

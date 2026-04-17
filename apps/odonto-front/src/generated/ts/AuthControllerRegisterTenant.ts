@@ -17,5 +17,5 @@ export type AuthControllerRegisterTenantMutationResponse = AuthControllerRegiste
 export type AuthControllerRegisterTenantMutation = {
   Response: AuthControllerRegisterTenant201;
   Request: AuthControllerRegisterTenantMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

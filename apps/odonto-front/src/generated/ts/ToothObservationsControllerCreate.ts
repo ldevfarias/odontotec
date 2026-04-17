@@ -15,5 +15,5 @@ export type ToothObservationsControllerCreateMutationResponse =
 export type ToothObservationsControllerCreateMutation = {
   Response: ToothObservationsControllerCreate201;
   Request: ToothObservationsControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

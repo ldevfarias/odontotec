@@ -1,22 +1,20 @@
 'use client';
 
 import { format, isSameDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import React from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { safeParseISO } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, safeParseISO } from '@/lib/utils';
 
 const START_HOUR = 8;
 const END_HOUR = 18;
 const HOUR_HEIGHT = 72; // px per hour
 
 interface DentistTimelineProps {
-  appointments: any[];
+  appointments: unknown[];
   isLoading?: boolean;
-  onStatusChange?: (appointment: any, status: string) => void;
-  onEditAppointment?: (appointment: any) => void;
+  onStatusChange?: (appointment: unknown, status: string) => void;
+  onEditAppointment?: (appointment: unknown) => void;
 }
 
 export function DentistTimeline({

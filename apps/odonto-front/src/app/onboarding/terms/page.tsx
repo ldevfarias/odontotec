@@ -28,7 +28,7 @@ export default function TermsPage() {
       await acceptTerms();
       notificationService.success('Termos aceitos com sucesso!');
       router.push('/onboarding/clinic');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       notificationService.error(error.response?.data?.message || 'Erro ao aceitar os termos.');
     } finally {

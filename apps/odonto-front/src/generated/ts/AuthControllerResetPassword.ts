@@ -17,5 +17,5 @@ export type AuthControllerResetPasswordMutationResponse = AuthControllerResetPas
 export type AuthControllerResetPasswordMutation = {
   Response: AuthControllerResetPassword200;
   Request: AuthControllerResetPasswordMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

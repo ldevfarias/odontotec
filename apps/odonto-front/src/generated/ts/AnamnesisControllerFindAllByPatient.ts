@@ -18,5 +18,5 @@ export type AnamnesisControllerFindAllByPatientQueryResponse =
 export type AnamnesisControllerFindAllByPatientQuery = {
   Response: AnamnesisControllerFindAllByPatient200;
   PathParams: AnamnesisControllerFindAllByPatientPathParams;
-  Errors: any;
+  Errors: unknown;
 };

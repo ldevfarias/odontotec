@@ -35,5 +35,5 @@ export type AppointmentsControllerGetAvailableSlotsQueryResponse =
 export type AppointmentsControllerGetAvailableSlotsQuery = {
   Response: AppointmentsControllerGetAvailableSlots200;
   QueryParams: AppointmentsControllerGetAvailableSlotsQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

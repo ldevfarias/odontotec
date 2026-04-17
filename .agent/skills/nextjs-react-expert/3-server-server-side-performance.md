@@ -188,7 +188,7 @@ users={[{id:1},{id:2}]} sorted={users.toSorted()} // sends 2 arrays + 2 unique o
 ```typescript
 import { LRUCache } from 'lru-cache';
 
-const cache = new LRUCache<string, any>({
+const cache = new LRUCache<string, unknown>({
   max: 1000,
   ttl: 5 * 60 * 1000, // 5 minutes
 });

@@ -18,5 +18,5 @@ export type ToothObservationsControllerRemoveMutationResponse =
 export type ToothObservationsControllerRemoveMutation = {
   Response: ToothObservationsControllerRemove204;
   PathParams: ToothObservationsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

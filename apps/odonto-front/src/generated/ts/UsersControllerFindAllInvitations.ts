@@ -9,5 +9,5 @@ export type UsersControllerFindAllInvitationsQueryResponse = UsersControllerFind
 
 export type UsersControllerFindAllInvitationsQuery = {
   Response: UsersControllerFindAllInvitations200;
-  Errors: any;
+  Errors: unknown;
 };

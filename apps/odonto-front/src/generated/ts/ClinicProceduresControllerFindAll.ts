@@ -9,5 +9,5 @@ export type ClinicProceduresControllerFindAllQueryResponse = ClinicProceduresCon
 
 export type ClinicProceduresControllerFindAllQuery = {
   Response: ClinicProceduresControllerFindAll200;
-  Errors: any;
+  Errors: unknown;
 };

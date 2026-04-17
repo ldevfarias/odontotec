@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 interface RecentActivityProps {
-  appointments: any[];
+  appointments: unknown[];
 }
 
 export const RecentActivity = ({ appointments }: RecentActivityProps) => {

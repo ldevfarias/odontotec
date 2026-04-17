@@ -9,5 +9,5 @@ export type SubscriptionControllerGetStatusQueryResponse = SubscriptionControlle
 
 export type SubscriptionControllerGetStatusQuery = {
   Response: SubscriptionControllerGetStatus200;
-  Errors: any;
+  Errors: unknown;
 };

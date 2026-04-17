@@ -17,5 +17,5 @@ export type PaymentsControllerFindOneQueryResponse = PaymentsControllerFindOne20
 export type PaymentsControllerFindOneQuery = {
   Response: PaymentsControllerFindOne200;
   PathParams: PaymentsControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

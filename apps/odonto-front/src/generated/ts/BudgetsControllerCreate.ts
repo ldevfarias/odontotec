@@ -17,5 +17,5 @@ export type BudgetsControllerCreateMutationResponse = BudgetsControllerCreate201
 export type BudgetsControllerCreateMutation = {
   Response: BudgetsControllerCreate201;
   Request: BudgetsControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

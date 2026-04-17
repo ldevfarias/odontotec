@@ -17,7 +17,6 @@ import {
 import { Search } from 'lucide-react';
 import * as React from 'react';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
 import {
@@ -48,6 +47,8 @@ export function DataTable<TData, TValue>({
   rowSelection: controlledRowSelection,
   setRowSelection: setControlledRowSelection,
 }: DataTableProps<TData, TValue>) {
+  'use no memo';
+
   const [internalRowSelection, setInternalRowSelection] = React.useState({});
   const rowSelection =
     controlledRowSelection !== undefined ? controlledRowSelection : internalRowSelection;

@@ -22,5 +22,5 @@ export type UsersControllerUploadAvatarMutationResponse = UsersControllerUploadA
 export type UsersControllerUploadAvatarMutation = {
   Response: UsersControllerUploadAvatar200;
   Request: UsersControllerUploadAvatarMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

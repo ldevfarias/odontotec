@@ -17,5 +17,5 @@ export type BudgetsControllerFindOneQueryResponse = BudgetsControllerFindOne200;
 export type BudgetsControllerFindOneQuery = {
   Response: BudgetsControllerFindOne200;
   PathParams: BudgetsControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

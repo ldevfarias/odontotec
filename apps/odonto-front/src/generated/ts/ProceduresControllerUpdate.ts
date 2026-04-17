@@ -22,5 +22,5 @@ export type ProceduresControllerUpdateMutation = {
   Response: ProceduresControllerUpdate200;
   Request: ProceduresControllerUpdateMutationRequest;
   PathParams: ProceduresControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

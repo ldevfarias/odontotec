@@ -22,5 +22,5 @@ export type UsersControllerSetActiveMutation = {
   Response: UsersControllerSetActive200;
   Request: UsersControllerSetActiveMutationRequest;
   PathParams: UsersControllerSetActivePathParams;
-  Errors: any;
+  Errors: unknown;
 };
