@@ -179,11 +179,10 @@ export function CalendarHeader({
           <button
             key={key}
             onClick={() => setView(key)}
-            className={`shrink-0 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
-              view === key
+            className={`shrink-0 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${view === key
                 ? 'border-primary text-primary'
                 : 'text-muted-foreground border-transparent'
-            }`}
+              }`}
           >
             {label}
           </button>

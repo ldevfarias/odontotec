@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { PatientSearchCMDK } from '@/components/patients/PatientSearchCMDK';
 import { AvatarUploadModal } from '@/components/profile/AvatarUploadModal';
 import { Sidebar } from '@/components/Sidebar';
-import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -25,10 +24,10 @@ export function DashboardHeader() {
 
   const initials = user?.name
     ? user.name
-        .split(' ')
-        .slice(0, 2)
-        .map((n) => n[0].toUpperCase())
-        .join('')
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n[0].toUpperCase())
+      .join('')
     : '?';
 
   return (

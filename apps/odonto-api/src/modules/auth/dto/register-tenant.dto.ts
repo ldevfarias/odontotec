@@ -1,12 +1,16 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+    IsEmail,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    Matches,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
+
+const PASSWORD_COMPLEXITY_MESSAGE =
+  'A senha deve conter ao menos uma letra maiúscula, um número ou um caractere especial.';
 
 export class RegisterTenantDto {
   @ApiProperty({ description: 'The name of the user (admin)' })
@@ -26,6 +30,9 @@ export class RegisterTenantDto {
   @IsString()
   @MinLength(8)
   @MaxLength(128)
+  @Matches(/(?=.*[A-Z])|(?=.*[0-9])|(?=.*[^a-zA-Z0-9])/, {
+    message: PASSWORD_COMPLEXITY_MESSAGE,
+  })
   password: string;
 
   @ApiProperty({ description: 'The name of the clinic' })

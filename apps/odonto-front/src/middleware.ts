@@ -23,9 +23,10 @@ export async function middleware(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
   );
   const isOnboardingRoute = pathname.startsWith('/onboarding');
+  const isLoginRoute = pathname === '/login';
 
-  // Allow access to public routes
-  if (!isProtectedRoute && !isOnboardingRoute) {
+  // Allow access to public routes (not login, not protected, not onboarding)
+  if (!isProtectedRoute && !isOnboardingRoute && !isLoginRoute) {
     return NextResponse.next();
   }
 
@@ -37,7 +38,8 @@ export async function middleware(request: NextRequest) {
   // No valid access_token — check refresh_token before deciding
   if (!token || !payload) {
     if (!refreshToken) {
-      // No tokens at all: redirect to login
+      // No tokens at all — public routes are fine, protected routes go to login
+      if (isLoginRoute) return NextResponse.next();
       const loginUrl = new URL('/login', request.url);
       return NextResponse.redirect(loginUrl);
     }
@@ -45,10 +47,18 @@ export async function middleware(request: NextRequest) {
     // Let the request through — the client-side axios interceptor will
     // transparently refresh the token and retry. Doing isActive checks
     // here without a verified payload would produce false positives.
+    // The login page has a client-side guard that handles this case.
     return NextResponse.next();
   }
 
   // Valid access_token payload available — apply routing rules.
+
+  // Authenticated user trying to reach /login — send to app
+  if (isLoginRoute) {
+    const dashboardUrl = new URL('/dashboard', request.url);
+    return NextResponse.redirect(dashboardUrl);
+  }
+
   const isActive = payload.isActive === true;
 
   if (!isActive && isProtectedRoute) {
@@ -67,8 +77,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Protect all dashboard routes, onboarding and any other protected routes
+  // Protect all dashboard routes, onboarding and any other protected routes.
+  // /login is included so authenticated users are redirected away from it.
   matcher: [
+    '/login',
     '/dashboard/:path*',
     '/patients/:path*',
     '/professionals/:path*',

@@ -1,27 +1,33 @@
 import {
+  BadRequestException,
   Injectable,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
+import { randomBytes } from 'crypto';
 import { DataSource, EntityManager } from 'typeorm';
+
+import { ClinicsService } from '../clinics/clinics.service';
+import { ClinicRole } from '../clinics/enums/clinic-role.enum';
+import { EmailService } from '../email/email.service';
+import { UserRole } from '../users/enums/role.enum';
+import { UsersService } from '../users/users.service';
+import { CompleteClinicDto } from './dto/complete-clinic.dto';
+import { InitiateRegistrationDto } from './dto/initiate-registration.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterInvitationDto } from './dto/register-invitation.dto';
 import { RegisterTenantDto } from './dto/register-tenant.dto';
-import { InitiateRegistrationDto } from './dto/initiate-registration.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-import { CompleteClinicDto } from './dto/complete-clinic.dto';
-import { ClinicsService } from '../clinics/clinics.service';
-import { UserRole } from '../users/enums/role.enum';
-import { ClinicRole } from '../clinics/enums/clinic-role.enum';
-import { EmailService } from '../email/email.service';
-import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
+  // Pre-computed dummy hash used in validateUser to ensure bcrypt.compare always
+  // runs regardless of whether the user exists, preventing timing-based user enumeration.
+  private static readonly DUMMY_HASH =
+    '$2b$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012346';
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -297,11 +303,18 @@ export class AuthService {
     const normalizedEmail = email.toLowerCase().trim();
     const user = await this.usersService.findByEmail(normalizedEmail);
 
-    if (user && user.isActive && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user;
-      return result;
+    // Always run bcrypt.compare to prevent timing-based user enumeration.
+    // If the user doesn't exist, compare against DUMMY_HASH so response time
+    // is indistinguishable from a wrong-password attempt.
+    const hashToCompare = user?.password ?? AuthService.DUMMY_HASH;
+    const isPasswordValid = await bcrypt.compare(pass, hashToCompare);
+
+    if (!user || !user.isActive || !isPasswordValid) {
+      return null;
     }
-    return null;
+
+    const { password, ...result } = user;
+    return result;
   }
 
   async login(loginDto: LoginDto) {
@@ -441,9 +454,13 @@ export class AuthService {
     }
 
     const jti = randomBytes(32).toString('hex');
+    const resetSecret = this.configService.get<string>('JWT_RESET_SECRET');
+    if (!resetSecret) {
+      throw new Error('JWT_RESET_SECRET environment variable is required.');
+    }
     const token = await this.jwtService.signAsync(
       { sub: user.id, type: 'reset', jti },
-      { secret: this.configService.get('JWT_SECRET'), expiresIn: '1h' },
+      { secret: resetSecret, expiresIn: '1h' },
     );
 
     await this.usersService.update(user.id, {
@@ -459,10 +476,15 @@ export class AuthService {
   }
 
   async resetPassword(token: string, newPass: string): Promise<void> {
+    const resetSecret = this.configService.get<string>('JWT_RESET_SECRET');
+    if (!resetSecret) {
+      throw new Error('JWT_RESET_SECRET environment variable is required.');
+    }
+
     return await this.dataSource.transaction(async (manager) => {
       try {
         const payload = await this.jwtService.verifyAsync(token, {
-          secret: this.configService.get('JWT_SECRET'),
+          secret: resetSecret,
         });
 
         if (payload.type !== 'reset')

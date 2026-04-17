@@ -16,8 +16,8 @@ export const RecentActivity = ({ appointments }: RecentActivityProps) => {
       <ScrollArea className="-mr-2 flex-1 pr-4">
         <div className="flex flex-col gap-8 pb-4">
           {appointments.length === 0 ? (
-            <div className="flex h-[180px] flex-col items-center justify-center gap-2 text-center text-gray-500 opacity-50">
-              <span className="text-[13px] font-semibold">Nenhuma atividade hoje.</span>
+            <div className="flex h-[180px] items-center justify-center py-6 text-center text-sm text-gray-500">
+              Nenhuma atividade hoje.
             </div>
           ) : (
             appointments.map((apt, i) => (

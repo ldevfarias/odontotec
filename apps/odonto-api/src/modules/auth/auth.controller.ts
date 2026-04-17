@@ -1,29 +1,29 @@
 import {
-  Controller,
-  Post,
-  Get,
   Body,
-  UseGuards,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
   Request,
   Res,
-  HttpCode,
+  UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import type { Response } from 'express';
+
 import { AuthService } from './auth.service';
+import { Public } from './decorators/public.decorator';
+import { CompleteClinicDto } from './dto/complete-clinic.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { InitiateRegistrationDto } from './dto/initiate-registration.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterInvitationDto } from './dto/register-invitation.dto';
 import { RegisterTenantDto } from './dto/register-tenant.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { InitiateRegistrationDto } from './dto/initiate-registration.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-import { CompleteClinicDto } from './dto/complete-clinic.dto';
-
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { Public } from './decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')

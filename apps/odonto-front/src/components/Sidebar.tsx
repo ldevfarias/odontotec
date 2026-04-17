@@ -1,10 +1,7 @@
 'use client';
 
 import {
-  Activity,
-  Building2,
-  Calendar,
-  CalendarDays,
+  Building2, CalendarDays,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -12,11 +9,10 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
-  Users,
+  Users
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -80,10 +76,10 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
 
   const initials = user?.name
     ? user.name
-        .split(' ')
-        .slice(0, 2)
-        .map((n) => n[0].toUpperCase())
-        .join('')
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n[0].toUpperCase())
+      .join('')
     : '?';
 
   const filteredGroups = menuGroups.filter((group) => {
