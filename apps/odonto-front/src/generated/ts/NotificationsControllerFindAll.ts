@@ -26,5 +26,5 @@ export type NotificationsControllerFindAllQueryResponse = NotificationsControlle
 export type NotificationsControllerFindAllQuery = {
   Response: NotificationsControllerFindAll200;
   QueryParams: NotificationsControllerFindAllQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

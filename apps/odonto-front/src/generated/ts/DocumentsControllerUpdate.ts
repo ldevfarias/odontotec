@@ -22,5 +22,5 @@ export type DocumentsControllerUpdateMutation = {
   Response: DocumentsControllerUpdate200;
   Request: DocumentsControllerUpdateMutationRequest;
   PathParams: DocumentsControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

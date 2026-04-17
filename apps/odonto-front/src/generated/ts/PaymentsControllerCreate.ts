@@ -14,5 +14,5 @@ export type PaymentsControllerCreateMutationResponse = PaymentsControllerCreate2
 export type PaymentsControllerCreateMutation = {
   Response: PaymentsControllerCreate201;
   Request: PaymentsControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

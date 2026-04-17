@@ -17,5 +17,5 @@ export type TreatmentPlansControllerCreateMutationResponse = TreatmentPlansContr
 export type TreatmentPlansControllerCreateMutation = {
   Response: TreatmentPlansControllerCreate201;
   Request: TreatmentPlansControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

@@ -14,5 +14,5 @@ export type ClinicProceduresControllerCreateMutationResponse = ClinicProceduresC
 export type ClinicProceduresControllerCreateMutation = {
   Response: ClinicProceduresControllerCreate201;
   Request: ClinicProceduresControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

@@ -8,7 +8,7 @@ export interface DashboardStats {
   occupancyRate: number;
   revenue: number;
   expectedRevenue: number;
-  recentAppointments: any[];
+  recentAppointments: unknown[];
   revenueHistory: { day: string; value: number }[];
 }
 

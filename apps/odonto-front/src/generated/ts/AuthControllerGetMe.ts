@@ -12,5 +12,5 @@ export type AuthControllerGetMeQueryResponse = AuthControllerGetMe200;
 
 export type AuthControllerGetMeQuery = {
   Response: AuthControllerGetMe200;
-  Errors: any;
+  Errors: unknown;
 };

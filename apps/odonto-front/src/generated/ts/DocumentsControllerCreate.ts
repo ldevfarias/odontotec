@@ -14,5 +14,5 @@ export type DocumentsControllerCreateMutationResponse = DocumentsControllerCreat
 export type DocumentsControllerCreateMutation = {
   Response: DocumentsControllerCreate201;
   Request: DocumentsControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

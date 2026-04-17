@@ -22,5 +22,5 @@ export type PaymentsControllerUpdateMutation = {
   Response: PaymentsControllerUpdate200;
   Request: PaymentsControllerUpdateMutationRequest;
   PathParams: PaymentsControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

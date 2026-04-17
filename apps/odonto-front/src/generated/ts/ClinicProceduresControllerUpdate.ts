@@ -22,5 +22,5 @@ export type ClinicProceduresControllerUpdateMutation = {
   Response: ClinicProceduresControllerUpdate200;
   Request: ClinicProceduresControllerUpdateMutationRequest;
   PathParams: ClinicProceduresControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

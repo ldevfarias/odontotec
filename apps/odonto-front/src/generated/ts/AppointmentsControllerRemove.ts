@@ -17,5 +17,5 @@ export type AppointmentsControllerRemoveMutationResponse = AppointmentsControlle
 export type AppointmentsControllerRemoveMutation = {
   Response: AppointmentsControllerRemove200;
   PathParams: AppointmentsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

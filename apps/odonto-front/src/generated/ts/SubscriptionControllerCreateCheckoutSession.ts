@@ -10,5 +10,5 @@ export type SubscriptionControllerCreateCheckoutSessionMutationResponse =
 
 export type SubscriptionControllerCreateCheckoutSessionMutation = {
   Response: SubscriptionControllerCreateCheckoutSession201;
-  Errors: any;
+  Errors: unknown;
 };

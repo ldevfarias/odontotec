@@ -32,5 +32,5 @@ export type ExamsControllerUploadMutationResponse = ExamsControllerUpload201;
 export type ExamsControllerUploadMutation = {
   Response: ExamsControllerUpload201;
   Request: ExamsControllerUploadMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

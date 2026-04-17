@@ -31,5 +31,5 @@ export type PatientsControllerFindAllQueryResponse = PatientsControllerFindAll20
 export type PatientsControllerFindAllQuery = {
   Response: PatientsControllerFindAll200;
   QueryParams: PatientsControllerFindAllQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -17,5 +17,5 @@ export type AuthControllerForgotPasswordMutationResponse = AuthControllerForgotP
 export type AuthControllerForgotPasswordMutation = {
   Response: AuthControllerForgotPassword200;
   Request: AuthControllerForgotPasswordMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

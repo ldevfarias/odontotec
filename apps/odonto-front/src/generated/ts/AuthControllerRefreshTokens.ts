@@ -12,5 +12,5 @@ export type AuthControllerRefreshTokensMutationResponse = AuthControllerRefreshT
 
 export type AuthControllerRefreshTokensMutation = {
   Response: AuthControllerRefreshTokens200;
-  Errors: any;
+  Errors: unknown;
 };

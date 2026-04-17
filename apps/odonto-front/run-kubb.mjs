@@ -23,7 +23,7 @@ const __dirname = dirname(__filename);
 
 async function generate() {
   try {
-    const result = await build({
+    await build({
       config: {
         root: __dirname,
         input: {

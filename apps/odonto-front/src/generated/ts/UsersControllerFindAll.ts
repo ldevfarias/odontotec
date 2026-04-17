@@ -40,5 +40,5 @@ export type UsersControllerFindAllQueryResponse = UsersControllerFindAll200;
 export type UsersControllerFindAllQuery = {
   Response: UsersControllerFindAll200;
   QueryParams: UsersControllerFindAllQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

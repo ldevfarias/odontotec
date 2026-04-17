@@ -17,5 +17,5 @@ export type PaymentsControllerRemoveMutationResponse = PaymentsControllerRemove2
 export type PaymentsControllerRemoveMutation = {
   Response: PaymentsControllerRemove200;
   PathParams: PaymentsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

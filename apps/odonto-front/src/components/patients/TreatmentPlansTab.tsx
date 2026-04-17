@@ -2,25 +2,14 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import {
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  DollarSign,
-  FileText,
-  Plus,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import { CheckCircle2, Clock, FileText, Trash2, XCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import { TreatmentPlansTabSkeleton } from '@/components/skeletons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -32,7 +21,25 @@ import {
 import { useTreatmentPlansControllerFindAll } from '@/generated/hooks/useTreatmentPlansControllerFindAll';
 import { useTreatmentPlansControllerRemove } from '@/generated/hooks/useTreatmentPlansControllerRemove';
 import { useTreatmentPlansControllerUpdate } from '@/generated/hooks/useTreatmentPlansControllerUpdate';
+import { TreatmentPlanItemDto } from '@/generated/ts/TreatmentPlanItemDto';
+import { UpdateTreatmentPlanDtoStatusEnumKey } from '@/generated/ts/UpdateTreatmentPlanDto';
 import { notificationService } from '@/services/notification.service';
+
+interface TreatmentPlanItem extends Omit<TreatmentPlanItemDto, 'surface' | 'id'> {
+  id: number;
+  surface?: string;
+}
+
+interface TreatmentPlan {
+  id: number;
+  patientId: number;
+  status: string;
+  createdAt: string;
+  totalAmount: number;
+  notes?: string;
+  dentist?: { name: string };
+  items?: TreatmentPlanItem[];
+}
 
 interface TreatmentPlansTabProps {
   patientId: number;
@@ -49,7 +56,6 @@ const STATUS_CONFIG = {
 export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
   const queryClient = useQueryClient();
   const { data: treatmentPlansResponse, isLoading } = useTreatmentPlansControllerFindAll();
-  const treatmentPlans = treatmentPlansResponse?.data ?? [];
   const { mutate: removePlan } = useTreatmentPlansControllerRemove();
   const { mutate: updatePlan } = useTreatmentPlansControllerUpdate();
 
@@ -58,12 +64,13 @@ export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
   const [itemData, setItemData] = useState<{
     planId: number;
     itemId: number;
-    currentItems: any[];
+    currentItems: TreatmentPlanItem[];
   } | null>(null);
 
   const patientPlans = useMemo(() => {
-    return (treatmentPlans as any[]).filter((plan) => plan.patientId === patientId);
-  }, [treatmentPlans, patientId]);
+    const plans = (treatmentPlansResponse?.data ?? []) as TreatmentPlan[];
+    return plans.filter((plan) => plan.patientId === patientId);
+  }, [treatmentPlansResponse, patientId]);
 
   const handleDelete = (id: number) => {
     setDeleteId(id);
@@ -86,9 +93,9 @@ export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
     }
   };
 
-  const handleStatusChange = (id: number, status: string) => {
+  const handleStatusChange = (id: number, status: UpdateTreatmentPlanDtoStatusEnumKey) => {
     updatePlan(
-      { id, data: { status: status as any } },
+      { id, data: { status } },
       {
         onSuccess: () => {
           notificationService.success('Status atualizado!');
@@ -98,17 +105,24 @@ export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
     );
   };
 
-  const handleRemoveItem = (planId: number, itemId: number, currentItems: any[]) => {
+  const handleRemoveItem = (planId: number, itemId: number, currentItems: TreatmentPlanItem[]) => {
     setItemData({ planId, itemId, currentItems });
     setDeleteType('item');
   };
 
   const confirmRemoveItem = () => {
     if (itemData) {
-      const updatedItems = itemData.currentItems.filter((item) => item.id !== itemData.itemId);
+      const updatedItems: TreatmentPlanItemDto[] = itemData.currentItems.map((item) => ({
+        id: item.id,
+        description: item.description,
+        value: item.value,
+        toothNumber: item.toothNumber,
+        status: item.status,
+      }));
+      const filteredItems = updatedItems.filter((item) => item.id !== itemData.itemId);
 
       updatePlan(
-        { id: itemData.planId, data: { items: updatedItems } as any },
+        { id: itemData.planId, data: { items: filteredItems } },
         {
           onSuccess: () => {
             notificationService.success('Item removido com sucesso!');
@@ -133,7 +147,7 @@ export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
           <div className="space-y-1">
             <h3 className="font-semibold">Nenhum orçamento encontrado</h3>
             <p className="text-muted-foreground text-sm">
-              Os itens marcados como "Orçamento" no Odontograma aparecerão aqui.
+              Os itens marcados como &ldquo;Orçamento&rdquo; no Odontograma aparecerão aqui.
             </p>
           </div>
         </CardContent>
@@ -207,14 +221,14 @@ export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[100px]">Dente</TableHead>
+                    <TableHead className="w-25">Dente</TableHead>
                     <TableHead>Procedimento</TableHead>
                     <TableHead>Faces</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(plan.items || []).map((item: any, idx: number) => (
+                  {(plan.items ?? []).map((item, idx) => (
                     <TableRow key={idx}>
                       <TableCell className="font-medium">
                         {item.toothNumber ? `Dente ${item.toothNumber}` : 'Geral'}
@@ -243,7 +257,7 @@ export function TreatmentPlansTab({ patientId }: TreatmentPlansTabProps) {
                             variant="ghost"
                             size="icon"
                             className="text-muted-foreground hover:text-destructive h-6 w-6 opacity-50 hover:opacity-100"
-                            onClick={() => handleRemoveItem(plan.id, item.id, plan.items)}
+                            onClick={() => handleRemoveItem(plan.id, item.id, plan.items ?? [])}
                             title="Remover item"
                           >
                             <Trash2 className="h-3 w-3" />

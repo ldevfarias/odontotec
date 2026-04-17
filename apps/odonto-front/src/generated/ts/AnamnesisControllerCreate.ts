@@ -17,5 +17,5 @@ export type AnamnesisControllerCreateMutationResponse = AnamnesisControllerCreat
 export type AnamnesisControllerCreateMutation = {
   Response: AnamnesisControllerCreate201;
   Request: AnamnesisControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

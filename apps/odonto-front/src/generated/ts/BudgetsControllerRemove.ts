@@ -17,5 +17,5 @@ export type BudgetsControllerRemoveMutationResponse = BudgetsControllerRemove200
 export type BudgetsControllerRemoveMutation = {
   Response: BudgetsControllerRemove200;
   PathParams: BudgetsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface DentistRecentPatientsProps {
-  appointments: any[];
+  appointments: unknown[];
   isLoading?: boolean;
 }
 

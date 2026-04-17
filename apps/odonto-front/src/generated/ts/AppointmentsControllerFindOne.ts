@@ -17,5 +17,5 @@ export type AppointmentsControllerFindOneQueryResponse = AppointmentsControllerF
 export type AppointmentsControllerFindOneQuery = {
   Response: AppointmentsControllerFindOne200;
   PathParams: AppointmentsControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

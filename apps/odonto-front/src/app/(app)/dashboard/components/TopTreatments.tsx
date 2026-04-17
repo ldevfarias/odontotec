@@ -90,7 +90,7 @@ export function TopTreatments() {
           </div>
         ) : (
           <div className="flex flex-col gap-4 overflow-hidden transition-all duration-300 ease-in-out">
-            {displayedTreatments.map((treatment: any, i: number) => {
+            {displayedTreatments.map((treatment: unknown, i: number) => {
               const style = getTreatmentStyle(treatment.name || '', treatment.category || '', i);
               const Icon = style.icon;
               const formattedPrice = new Intl.NumberFormat('pt-BR', {

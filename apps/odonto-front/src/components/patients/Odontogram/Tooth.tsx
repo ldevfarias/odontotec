@@ -8,7 +8,7 @@ export type ToothFace = 'occlusal' | 'mesial' | 'distal' | 'buccal' | 'lingual';
 
 interface ToothProps {
   number: string;
-  observations?: any[];
+  observations?: unknown[];
   className?: string;
   isSelected?: boolean;
   onToothClick: (number: string) => void;
@@ -24,7 +24,7 @@ export const Tooth: React.FC<ToothProps> = ({
   const getFaceColor = (face: ToothFace) => {
     if (isSelected) return 'fill-primary/20 stroke-primary/60';
 
-    const hasFaceObservation = observations.some((o: any) =>
+    const hasFaceObservation = observations.some((o: unknown) =>
       o.toothFaces?.split(',').includes(face.charAt(0).toUpperCase()),
     );
     if (hasFaceObservation) return 'fill-destructive/40 stroke-destructive/60';

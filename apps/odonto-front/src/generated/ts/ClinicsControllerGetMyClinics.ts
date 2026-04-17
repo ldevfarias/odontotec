@@ -9,5 +9,5 @@ export type ClinicsControllerGetMyClinicsQueryResponse = ClinicsControllerGetMyC
 
 export type ClinicsControllerGetMyClinicsQuery = {
   Response: ClinicsControllerGetMyClinics200;
-  Errors: any;
+  Errors: unknown;
 };

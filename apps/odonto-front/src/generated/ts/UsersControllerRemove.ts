@@ -17,5 +17,5 @@ export type UsersControllerRemoveMutationResponse = UsersControllerRemove200;
 export type UsersControllerRemoveMutation = {
   Response: UsersControllerRemove200;
   PathParams: UsersControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -1,8 +1,8 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 // Export types that Kubb-generated clients expect
-export type RequestConfig<TData = unknown> = AxiosRequestConfig<any>;
-export type ResponseErrorConfig<TError = unknown> = any;
+export type RequestConfig<TData = unknown> = AxiosRequestConfig<TData>;
+export type ResponseErrorConfig<TError = unknown> = TError;
 export type Client = typeof fetch;
 
 export const api: AxiosInstance = axios.create({
@@ -27,10 +27,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
+interface QueuedRequest {
+  resolve: (value: string | null) => void;
+  reject: (reason?: unknown) => void;
+}
 
-const processQueue = (error: any, token: string | null = null) => {
+let isRefreshing = false;
+let failedQueue: QueuedRequest[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);

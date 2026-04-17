@@ -22,5 +22,5 @@ export type AnamnesisControllerUpdateMutation = {
   Response: AnamnesisControllerUpdate200;
   Request: AnamnesisControllerUpdateMutationRequest;
   PathParams: AnamnesisControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

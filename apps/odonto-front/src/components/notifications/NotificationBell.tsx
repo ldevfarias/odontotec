@@ -3,7 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { AlertTriangle, Bell, BellRing, Check, CheckCircle2, Info, XCircle } from 'lucide-react';
+import { AlertTriangle, Bell, BellRing, CheckCircle2, Info, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,7 @@ export function NotificationBell() {
   const { mutate: markAsRead } = useNotificationsControllerMarkAsRead();
   const { mutate: markAllAsRead } = useNotificationsControllerMarkAllAsRead();
 
-  const unreadCount = notifications.filter((n: any) => !n.read).length;
+  const unreadCount = notifications.filter((n: unknown) => !n.read).length;
 
   const handleMarkAsRead = (id: number) => {
     markAsRead(
@@ -94,7 +94,7 @@ export function NotificationBell() {
             </div>
           ) : (
             <div className="flex flex-col">
-              {notifications.map((n: any) => (
+              {notifications.map((n: unknown) => (
                 <button
                   key={n.id}
                   className={cn(

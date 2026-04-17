@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { CreatePatientDialog } from '@/components/patients/CreatePatientDialog';
 import { PatientsBulkActions } from '@/components/patients/PatientsBulkActions';
 import { PatientFilterOption, PatientsFilter } from '@/components/patients/PatientsFilter';
-import { PatientsTable } from '@/components/patients/PatientsTable';
+import { Patient, PatientsTable } from '@/components/patients/PatientsTable';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePatientsControllerFindAll } from '@/generated/hooks/usePatientsControllerFindAll';
 import { notificationService } from '@/services/notification.service';
@@ -52,7 +52,7 @@ export default function PatientsPage() {
         <PatientsFilter value={filter} onChange={setFilter} />
 
         <PatientsTable
-          data={patients as any[]}
+          data={patients as Patient[]}
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
         />

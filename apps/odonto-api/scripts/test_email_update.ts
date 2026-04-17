@@ -25,7 +25,7 @@ async function run() {
     );
 
     console.log('Update success:', patchRes.data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error.response) {
       console.error('Error Status:', error.response.status);
       console.error('Error Data:', error.response.data);

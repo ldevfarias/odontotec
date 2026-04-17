@@ -6,6 +6,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
+import Image from 'next/image';
 import { useMemo } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -85,9 +86,11 @@ export function ProfessionalCard({
       {/* Avatar */}
       <div className="relative shrink-0">
         {professional.avatarUrl ? (
-          <img
+          <Image
             src={professional.avatarUrl}
             alt={professional.name}
+            width={36}
+            height={36}
             className={cn(
               'h-9 w-9 rounded-full object-cover ring-2 transition-all',
               isActive ? 'ring-primary/20' : 'ring-transparent grayscale',

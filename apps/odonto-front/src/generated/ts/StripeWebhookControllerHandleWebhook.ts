@@ -18,5 +18,5 @@ export type StripeWebhookControllerHandleWebhookMutationResponse =
 export type StripeWebhookControllerHandleWebhookMutation = {
   Response: StripeWebhookControllerHandleWebhook201;
   HeaderParams: StripeWebhookControllerHandleWebhookHeaderParams;
-  Errors: any;
+  Errors: unknown;
 };

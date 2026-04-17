@@ -1,16 +1,16 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsArray,
-  ValidateNested,
-  IsDefined,
-  ArrayMaxSize,
-  MaxLength,
-} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import {
+    ArrayMaxSize,
+    IsArray,
+    IsDefined,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    MaxLength,
+    ValidateNested,
+} from 'class-validator';
 
 export class AnamnesisAnswerDto {
   @ApiProperty({ example: 'hypertension' })
@@ -21,7 +21,7 @@ export class AnamnesisAnswerDto {
 
   @ApiProperty({ example: true })
   @IsDefined()
-  value: any;
+  value: unknown;
 
   @ApiProperty({ example: 'Controlada com medicação', required: false })
   @IsOptional()

@@ -30,5 +30,5 @@ export type DocumentsControllerFindAllQueryResponse = DocumentsControllerFindAll
 export type DocumentsControllerFindAllQuery = {
   Response: DocumentsControllerFindAll200;
   QueryParams: DocumentsControllerFindAllQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

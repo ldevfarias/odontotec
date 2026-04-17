@@ -4,6 +4,6 @@ export class DashboardStatsDto {
   occupancyRate: number;
   revenue: number;
   expectedRevenue: number;
-  recentAppointments: any[]; // Define a stricter type if possible
+  recentAppointments: unknown[]; // Define a stricter type if possible
   revenueHistory: { day: string; value: number }[];
 }

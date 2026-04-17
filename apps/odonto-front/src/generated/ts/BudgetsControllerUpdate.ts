@@ -22,5 +22,5 @@ export type BudgetsControllerUpdateMutation = {
   Response: BudgetsControllerUpdate200;
   Request: BudgetsControllerUpdateMutationRequest;
   PathParams: BudgetsControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

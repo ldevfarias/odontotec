@@ -6,10 +6,9 @@ import { CalendarEvent } from './types';
 
 interface TodaySummaryProps {
   events: CalendarEvent[];
-  currentDate: Date;
 }
 
-export function TodaySummary({ events, currentDate }: TodaySummaryProps) {
+export function TodaySummary({ events }: TodaySummaryProps) {
   const stats = useMemo(() => {
     const today = new Date();
     const todayEvents = events.filter((e) => isSameDay(e.startTime, today));

@@ -17,5 +17,5 @@ export type PaymentsControllerFindAllByPatientQueryResponse = PaymentsController
 export type PaymentsControllerFindAllByPatientQuery = {
   Response: PaymentsControllerFindAllByPatient200;
   PathParams: PaymentsControllerFindAllByPatientPathParams;
-  Errors: any;
+  Errors: unknown;
 };

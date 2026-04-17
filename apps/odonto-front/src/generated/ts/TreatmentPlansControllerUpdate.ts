@@ -22,5 +22,5 @@ export type TreatmentPlansControllerUpdateMutation = {
   Response: TreatmentPlansControllerUpdate200;
   Request: TreatmentPlansControllerUpdateMutationRequest;
   PathParams: TreatmentPlansControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

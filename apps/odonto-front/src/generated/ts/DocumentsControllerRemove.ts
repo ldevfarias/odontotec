@@ -17,5 +17,5 @@ export type DocumentsControllerRemoveMutationResponse = DocumentsControllerRemov
 export type DocumentsControllerRemoveMutation = {
   Response: DocumentsControllerRemove200;
   PathParams: DocumentsControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

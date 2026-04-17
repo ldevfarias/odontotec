@@ -17,5 +17,5 @@ export type ClinicProceduresControllerRemoveMutationResponse = ClinicProceduresC
 export type ClinicProceduresControllerRemoveMutation = {
   Response: ClinicProceduresControllerRemove200;
   PathParams: ClinicProceduresControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

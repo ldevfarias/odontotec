@@ -22,5 +22,5 @@ export type UsersControllerUpdateMutation = {
   Response: UsersControllerUpdate200;
   Request: UsersControllerUpdateMutationRequest;
   PathParams: UsersControllerUpdatePathParams;
-  Errors: any;
+  Errors: unknown;
 };

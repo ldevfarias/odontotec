@@ -18,5 +18,5 @@ export type ToothObservationsControllerFindAllByPatientQueryResponse =
 export type ToothObservationsControllerFindAllByPatientQuery = {
   Response: ToothObservationsControllerFindAllByPatient200;
   PathParams: ToothObservationsControllerFindAllByPatientPathParams;
-  Errors: any;
+  Errors: unknown;
 };

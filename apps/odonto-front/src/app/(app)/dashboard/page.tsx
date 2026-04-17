@@ -1,7 +1,7 @@
 'use client';
 
-import { CalendarDays, Users, Wallet } from 'lucide-react';
-import { Suspense, useState } from 'react';
+import { CalendarDays } from 'lucide-react';
+import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -105,7 +105,7 @@ function AdminDashboard() {
 
           {/* Revenue Chart */}
           <div className="h-[340px]">
-            <RevenueChart revenue={stats.revenue} period={period} />
+            <RevenueChart period={period} />
           </div>
         </div>
 

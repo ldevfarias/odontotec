@@ -26,5 +26,5 @@ export type TreatmentPlansControllerFindAllQueryResponse = TreatmentPlansControl
 export type TreatmentPlansControllerFindAllQuery = {
   Response: TreatmentPlansControllerFindAll200;
   QueryParams: TreatmentPlansControllerFindAllQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

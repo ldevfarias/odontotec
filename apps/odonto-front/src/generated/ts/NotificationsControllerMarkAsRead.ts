@@ -18,5 +18,5 @@ export type NotificationsControllerMarkAsReadMutationResponse =
 export type NotificationsControllerMarkAsReadMutation = {
   Response: NotificationsControllerMarkAsRead200;
   PathParams: NotificationsControllerMarkAsReadPathParams;
-  Errors: any;
+  Errors: unknown;
 };

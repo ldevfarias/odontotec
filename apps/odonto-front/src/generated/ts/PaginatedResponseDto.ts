@@ -7,7 +7,7 @@ export type PaginatedResponseDto = {
   /**
    * @type array
    */
-  data: any[][];
+  data: unknown[][];
   /**
    * @type number
    */

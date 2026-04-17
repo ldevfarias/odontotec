@@ -18,5 +18,5 @@ export type ProceduresControllerFindAllByPatientQueryResponse =
 export type ProceduresControllerFindAllByPatientQuery = {
   Response: ProceduresControllerFindAllByPatient200;
   PathParams: ProceduresControllerFindAllByPatientPathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -17,5 +17,5 @@ export type TreatmentPlansControllerFindOneQueryResponse = TreatmentPlansControl
 export type TreatmentPlansControllerFindOneQuery = {
   Response: TreatmentPlansControllerFindOne200;
   PathParams: TreatmentPlansControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -18,5 +18,5 @@ export type AuthControllerInitiateRegistrationMutationResponse =
 export type AuthControllerInitiateRegistrationMutation = {
   Response: AuthControllerInitiateRegistration201;
   Request: AuthControllerInitiateRegistrationMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

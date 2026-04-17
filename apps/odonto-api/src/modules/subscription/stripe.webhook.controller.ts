@@ -1,18 +1,18 @@
 import {
-  Controller,
-  Post,
-  Headers,
-  Req,
-  BadRequestException,
+    BadRequestException,
+    Controller,
+    Headers,
+    Post,
+    Req,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-import { Clinic } from '../clinics/entities/clinic.entity';
-import { ProcessedStripeEvent } from './entities/processed-stripe-event.entity';
-import Stripe from 'stripe';
 import type { Request } from 'express';
+import Stripe from 'stripe';
+import { DataSource, EntityManager, Repository } from 'typeorm';
+import { Clinic } from '../clinics/entities/clinic.entity';
 import { EmailService } from '../email/email.service';
+import { ProcessedStripeEvent } from './entities/processed-stripe-event.entity';
 
 @Controller('webhooks/stripe')
 export class StripeWebhookController {
@@ -122,7 +122,7 @@ export class StripeWebhookController {
 
   private async handleCheckoutSessionCompleted(
     session: Stripe.Checkout.Session,
-    manager: any,
+    manager: EntityManager,
   ) {
     const clinicId = session.metadata?.clinicId;
     if (!clinicId) {
@@ -183,7 +183,7 @@ export class StripeWebhookController {
 
   private async handleInvoicePaymentSucceeded(
     invoice: Stripe.Invoice,
-    manager: any,
+    manager: EntityManager,
   ) {
     const subscriptionId =
       typeof (invoice as any).subscription === 'string'
@@ -222,7 +222,7 @@ export class StripeWebhookController {
 
   private async handleInvoicePaymentFailed(
     invoice: Stripe.Invoice,
-    manager: any,
+    manager: EntityManager,
   ) {
     const subscriptionId =
       typeof (invoice as any).subscription === 'string'
@@ -235,7 +235,7 @@ export class StripeWebhookController {
 
   private async handleSubscriptionUpdated(
     subscription: Stripe.Subscription,
-    manager: any,
+    manager: EntityManager,
   ) {
     const clinicRepo = manager.getRepository(Clinic);
     const clinic = await clinicRepo.findOne({
@@ -294,7 +294,7 @@ export class StripeWebhookController {
 
   private async handleSubscriptionDeleted(
     subscription: Stripe.Subscription,
-    manager: any,
+    manager: EntityManager,
   ) {
     const clinicRepo = manager.getRepository(Clinic);
     const clinic = await clinicRepo.findOne({

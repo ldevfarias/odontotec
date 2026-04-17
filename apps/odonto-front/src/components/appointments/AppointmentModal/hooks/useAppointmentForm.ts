@@ -168,6 +168,8 @@ export function useAppointmentForm({
 
   useEffect(() => {
     if (open) {
+      // Reset local new-patient fields when the modal opens.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewPatientName(null);
       setNewPatientPhone('');
       setNewPatientEmail('');

@@ -14,5 +14,5 @@ export type ClinicsControllerUpdateActiveMutationResponse = ClinicsControllerUpd
 export type ClinicsControllerUpdateActiveMutation = {
   Response: ClinicsControllerUpdateActive200;
   Request: ClinicsControllerUpdateActiveMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

@@ -14,5 +14,5 @@ export type UsersControllerRemoveAvatarMutationResponse = UsersControllerRemoveA
 
 export type UsersControllerRemoveAvatarMutation = {
   Response: UsersControllerRemoveAvatar200;
-  Errors: any;
+  Errors: unknown;
 };

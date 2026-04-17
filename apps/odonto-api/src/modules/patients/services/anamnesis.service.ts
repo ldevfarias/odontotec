@@ -18,7 +18,9 @@ export class AnamnesisService {
     clinicId: number,
   ): Promise<Anamnesis> {
     const anamnesis = this.anamnesisRepository.create({
-      ...createAnamnesisDto,
+      complaint: createAnamnesisDto.complaint,
+      data: createAnamnesisDto.data as unknown as Record<string, unknown>,
+      patientId: createAnamnesisDto.patientId,
       clinicId,
     });
     return this.anamnesisRepository.save(anamnesis);

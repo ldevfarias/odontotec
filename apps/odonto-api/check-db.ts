@@ -1,6 +1,6 @@
-import { createConnection } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { createConnection } from 'typeorm';
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
@@ -26,9 +26,9 @@ async function check() {
         `);
 
     console.log('Last 5 appointments:');
-    appointments.forEach((a: any) => {
+    appointments.forEach((a: Record<string, unknown>) => {
       console.log(
-        `ID: ${a.id} | Raw Date: ${a.date} | JS Date: ${new Date(a.date).toISOString()} | Local: ${new Date(a.date).toString()}`,
+        `ID: ${a['id']} | Raw Date: ${a['date']} | JS Date: ${new Date(a['date'] as string).toISOString()} | Local: ${new Date(a['date'] as string).toString()}`,
       );
     });
 

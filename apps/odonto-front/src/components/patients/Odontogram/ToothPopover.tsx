@@ -48,7 +48,7 @@ type ObservationFormValues = z.infer<typeof observationFormSchema>;
 interface ToothPopoverProps {
   toothNumber: string;
   patientId: number;
-  toothObservations: any[];
+  toothObservations: unknown[];
   children: React.ReactNode;
 }
 
@@ -108,13 +108,13 @@ export function ToothPopover({
           notificationService.success('Observação registrada com sucesso!');
           queryClient.setQueryData(
             toothObservationsControllerFindAllByPatientQueryKey(patientId),
-            (old: any[] = []) => [...old, newObservation],
+            (old: unknown[] = []) => [...old, newObservation],
           );
           form.reset(defaultValues);
           setSelectedFaces([]);
           setOpen(false);
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           notificationService.apiError(error, 'Erro ao registrar observação.');
         },
       },

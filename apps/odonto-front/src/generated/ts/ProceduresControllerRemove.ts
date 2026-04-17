@@ -17,5 +17,5 @@ export type ProceduresControllerRemoveMutationResponse = ProceduresControllerRem
 export type ProceduresControllerRemoveMutation = {
   Response: ProceduresControllerRemove200;
   PathParams: ProceduresControllerRemovePathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -14,5 +14,5 @@ export type ProceduresControllerCreateMutationResponse = ProceduresControllerCre
 export type ProceduresControllerCreateMutation = {
   Response: ProceduresControllerCreate201;
   Request: ProceduresControllerCreateMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

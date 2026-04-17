@@ -50,5 +50,5 @@ export type AppointmentsControllerFindAllQueryResponse = AppointmentsControllerF
 export type AppointmentsControllerFindAllQuery = {
   Response: AppointmentsControllerFindAll200;
   QueryParams: AppointmentsControllerFindAllQueryParams;
-  Errors: any;
+  Errors: unknown;
 };

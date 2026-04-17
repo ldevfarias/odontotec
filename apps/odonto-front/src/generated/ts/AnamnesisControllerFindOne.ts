@@ -17,5 +17,5 @@ export type AnamnesisControllerFindOneQueryResponse = AnamnesisControllerFindOne
 export type AnamnesisControllerFindOneQuery = {
   Response: AnamnesisControllerFindOne200;
   PathParams: AnamnesisControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

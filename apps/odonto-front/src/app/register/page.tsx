@@ -1,16 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircle2, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -71,7 +69,7 @@ export default function RegisterPage() {
         name: values.name,
       });
       notificationService.success('E-mail de verificação enviado!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       analytics.captureException(error, { extra: { email: values.email } });
       notificationService.apiError(error, 'Erro ao iniciar cadastro');

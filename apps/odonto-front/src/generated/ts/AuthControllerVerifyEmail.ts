@@ -17,5 +17,5 @@ export type AuthControllerVerifyEmailMutationResponse = AuthControllerVerifyEmai
 export type AuthControllerVerifyEmailMutation = {
   Response: AuthControllerVerifyEmail201;
   Request: AuthControllerVerifyEmailMutationRequest;
-  Errors: any;
+  Errors: unknown;
 };

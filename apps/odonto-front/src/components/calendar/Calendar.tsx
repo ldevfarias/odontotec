@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'; // useEffect kept for mobile view detection
+import { useMemo, useState } from 'react';
 
 import { AppointmentDetailSheet } from './AppointmentDetailSheet';
 import { CalendarHeader } from './CalendarHeader';
@@ -35,20 +35,14 @@ export function Calendar({
   onEditAppointment,
   onUpdateAppointmentStatus,
 }: CalendarProps) {
-  const [state, setState] = useState<CalendarState>({
+  const [state, setState] = useState<CalendarState>(() => ({
     currentDate: new Date(),
-    view: 'week',
+    view: typeof window !== 'undefined' && window.innerWidth < 640 ? 'agenda' : 'week',
     selectedCategories: categories.map((c) => c.id),
     selectedProfessionals: professionals.map((p) => p.id),
-  });
+  }));
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [mobileSelectedEvent, setMobileSelectedEvent] = useState<CalendarEvent | null>(null);
-
-  useEffect(() => {
-    if (window.innerWidth < 640) {
-      setState((prev) => ({ ...prev, view: 'agenda' }));
-    }
-  }, []);
 
   const handleStateChange = (updates: Partial<CalendarState>) => {
     setState((prev) => ({ ...prev, ...updates }));
@@ -78,7 +72,6 @@ export function Calendar({
       <CalendarSidebar
         state={state}
         onStateChange={handleStateChange}
-        categories={categories}
         professionals={professionals}
         events={events}
         mobileOpen={mobileFilterOpen}
@@ -131,7 +124,6 @@ export function Calendar({
               professionals={activeProfessionals}
               onEditAppointment={onEditAppointment}
               onUpdateAppointmentStatus={onUpdateAppointmentStatus}
-              onEventTap={(e) => setMobileSelectedEvent(e)}
               onDayTap={handleDayTap}
             />
           )}

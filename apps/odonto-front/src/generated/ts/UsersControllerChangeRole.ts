@@ -22,5 +22,5 @@ export type UsersControllerChangeRoleMutation = {
   Response: UsersControllerChangeRole200;
   Request: UsersControllerChangeRoleMutationRequest;
   PathParams: UsersControllerChangeRolePathParams;
-  Errors: any;
+  Errors: unknown;
 };

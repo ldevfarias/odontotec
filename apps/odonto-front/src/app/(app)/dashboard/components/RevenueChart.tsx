@@ -1,16 +1,7 @@
 'use client';
 
-import { TrendingUp } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  TooltipProps,
-  XAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis } from 'recharts';
 
 import {
   type ChartConfig,
@@ -19,11 +10,10 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RevenueDataPoint, RevenuePeriod, useRevenueHistory } from '@/hooks/useRevenueHistory';
+import { RevenuePeriod, useRevenueHistory } from '@/hooks/useRevenueHistory';
 import { cn } from '@/lib/utils';
 
 interface RevenueChartProps {
-  revenue: number;
   period: RevenuePeriod;
 }
 
@@ -42,13 +32,7 @@ function formatCurrency(val: number) {
   }).format(val);
 }
 
-function formatValue(val: number) {
-  if (val >= 1_000_000) return `R$ ${(val / 1_000_000).toFixed(1)}M`;
-  if (val >= 1_000) return `R$ ${(val / 1_000).toFixed(1)}k`;
-  return `R$ ${val}`;
-}
-
-export function RevenueChart({ revenue, period }: RevenueChartProps) {
+export function RevenueChart({ period }: RevenueChartProps) {
   const { data: apiData = [], isLoading } = useRevenueHistory(period);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -56,9 +40,6 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
 
   const isMonthly = period === 'last_month';
   const totalRevenue = revenueHistory.reduce((sum, d) => sum + d.value, 0);
-
-  const activeData =
-    activeIndex !== null ? revenueHistory[activeIndex] : revenueHistory[revenueHistory.length - 1];
 
   if (isLoading) {
     return (
@@ -70,12 +51,8 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
           </div>
         </div>
         <div className="flex flex-1 items-end gap-3 pb-6">
-          {Array.from({ length: 7 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-full w-full"
-              style={{ maxHeight: `${30 + Math.random() * 60}%` }}
-            />
+          {[55, 70, 45, 80, 60, 75, 50].map((height, i) => (
+            <Skeleton key={i} className="h-full w-full" style={{ maxHeight: `${height}%` }} />
           ))}
         </div>
       </div>

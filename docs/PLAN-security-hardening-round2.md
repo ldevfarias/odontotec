@@ -539,7 +539,7 @@ import { AppointmentsController } from './appointments.controller';
 
 const THROTTLER_METADATA_KEY = 'THROTTLER:default';
 
-function getThrottle(controller: any, methodName: string) {
+function getThrottle(controller: unknown, methodName: string) {
   return Reflect.getMetadata(THROTTLER_METADATA_KEY, controller.prototype[methodName]);
 }
 

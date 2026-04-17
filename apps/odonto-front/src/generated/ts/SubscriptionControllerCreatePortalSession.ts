@@ -10,5 +10,5 @@ export type SubscriptionControllerCreatePortalSessionMutationResponse =
 
 export type SubscriptionControllerCreatePortalSessionMutation = {
   Response: SubscriptionControllerCreatePortalSession201;
-  Errors: any;
+  Errors: unknown;
 };

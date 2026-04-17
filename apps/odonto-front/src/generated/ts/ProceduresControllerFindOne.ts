@@ -17,5 +17,5 @@ export type ProceduresControllerFindOneQueryResponse = ProceduresControllerFindO
 export type ProceduresControllerFindOneQuery = {
   Response: ProceduresControllerFindOne200;
   PathParams: ProceduresControllerFindOnePathParams;
-  Errors: any;
+  Errors: unknown;
 };

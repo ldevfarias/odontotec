@@ -45,7 +45,7 @@ No,Category,Guideline,Description,Do,Don't,Code Good,Code Bad,Severity,Docs URL
 44,Accessibility,Manage focus properly,Handle focus for modals dialogs,Focus trap in modals return focus on close,No focus management,useEffect to focus input,Modal without focus trap,High,
 45,Accessibility,Announce dynamic content,Use ARIA live regions for updates,aria-live for dynamic updates,Silent updates to screen readers,"<div aria-live=""polite"">{msg}</div>",<div>{msg}</div>,Medium,
 46,Accessibility,Label form controls,Associate labels with inputs,htmlFor matching input id,Placeholder as only label,"<label htmlFor=""email"">Email</label>","<input placeholder=""Email""/>",High,
-47,TypeScript,Type component props,Define interfaces for all props,interface Props with all prop types,any or missing types,interface Props { name: string },function Component(props: any),High,
+47,TypeScript,Type component props,Define interfaces for all props,interface Props with all prop types,any or missing types,interface Props { name: string },function Component(props: unknown),High,
 48,TypeScript,Type state properly,Provide types for useState,useState<Type>() for complex state,Inferred any types,useState<User | null>(null),useState(null),Medium,
 49,TypeScript,Type event handlers,Use React event types,React.ChangeEvent<HTMLInputElement>,Generic Event type,onChange: React.ChangeEvent<HTMLInputElement>,onChange: Event,Medium,
 50,TypeScript,Use generics for reusable components,Generic components for flexible typing,Generic props for list components,Union types for flexibility,<List<T> items={T[]}>,<List items={any[]}>,Medium,

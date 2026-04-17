@@ -17,5 +17,5 @@ export type UsersControllerFindInvitationQueryResponse = UsersControllerFindInvi
 export type UsersControllerFindInvitationQuery = {
   Response: UsersControllerFindInvitation200;
   PathParams: UsersControllerFindInvitationPathParams;
-  Errors: any;
+  Errors: unknown;
 };

@@ -87,7 +87,7 @@ async function testTreatmentPlans() {
     } else {
       console.log('✅ ClinicId correctly assigned.');
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Verification FAILED!');
     if (error.response) {
       console.error('Status:', error.response.status);
