@@ -28,7 +28,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { usePatientsControllerCreate } from '@/generated/hooks/usePatientsControllerCreate';
 import { patientsControllerFindAllQueryKey } from '@/generated/hooks/usePatientsControllerFindAll';
-import { patientsControllerCreateMutationRequestSchema } from '@/generated/zod/patientsControllerCreateSchema';
 import { analytics, EVENT_NAMES } from '@/services/analytics.service';
 import { notificationService } from '@/services/notification.service';
 import { cpfMask, phoneMask } from '@/utils/masks';

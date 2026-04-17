@@ -476,6 +476,7 @@
   line-height: 1.4;
   color: var(--color-muted-foreground);
 }
+<<<<<<< HEAD
 /* =========================================
    Driver.js — Tour Guiado Overrides
    ========================================= */
@@ -584,3 +585,5 @@
 .driver-popover-arrow-side-bottom.driver-popover-arrow {
   border-bottom-color: white;
 }
+=======
+>>>>>>> d29d43bb430b485aba5293dea17bef6e518e704f

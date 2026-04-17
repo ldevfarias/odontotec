@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 
-import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
 import { ClinicsService } from '../clinics/clinics.service';
 import { EmailService } from '../email/email.service';
 import { UserRole } from '../users/enums/role.enum';
+import { UsersService } from '../users/users.service';
+import { AuthService } from './auth.service';
 
 // Partially mock bcrypt: keep real hash (so bcrypt hash assertions work), mock compare for control
 jest.mock('bcrypt', () => {
@@ -80,6 +80,7 @@ const mockJwtService = {
 const configGetImpl = (key: string) => {
   if (key === 'JWT_SECRET') return 'test-secret';
   if (key === 'JWT_REFRESH_SECRET') return 'test-refresh-secret';
+  if (key === 'JWT_RESET_SECRET') return 'test-reset-secret';
   return undefined;
 };
 
@@ -179,6 +180,7 @@ describe('AuthService', () => {
     it('returns null when user is inactive', async () => {
       const user = buildUser({ isActive: false });
       mockUsersService.findByEmail.mockResolvedValue(user);
+      bcryptMock.compare.mockResolvedValue(true); // password is correct — only isActive blocks login
 
       const result = await service.validateUser(
         'ana@clinic.com',
@@ -366,14 +368,6 @@ describe('AuthService', () => {
       );
     });
 
-    /**
-     * SECURITY FIX — TDD red test.
-     *
-     * An inactive user should NOT be able to obtain new tokens via the
-     * refresh endpoint. The current implementation does NOT check
-     * `user.isActive`, so this test is expected to FAIL until the fix is
-     * applied to `refreshTokens()`.
-     */
     it('throws UnauthorizedException when user is inactive', async () => {
       const user = buildUser({ isActive: false });
       mockUsersService.findOneWithRefreshToken.mockResolvedValue(user);
