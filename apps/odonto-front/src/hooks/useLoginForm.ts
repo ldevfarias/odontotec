@@ -129,8 +129,24 @@ export function useLoginForm() {
           setIsRedirecting(true);
           try {
             login('', undefined, authUser, authClinics);
-          } catch {
+          } catch (error) {
             setIsRedirecting(false);
+
+            analytics.capture(EVENT_NAMES.USER_LOGIN_FAILED, {
+              email: values.email,
+              error_stage: 'auth_context_login',
+            });
+            analytics.captureException(error, {
+              extra: {
+                email: values.email,
+                stage: 'auth_context_login',
+              },
+            });
+
+            notificationService.error(
+              AUTH_MESSAGES.LOGIN.ERROR_TOAST_TITLE,
+              AUTH_MESSAGES.LOGIN.DEFAULT_ERROR_MESSAGE,
+            );
           }
         },
         onError: (error: unknown) => {
