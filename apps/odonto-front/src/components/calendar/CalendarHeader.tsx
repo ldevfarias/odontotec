@@ -166,7 +166,7 @@ export function CalendarHeader({
             </button>
           </div>
 
-          <Button data-tour="create-appointment-btn" className="h-9 gap-2 rounded-xl text-sm" onClick={onNewAppointment}>
+          <Button className="h-9 gap-2 rounded-xl text-sm" onClick={onNewAppointment}>
             <Plus className="h-4 w-4" />
             Novo Agendamento
           </Button>
@@ -179,11 +179,10 @@ export function CalendarHeader({
           <button
             key={key}
             onClick={() => setView(key)}
-            className={`shrink-0 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
-              view === key
+            className={`shrink-0 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${view === key
                 ? 'border-primary text-primary'
                 : 'text-muted-foreground border-transparent'
-            }`}
+              }`}
           >
             {label}
           </button>

@@ -30,11 +30,6 @@ export const EVENT_NAMES = {
 
   // Time / Profissionais
   PROFESSIONAL_INVITED: 'professional_invited',
-
-  // Tour Guiado
-  TOUR_STARTED: 'tour_started',
-  TOUR_COMPLETED: 'tour_completed',
-  TOUR_DISMISSED: 'tour_dismissed',
 } as const;
 
 export type EventName = (typeof EVENT_NAMES)[keyof typeof EVENT_NAMES];
@@ -76,9 +71,6 @@ interface EventPayloads {
   [EVENT_NAMES.SUBSCRIPTION_CHECKOUT_INITIATED]: { plan: string };
   [EVENT_NAMES.SUBSCRIPTION_PORTAL_OPENED]: Record<string, never>;
   [EVENT_NAMES.PROFESSIONAL_INVITED]: { email: string; role: string };
-  [EVENT_NAMES.TOUR_STARTED]: Record<string, never>;
-  [EVENT_NAMES.TOUR_COMPLETED]: Record<string, never>;
-  [EVENT_NAMES.TOUR_DISMISSED]: { step: number };
 }
 
 /**

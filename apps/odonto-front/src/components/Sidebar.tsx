@@ -1,10 +1,7 @@
 'use client';
 
 import {
-  Activity,
-  Building2,
-  Calendar,
-  CalendarDays,
+  Building2, CalendarDays,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -12,11 +9,10 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
-  Users,
+  Users
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -30,8 +26,8 @@ const menuGroups = [
     label: 'Principal',
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', exact: true },
-      { icon: CalendarDays, label: 'Agendamentos', href: '/agendamentos', dataTour: 'nav-appointments' },
-      { icon: Users, label: 'Pacientes', href: '/patients', dataTour: 'nav-patients' },
+      { icon: CalendarDays, label: 'Agendamentos', href: '/agendamentos' },
+      { icon: Users, label: 'Pacientes', href: '/patients' },
     ],
   },
   {
@@ -78,19 +74,12 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
     localStorage.setItem('sidebar-collapsed', String(collapsed));
   }, [collapsed, isMobile]);
 
-  useEffect(() => {
-    if (isMobile) return;
-    const handler = () => setCollapsed(false);
-    window.addEventListener('tour:expand-sidebar', handler);
-    return () => window.removeEventListener('tour:expand-sidebar', handler);
-  }, [isMobile]);
-
   const initials = user?.name
     ? user.name
-        .split(' ')
-        .slice(0, 2)
-        .map((n) => n[0].toUpperCase())
-        .join('')
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n[0].toUpperCase())
+      .join('')
     : '?';
 
   const filteredGroups = menuGroups.filter((group) => {
@@ -139,7 +128,6 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
           <Popover open={clinicOpen} onOpenChange={setClinicOpen}>
             <PopoverTrigger asChild>
               <button
-                data-tour="clinic-header"
                 className={cn(
                   'group flex w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-transparent text-left transition-colors outline-none hover:border-gray-200 hover:bg-gray-50',
                   isCollapsed ? 'justify-center p-1.5' : '-ml-2.5 px-2.5 py-1.5',
@@ -238,7 +226,6 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
                     href={item.href}
                     prefetch={true}
                     title={isCollapsed ? item.label : undefined}
-                    data-tour={'dataTour' in item ? item.dataTour : undefined}
                     className={cn(
                       'flex items-center gap-3 rounded-xl px-3 py-2.5',
                       'text-sm font-medium',
