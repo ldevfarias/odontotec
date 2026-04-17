@@ -5,6 +5,7 @@ import { RouteGuard } from '@/components/RouteGuard';
 import { Sidebar } from '@/components/Sidebar';
 import { AppLayoutSkeleton } from '@/components/skeletons';
 import { SubscriptionBlocker } from '@/components/SubscriptionBlocker';
+import { TourProvider } from '@/contexts/TourContext';
 import { SubscriptionProvider, useSubscription } from '@/contexts/SubscriptionContext';
 import { cn } from '@/lib/utils';
 
@@ -41,7 +42,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <RouteGuard>
       <SubscriptionProvider>
-        <DashboardContent>{children}</DashboardContent>
+        <TourProvider>
+          <DashboardContent>{children}</DashboardContent>
+        </TourProvider>
       </SubscriptionProvider>
     </RouteGuard>
   );
