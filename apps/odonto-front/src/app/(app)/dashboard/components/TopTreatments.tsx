@@ -85,7 +85,7 @@ export function TopTreatments() {
             </div>
           ))
         ) : displayedTreatments.length === 0 ? (
-          <div className="py-6 text-center text-sm text-gray-500 italic">
+          <div className="py-6 text-center text-sm text-gray-500">
             Nenhum procedimento cadastrado.
           </div>
         ) : (
