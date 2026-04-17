@@ -30,8 +30,8 @@ const menuGroups = [
     label: 'Principal',
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', exact: true },
-      { icon: CalendarDays, label: 'Agendamentos', href: '/agendamentos' },
-      { icon: Users, label: 'Pacientes', href: '/patients' },
+      { icon: CalendarDays, label: 'Agendamentos', href: '/agendamentos', dataTour: 'nav-appointments' },
+      { icon: Users, label: 'Pacientes', href: '/patients', dataTour: 'nav-patients' },
     ],
   },
   {
@@ -77,6 +77,13 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
     if (isMobile) return;
     localStorage.setItem('sidebar-collapsed', String(collapsed));
   }, [collapsed, isMobile]);
+
+  useEffect(() => {
+    if (isMobile) return;
+    const handler = () => setCollapsed(false);
+    window.addEventListener('tour:expand-sidebar', handler);
+    return () => window.removeEventListener('tour:expand-sidebar', handler);
+  }, [isMobile]);
 
   const initials = user?.name
     ? user.name
@@ -132,6 +139,7 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
           <Popover open={clinicOpen} onOpenChange={setClinicOpen}>
             <PopoverTrigger asChild>
               <button
+                data-tour="clinic-header"
                 className={cn(
                   'group flex w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-transparent text-left transition-colors outline-none hover:border-gray-200 hover:bg-gray-50',
                   isCollapsed ? 'justify-center p-1.5' : '-ml-2.5 px-2.5 py-1.5',
@@ -230,6 +238,7 @@ export function Sidebar({ className, isMobile }: { className?: string; isMobile?
                     href={item.href}
                     prefetch={true}
                     title={isCollapsed ? item.label : undefined}
+                    data-tour={'dataTour' in item ? item.dataTour : undefined}
                     className={cn(
                       'flex items-center gap-3 rounded-xl px-3 py-2.5',
                       'text-sm font-medium',

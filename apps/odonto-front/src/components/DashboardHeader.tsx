@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, ChevronDown, LogOut, Menu, Search, Settings } from 'lucide-react';
+import { Camera, ChevronDown, HelpCircle, LogOut, Menu, Search, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -13,6 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTourContext } from '@/contexts/TourContext';
+import { notificationService } from '@/services/notification.service';
 
 import { NotificationBell } from './notifications/NotificationBell';
 
@@ -22,6 +24,15 @@ export function DashboardHeader() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const { startTour } = useTourContext();
+
+  const handleTourClick = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      notificationService.info('O tour guiado está disponível apenas no desktop.');
+      return;
+    }
+    startTour();
+  };
 
   const initials = user?.name
     ? user.name
@@ -76,6 +87,14 @@ export function DashboardHeader() {
 
       {/* Actions */}
       <div className="flex shrink-0 items-center gap-3">
+        <button
+          onClick={handleTourClick}
+          title="Tour guiado"
+          className="hidden items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm transition-colors hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 md:flex"
+        >
+          <HelpCircle className="h-3.5 w-3.5" />
+          Tour guiado
+        </button>
         <NotificationBell />
         <div className="hidden h-8 w-[1px] bg-gray-200 sm:block" />
 

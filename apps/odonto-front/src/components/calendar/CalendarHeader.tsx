@@ -166,7 +166,7 @@ export function CalendarHeader({
             </button>
           </div>
 
-          <Button className="h-9 gap-2 rounded-xl text-sm" onClick={onNewAppointment}>
+          <Button data-tour="create-appointment-btn" className="h-9 gap-2 rounded-xl text-sm" onClick={onNewAppointment}>
             <Plus className="h-4 w-4" />
             Novo Agendamento
           </Button>
