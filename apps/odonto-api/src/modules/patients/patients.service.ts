@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Patient } from './entities/patient.entity';
-import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
-import { AnamnesisService } from './services/anamnesis.service';
 import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
+import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
+import { Patient } from './entities/patient.entity';
+import { AnamnesisService } from './services/anamnesis.service';
 
 @Injectable()
 export class PatientsService {
@@ -46,7 +46,7 @@ export class PatientsService {
             LEFT JOIN appointments a ON a.patient_id = p.id AND a.clinic_id = $1
             WHERE p.clinic_id = $1 AND p.deleted_at IS NULL
             GROUP BY p.id
-            ORDER BY p.name ASC
+            ORDER BY p.id DESC
             LIMIT $2 OFFSET $3;
         `;
     const [countResult, data] = await Promise.all([
