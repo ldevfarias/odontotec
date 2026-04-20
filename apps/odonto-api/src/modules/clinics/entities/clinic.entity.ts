@@ -31,6 +31,9 @@ export class Clinic {
   @Column({ type: 'text', nullable: true })
   email: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  cnpj: string | null;
+
   @Column({ default: 'FREE' })
   plan: 'FREE' | 'PRO';
 

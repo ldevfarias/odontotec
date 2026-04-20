@@ -1,4 +1,5 @@
 import { IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsValidCnpj } from '../../../common/validators/is-valid-cnpj.validator';
 
 export class UpdateClinicDto {
   @IsString()
@@ -20,4 +21,8 @@ export class UpdateClinicDto {
   @IsOptional()
   @MaxLength(255)
   email?: string;
+
+  @IsOptional()
+  @IsValidCnpj()
+  cnpj?: string;
 }
