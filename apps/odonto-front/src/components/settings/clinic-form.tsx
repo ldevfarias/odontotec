@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { api } from '@/lib/api';
+import { formatCnpj, stripCnpj, validateCnpj } from '@/lib/validators/cnpj';
 import { notificationService } from '@/services/notification.service';
 
 const clinicFormSchema = z.object({
@@ -35,6 +36,13 @@ const clinicFormSchema = z.object({
     .or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().optional(),
+  cnpj: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine((val) => !val || validateCnpj(stripCnpj(val)), {
+      message: 'CNPJ inválido.',
+    }),
 });
 
 type ClinicFormValues = z.infer<typeof clinicFormSchema>;
@@ -53,6 +61,7 @@ export function ClinicForm() {
       email: '',
       phone: '',
       address: '',
+      cnpj: '',
     },
   });
 
@@ -66,6 +75,7 @@ export function ClinicForm() {
           email: clinic.email || '',
           phone: clinic.phone || '',
           address: clinic.address || '',
+          cnpj: clinic.cnpj ? formatCnpj(clinic.cnpj) : '',
         });
         if (clinic.logoUrl) {
           setLogoPreview(`${process.env.NEXT_PUBLIC_API_URL}${clinic.logoUrl}`);
@@ -115,10 +125,28 @@ export function ClinicForm() {
     reader.readAsDataURL(file);
   };
 
+  function handleCnpjChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    onChange: (val: string) => void,
+  ) {
+    const raw = e.target.value
+      .replace(/[^A-Za-z0-9]/g, '')
+      .toUpperCase()
+      .slice(0, 14);
+    // Positions 12–13 (check digits) must be numeric only
+    const validated =
+      raw.length > 12 ? raw.slice(0, 12) + raw.slice(12).replace(/[^0-9]/g, '') : raw;
+    onChange(formatCnpj(validated));
+  }
+
   async function onSubmit(data: ClinicFormValues) {
     setIsSaving(true);
     try {
-      await api.patch('/clinics/active', data);
+      const cnpjRaw = stripCnpj(data.cnpj || '');
+      await api.patch('/clinics/active', {
+        ...data,
+        cnpj: cnpjRaw || undefined,
+      });
 
       if (logoFile) {
         const formData = new FormData();
@@ -185,6 +213,26 @@ export function ClinicForm() {
                     <FormLabel>Nome da Clínica</FormLabel>
                     <FormControl>
                       <Input placeholder="Clínica Odontológica Exemplo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="cnpj"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      CNPJ <span className="text-muted-foreground">(opcional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="AB.222.333/0001-01"
+                        {...field}
+                        onChange={(e) => handleCnpjChange(e, field.onChange)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
