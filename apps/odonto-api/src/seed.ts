@@ -121,6 +121,85 @@ const CANCELLATION_REASONS = [
   'Esqueceu o agendamento',
 ];
 
+async function seedDemoData(
+  clinic: Clinic,
+  dentist: { id: number },
+  clinicProcs: ClinicProcedure[],
+  dataSource: DataSource,
+): Promise<void> {
+  const patientRepo = dataSource.getRepository(Patient);
+  const procedureRepo = dataSource.getRepository(Procedure);
+  const anamnesisRepo = dataSource.getRepository(Anamnesis);
+  const paymentRepo = dataSource.getRepository(Payment);
+  const appointmentRepo = dataSource.getRepository(Appointment);
+  const toothObsRepo = dataSource.getRepository(ToothObservation);
+  const budgetRepo = dataSource.getRepository(Budget);
+  const budgetItemRepo = dataSource.getRepository(BudgetItem);
+  const treatmentPlanRepo = dataSource.getRepository(TreatmentPlan);
+  const treatmentPlanItemRepo = dataSource.getRepository(TreatmentPlanItem);
+
+  console.log('\nSeeding demo patients...');
+
+  for (let i = 0; i < PATIENT_NAMES.length; i++) {
+    const name = PATIENT_NAMES[i];
+
+    // Idempotência: skip se já existe
+    const existing = await patientRepo.findOne({
+      where: { name, clinicId: clinic.id },
+    });
+
+    let patient: Patient;
+    if (existing) {
+      patient = existing;
+      console.log(`  → [${i + 1}/${PATIENT_NAMES.length}] Paciente já existe: ${name}`);
+    } else {
+      const birthYear = new Date().getFullYear() - randInt(18, 80);
+      const cpfNums = Array.from({ length: 11 }, () => randInt(0, 9));
+      const cpf = `${cpfNums.slice(0, 3).join('')}.${cpfNums.slice(3, 6).join('')}.${cpfNums.slice(6, 9).join('')}-${cpfNums.slice(9).join('')}`;
+      const emailSlug = name
+        .toLowerCase()
+        .replace(/\s+/g, '.')
+        .replace(/[áàâã]/g, 'a')
+        .replace(/[éê]/g, 'e')
+        .replace(/[í]/g, 'i')
+        .replace(/[óô]/g, 'o')
+        .replace(/[ú]/g, 'u')
+        .replace(/[ç]/g, 'c');
+
+      patient = patientRepo.create({
+        name,
+        birthDate: new Date(birthYear, randInt(0, 11), randInt(1, 28)),
+        document: cpf,
+        email: `${emailSlug}${randInt(1, 99)}@email.com`,
+        phone: `(${randInt(11, 99)}) 9${randInt(1000, 9999)}-${randInt(1000, 9999)}`,
+        address: pick(ADDRESSES),
+        clinicId: clinic.id,
+      });
+      patient = await patientRepo.save(patient);
+      console.log(`  → [${i + 1}/${PATIENT_NAMES.length}] Paciente criado: ${name}`);
+    }
+
+    // Dados relacionados — cada bloco é idempotente
+    await seedProcedures(procedureRepo, patient, clinic.id);
+    await seedAnamnesis(anamnesisRepo, patient, clinic.id, i);
+    await seedPayments(paymentRepo, patient, clinic.id);
+    await seedAppointments(appointmentRepo, patient, clinic.id, dentist.id, i);
+    await seedToothObservations(toothObsRepo, patient, clinic.id);
+    await seedBudget(budgetRepo, budgetItemRepo, patient, clinic.id, clinicProcs);
+    await seedTreatmentPlan(treatmentPlanRepo, treatmentPlanItemRepo, patient, clinic.id, dentist.id);
+  }
+
+  console.log('Demo seeding complete!\n');
+}
+
+async function seedProcedures(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
+async function seedAnamnesis(_repo: any, _patient: Patient, _clinicId: number, _idx: number): Promise<void> {}
+async function seedPayments(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
+async function seedAppointments(_repo: any, _patient: Patient, _clinicId: number, _dentistId: number, _idx: number): Promise<void> {}
+async function seedToothObservations(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
+async function seedBudget(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _procs: ClinicProcedure[]): Promise<void> {}
+async function seedTreatmentPlan(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _dentistId: number): Promise<void> {}
+
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const dataSource = app.get(DataSource);
@@ -264,6 +343,14 @@ async function bootstrap() {
       );
     }
   }
+
+  // Buscar procedimentos criados para passar ao seedDemoData
+  const clinicProcsForSeed = await procRepo.find({ where: { clinicId: clinic.id } });
+
+  // Buscar dentista para passar ao seedDemoData
+  const dentistUser = await userRepo.findOne({ where: { email: 'dentist@odontotec.com' } });
+
+  await seedDemoData(clinic, dentistUser!, clinicProcsForSeed, dataSource);
 
   await app.close();
   console.log('Seeding complete!');
