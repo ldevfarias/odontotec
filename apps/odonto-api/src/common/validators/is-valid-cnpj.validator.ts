@@ -22,7 +22,7 @@ export function validateCnpj(raw: string): boolean {
   const dv1 = calcDigit(cnpj.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
   const dv2 = calcDigit(cnpj.slice(0, 13), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
 
-  return dv1 === parseInt(cnpj[12]) && dv2 === parseInt(cnpj[13]);
+  return dv1 === parseInt(cnpj[12], 10) && dv2 === parseInt(cnpj[13], 10);
 }
 
 export function IsValidCnpj(validationOptions?: ValidationOptions) {
