@@ -2409,10 +2409,10 @@
         "parameters": [
           {
             "name": "patientId",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
