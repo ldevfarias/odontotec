@@ -37,7 +37,7 @@ describe('validateCnpj', () => {
     expect(validateCnpj('AB2223330001AB')).toBe(false);
   });
 
-  it('returns true for empty string (optional field)', () => {
+  it('rejects empty string', () => {
     expect(validateCnpj('')).toBe(false);
   });
 });
