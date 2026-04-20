@@ -125,19 +125,19 @@ export function ClinicForm() {
     reader.readAsDataURL(file);
   };
 
-  function handleCnpjChange(
+  const handleCnpjChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     onChange: (val: string) => void,
-  ) {
+  ) => {
     const raw = e.target.value
       .replace(/[^A-Za-z0-9]/g, '')
-      .toUpperCase()
-      .slice(0, 14);
+      .slice(0, 14)
+      .toUpperCase();
     // Positions 12–13 (check digits) must be numeric only
     const validated =
       raw.length > 12 ? raw.slice(0, 12) + raw.slice(12).replace(/[^0-9]/g, '') : raw;
     onChange(formatCnpj(validated));
-  }
+  };
 
   async function onSubmit(data: ClinicFormValues) {
     setIsSaving(true);
