@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddCnpjToClinic20260420155647 implements MigrationInterface {
+export class AddCnpjToClinic1776711694455 implements MigrationInterface {
+  name = 'AddCnpjToClinic1776711694455';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TABLE "clinics" ADD COLUMN IF NOT EXISTS "cnpj" text`,
