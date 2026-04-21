@@ -299,7 +299,69 @@ async function seedPayments(
     await repo.save(record);
   }
 }
-async function seedAppointments(_repo: any, _patient: Patient, _clinicId: number, _dentistId: number, _idx: number): Promise<void> {}
+async function seedAppointments(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  dentistId: number,
+  idx: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const qty = randInt(2, 5);
+  for (let j = 0; j < qty; j++) {
+    const dayOffset = idx * 3 + j * 7;
+    const isPast = dayOffset <= 180;
+    const appointmentDate = isPast
+      ? daysAgo(180 - dayOffset)
+      : daysFromNow(dayOffset - 180);
+
+    appointmentDate.setHours(8 + (j % 9), (idx % 2) * 30, 0, 0);
+
+    let status: AppointmentStatus;
+    let cancelledBy: 'PATIENT' | 'CLINIC' | null = null;
+    let cancellationReason: string | null = null;
+
+    if (isPast) {
+      status = weightedPick([
+        { value: AppointmentStatus.COMPLETED, weight: 60 },
+        { value: AppointmentStatus.CANCELLED, weight: 25 },
+        { value: AppointmentStatus.ABSENT, weight: 15 },
+      ]);
+      if (status === AppointmentStatus.CANCELLED) {
+        cancelledBy = pick(['PATIENT', 'CLINIC'] as const);
+        cancellationReason = pick(CANCELLATION_REASONS);
+      }
+    } else {
+      status = weightedPick([
+        { value: AppointmentStatus.SCHEDULED, weight: 70 },
+        { value: AppointmentStatus.CONFIRMED, weight: 30 },
+      ]);
+    }
+
+    const record = repo.create({
+      date: appointmentDate,
+      duration: pick([30, 60]),
+      status,
+      cancelledBy,
+      cancellationReason,
+      clinicId,
+      dentistId,
+      patientId: patient.id,
+    });
+
+    try {
+      await repo.save(record);
+    } catch (e: any) {
+      if (e?.code === '23505') {
+        console.warn(`    ⚠ Appointment slot conflict for patient ${patient.id}, skipping`);
+      } else {
+        throw e;
+      }
+    }
+  }
+}
 async function seedToothObservations(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
 async function seedBudget(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _procs: ClinicProcedure[]): Promise<void> {}
 async function seedTreatmentPlan(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _dentistId: number): Promise<void> {}
