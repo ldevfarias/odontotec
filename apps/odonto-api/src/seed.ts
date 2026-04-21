@@ -390,7 +390,53 @@ async function seedToothObservations(
     await repo.save(record);
   }
 }
-async function seedBudget(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _procs: ClinicProcedure[]): Promise<void> {}
+async function seedBudget(
+  repo: Repository<any>,
+  itemRepo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  clinicProcs: ClinicProcedure[],
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const status = weightedPick([
+    { value: BudgetStatus.PENDING, weight: 40 },
+    { value: BudgetStatus.APPROVED, weight: 45 },
+    { value: BudgetStatus.REJECTED, weight: 15 },
+  ]);
+
+  const budget = repo.create({
+    clinicId,
+    patientId: patient.id,
+    status,
+    notes: pick([null, null, 'Aguardando confirmação do plano', 'Paciente pediu desconto']),
+    total: 0,
+  });
+  const savedBudget = await repo.save(budget);
+
+  const itemQty = randInt(2, 3);
+  let total = 0;
+  for (let j = 0; j < itemQty; j++) {
+    const proc = pick(clinicProcs);
+    const quantity = pick([1, 1, 2]);
+    const unitPrice = Number(proc.baseValue);
+    const subtotal = unitPrice * quantity;
+    total += subtotal;
+
+    const item = itemRepo.create({
+      budgetId: savedBudget.id,
+      clinicProcedureId: proc.id,
+      quantity,
+      unitPrice,
+      subtotal,
+    });
+    await itemRepo.save(item);
+  }
+
+  savedBudget.total = total;
+  await repo.save(savedBudget);
+}
 async function seedTreatmentPlan(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _dentistId: number): Promise<void> {}
 
 async function bootstrap() {
