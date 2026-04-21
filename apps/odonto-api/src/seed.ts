@@ -223,7 +223,51 @@ async function seedProcedures(
     await repo.save(record);
   }
 }
-async function seedAnamnesis(_repo: any, _patient: Patient, _clinicId: number, _idx: number): Promise<void> {}
+async function seedAnamnesis(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  idx: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const medications = pick([
+    [],
+    ['Losartana 50mg'],
+    ['Metformina 850mg', 'Atenolol 25mg'],
+    ['Sinvastatina 20mg'],
+  ]);
+  const allergies = pick([
+    'Nenhuma conhecida',
+    'Penicilina',
+    'Dipirona',
+    'Anti-inflamatórios',
+    'Látex',
+  ]);
+  const medicalHistory = pick([
+    'Sem histórico relevante',
+    'Hipertensão arterial controlada',
+    'Diabetes tipo 2',
+    'Cardiopatia — usa marcapasso',
+    'Coagulopatia — uso de anticoagulante',
+    'Gestante — 2º trimestre',
+  ]);
+
+  const record = repo.create({
+    complaint: COMPLAINTS[idx % COMPLAINTS.length],
+    data: {
+      medications,
+      allergies,
+      medicalHistory,
+      smoker: pick([true, false, false, false]),
+      pregnant: medicalHistory.includes('Gestante'),
+    },
+    patientId: patient.id,
+    clinicId,
+  });
+  await repo.save(record);
+}
 async function seedPayments(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
 async function seedAppointments(_repo: any, _patient: Patient, _clinicId: number, _dentistId: number, _idx: number): Promise<void> {}
 async function seedToothObservations(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
