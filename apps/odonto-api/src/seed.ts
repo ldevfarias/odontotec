@@ -7,7 +7,7 @@ import { ClinicProcedure } from './modules/clinic-procedures/entities/clinic-pro
 import { ClinicRole } from './modules/clinics/enums/clinic-role.enum';
 import { UserRole } from './modules/users/enums/role.enum';
 import * as bcrypt from 'bcrypt';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Patient } from './modules/patients/entities/patient.entity';
 import { Procedure } from './modules/patients/entities/procedure.entity';
 import { Anamnesis } from './modules/patients/entities/anamnesis.entity';
@@ -192,7 +192,37 @@ async function seedDemoData(
   console.log('Demo seeding complete!\n');
 }
 
-async function seedProcedures(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
+async function seedProcedures(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const qty = randInt(2, 4);
+  for (let j = 0; j < qty; j++) {
+    const proc = pick(PROCEDURE_TYPES);
+    const toothNums = [
+      '11','12','13','14','15','16','17','18',
+      '21','22','23','24','25','26','27','28',
+      '31','32','33','34','35','36','37','38',
+      '41','42','43','44','45','46','47','48',
+    ];
+    const face = pick(TOOTH_FACES);
+    const record = repo.create({
+      description: proc.type,
+      type: proc.type,
+      date: daysAgo(randInt(1, 180)),
+      cost: proc.cost + randInt(-20, 50),
+      toothNumber: pick(toothNums),
+      toothFaces: face,
+      patientId: patient.id,
+      clinicId,
+    });
+    await repo.save(record);
+  }
+}
 async function seedAnamnesis(_repo: any, _patient: Patient, _clinicId: number, _idx: number): Promise<void> {}
 async function seedPayments(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
 async function seedAppointments(_repo: any, _patient: Patient, _clinicId: number, _dentistId: number, _idx: number): Promise<void> {}
