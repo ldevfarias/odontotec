@@ -362,7 +362,34 @@ async function seedAppointments(
     }
   }
 }
-async function seedToothObservations(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
+async function seedToothObservations(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const toothNums = [
+    '11','12','13','14','15','16','17','18',
+    '21','22','23','24','25','26','27','28',
+    '31','32','33','34','35','36','37','38',
+    '41','42','43','44','45','46','47','48',
+  ];
+
+  const qty = randInt(1, 2);
+  for (let j = 0; j < qty; j++) {
+    const record = repo.create({
+      toothNumber: pick(toothNums),
+      toothFaces: pick(TOOTH_FACES),
+      description: pick(TOOTH_DESCRIPTIONS),
+      date: daysAgo(randInt(1, 180)),
+      patientId: patient.id,
+      clinicId,
+    });
+    await repo.save(record);
+  }
+}
 async function seedBudget(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _procs: ClinicProcedure[]): Promise<void> {}
 async function seedTreatmentPlan(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _dentistId: number): Promise<void> {}
 
