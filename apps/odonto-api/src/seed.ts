@@ -437,7 +437,70 @@ async function seedBudget(
   savedBudget.total = total;
   await repo.save(savedBudget);
 }
-async function seedTreatmentPlan(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _dentistId: number): Promise<void> {}
+async function seedTreatmentPlan(
+  repo: Repository<any>,
+  itemRepo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  dentistId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const status = weightedPick([
+    { value: TreatmentPlanStatus.DRAFT, weight: 30 },
+    { value: TreatmentPlanStatus.APPROVED, weight: 50 },
+    { value: TreatmentPlanStatus.COMPLETED, weight: 20 },
+  ]);
+  const discount = pick([0, 0, 0, 50]);
+  const titles = [
+    'Plano de Tratamento Completo',
+    'Reabilitação Oral',
+    'Plano Preventivo',
+    'Tratamento Estético',
+  ];
+
+  const plan = repo.create({
+    title: pick(titles),
+    status,
+    discount,
+    totalAmount: 0,
+    notes: pick([null, null, 'Iniciar após aprovação do orçamento', 'Dividido em 3 sessões']),
+    patientId: patient.id,
+    dentistId,
+    clinicId,
+  });
+  const savedPlan = await repo.save(plan);
+
+  const itemQty = randInt(2, 3);
+  const procDescriptions = PROCEDURE_TYPES.map((p) => p.type);
+  const toothNums = ['11','16','21','26','31','36','41','46'];
+  const surfaces = ['M', 'D', 'V', 'L', 'O', null];
+  const itemStatuses = [
+    TreatmentPlanItemStatus.PLANNED,
+    TreatmentPlanItemStatus.IN_PROGRESS,
+    TreatmentPlanItemStatus.COMPLETED,
+  ];
+
+  let totalAmount = 0;
+  for (let j = 0; j < itemQty; j++) {
+    const value = randInt(150, 500);
+    totalAmount += value;
+
+    const item = itemRepo.create({
+      description: pick(procDescriptions),
+      value,
+      toothNumber: parseInt(pick(toothNums), 10),
+      surface: pick(surfaces),
+      status: pick(itemStatuses),
+      treatmentPlanId: savedPlan.id,
+    });
+    await itemRepo.save(item);
+  }
+
+  savedPlan.totalAmount = Math.max(0, totalAmount - discount);
+  await repo.save(savedPlan);
+}
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
