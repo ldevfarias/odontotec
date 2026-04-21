@@ -1,7 +1,6 @@
 'use client';
 
-import { Calendar, CreditCard, FileText } from 'lucide-react';
-import { Banknote } from 'lucide-react';
+import { Banknote, Calendar, CreditCard, FileText } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { AnamnesisTab } from '@/components/patients/AnamnesisTab';
@@ -24,6 +23,8 @@ export default function PatientDetailPage() {
   const isSecretary = user?.role === 'SIMPLE';
 
   const { data: patient, isLoading, isError } = usePatientsControllerFindOne(Number(id));
+  const tabTriggerClassName =
+    'cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold text-muted-foreground transition-colors duration-200 hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:after:bg-primary sm:px-4';
 
   if (isLoading) {
     return <PatientPageSkeleton />;
@@ -41,58 +42,43 @@ export default function PatientDetailPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full min-h-0 flex-col space-y-4">
       <PatientCard patient={patient} />
 
-      <div className="w-full">
-        <Tabs defaultValue={isSecretary ? 'budgets' : 'anamnesis'} className="w-full">
-          <div className="mb-4 flex justify-start overflow-x-auto sm:mb-6">
-            <TabsList className="bg-muted/50 border-border/40 h-auto min-w-max gap-1 rounded-xl border p-1">
+      <div className="flex min-h-0 flex-1">
+        <Tabs
+          defaultValue={isSecretary ? 'budgets' : 'anamnesis'}
+          className="border-border/40 bg-card flex h-full min-h-0 w-full rounded-xl border p-3 shadow-sm sm:p-4"
+        >
+          <div className="mb-4 flex justify-start overflow-x-auto overflow-y-hidden [scrollbar-width:none] sm:mb-6 [&::-webkit-scrollbar]:hidden">
+            <TabsList variant="line">
               {!isSecretary && (
-                <TabsTrigger
-                  value="anamnesis"
-                  className="data-[state=active]:text-primary cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-sm sm:px-4"
-                >
+                <TabsTrigger value="anamnesis" className={tabTriggerClassName}>
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Anamnese</span>
                 </TabsTrigger>
               )}
-              <TabsTrigger
-                value="budgets"
-                className="data-[state=active]:text-primary cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-sm sm:px-4"
-              >
+              <TabsTrigger value="budgets" className={tabTriggerClassName}>
                 <Banknote className="h-4 w-4" />
                 <span className="hidden sm:inline">Orçamentos</span>
               </TabsTrigger>
               {!isSecretary && (
-                <TabsTrigger
-                  value="odontogram"
-                  className="data-[state=active]:text-primary cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-sm sm:px-4"
-                >
+                <TabsTrigger value="odontogram" className={tabTriggerClassName}>
                   <Calendar className="h-4 w-4" />
                   <span className="hidden sm:inline">Odontograma</span>
                 </TabsTrigger>
               )}
               {!isSecretary && (
-                <TabsTrigger
-                  value="exams"
-                  className="data-[state=active]:text-primary cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-sm sm:px-4"
-                >
+                <TabsTrigger value="exams" className={tabTriggerClassName}>
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Exames</span>
                 </TabsTrigger>
               )}
-              <TabsTrigger
-                value="documents"
-                className="data-[state=active]:text-primary cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-sm sm:px-4"
-              >
+              <TabsTrigger value="documents" className={tabTriggerClassName}>
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">Receituário</span>
               </TabsTrigger>
-              <TabsTrigger
-                value="payments"
-                className="data-[state=active]:text-primary cursor-pointer gap-2 rounded-lg px-2 py-2 text-[0.85rem] font-semibold transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-sm sm:px-4"
-              >
+              <TabsTrigger value="payments" className={tabTriggerClassName}>
                 <CreditCard className="h-4 w-4" />
                 <span className="hidden sm:inline">Financeiro</span>
               </TabsTrigger>
@@ -100,32 +86,36 @@ export default function PatientDetailPage() {
           </div>
 
           {!isSecretary && (
-            <TabsContent value="anamnesis">
+            <TabsContent value="anamnesis" className="min-h-0 flex-1 overflow-y-auto">
               <AnamnesisTab patientId={Number(id)} />
             </TabsContent>
           )}
 
-          <TabsContent value="budgets">
-            <BudgetsTab patientId={Number(id)} />
+          <TabsContent value="budgets" className="min-h-0 flex-1 overflow-y-auto">
+            <BudgetsTab
+              patientId={Number(id)}
+              patientName={patient?.name ?? ''}
+              patientPhone={patient?.phone ?? undefined}
+            />
           </TabsContent>
 
           {!isSecretary && (
-            <TabsContent value="odontogram">
+            <TabsContent value="odontogram" className="min-h-0 flex-1 overflow-y-auto">
               <OdontogramTab patientId={Number(id)} />
             </TabsContent>
           )}
 
           {!isSecretary && (
-            <TabsContent value="exams">
+            <TabsContent value="exams" className="min-h-0 flex-1 overflow-y-auto">
               <ExamsTab patientId={Number(id)} />
             </TabsContent>
           )}
 
-          <TabsContent value="documents">
+          <TabsContent value="documents" className="min-h-0 flex-1 overflow-y-auto">
             <DocumentsTab patientId={Number(id)} />
           </TabsContent>
 
-          <TabsContent value="payments">
+          <TabsContent value="payments" className="min-h-0 flex-1 overflow-y-auto">
             <PaymentsTab patientId={Number(id)} />
           </TabsContent>
         </Tabs>
