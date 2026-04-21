@@ -268,7 +268,37 @@ async function seedAnamnesis(
   });
   await repo.save(record);
 }
-async function seedPayments(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
+async function seedPayments(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const qty = randInt(2, 3);
+  for (let j = 0; j < qty; j++) {
+    const status = weightedPick([
+      { value: PaymentStatus.COMPLETED, weight: 60 },
+      { value: PaymentStatus.PENDING, weight: 25 },
+      { value: PaymentStatus.CANCELLED, weight: 15 },
+    ]);
+    const record = repo.create({
+      amount: randInt(100, 600),
+      method: pick([
+        PaymentMethod.PIX,
+        PaymentMethod.CREDIT_CARD,
+        PaymentMethod.DEBIT_CARD,
+        PaymentMethod.CASH,
+      ]),
+      status,
+      date: daysAgo(randInt(1, 180)),
+      patientId: patient.id,
+      clinicId,
+    });
+    await repo.save(record);
+  }
+}
 async function seedAppointments(_repo: any, _patient: Patient, _clinicId: number, _dentistId: number, _idx: number): Promise<void> {}
 async function seedToothObservations(_repo: any, _patient: Patient, _clinicId: number): Promise<void> {}
 async function seedBudget(_repo: any, _itemRepo: any, _patient: Patient, _clinicId: number, _procs: ClinicProcedure[]): Promise<void> {}
