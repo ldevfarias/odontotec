@@ -7,8 +7,8 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 import { AdminGreetingBanner } from './components/AdminGreetingBanner';
 import { DentistDashboard } from './components/dentist/DentistDashboard';
+import { LazyRevenueChart } from './components/LazyRevenueChart';
 import { RecentActivity } from './components/RecentActivity';
-import { RevenueChart } from './components/RevenueChart';
 import { StatsCards } from './components/StatsCards';
 import { TopTreatments } from './components/TopTreatments';
 
@@ -54,7 +54,7 @@ function AdminDashboard() {
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Revenue Chart — self-manages its period */}
         <div className="flex lg:col-span-6 lg:h-90">
-          <RevenueChart />
+          <LazyRevenueChart />
         </div>
 
         {/* Agenda do Dia */}
