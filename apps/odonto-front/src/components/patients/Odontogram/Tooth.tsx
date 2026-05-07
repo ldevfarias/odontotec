@@ -6,9 +6,15 @@ import { cn } from '@/lib/utils';
 
 export type ToothFace = 'occlusal' | 'mesial' | 'distal' | 'buccal' | 'lingual';
 
+const MISSING_TOOTH_TOKEN = 'AUSENTE';
+
+type ToothObservation = {
+  toothFaces?: string;
+};
+
 interface ToothProps {
   number: string;
-  observations?: unknown[];
+  observations?: ToothObservation[];
   className?: string;
   isSelected?: boolean;
   onToothClick: (number: string) => void;
@@ -21,10 +27,16 @@ export const Tooth: React.FC<ToothProps> = ({
   isSelected = false,
   onToothClick,
 }) => {
+  const isMissingTooth = observations.some((o) => o.toothFaces?.includes(MISSING_TOOTH_TOKEN));
+
   const getFaceColor = (face: ToothFace) => {
+    if (isMissingTooth) {
+      return 'fill-muted/60 stroke-muted-foreground/50';
+    }
+
     if (isSelected) return 'fill-primary/20 stroke-primary/60';
 
-    const hasFaceObservation = observations.some((o: unknown) =>
+    const hasFaceObservation = observations.some((o) =>
       o.toothFaces?.split(',').includes(face.charAt(0).toUpperCase()),
     );
     if (hasFaceObservation) return 'fill-destructive/40 stroke-destructive/60';
@@ -41,6 +53,7 @@ export const Tooth: React.FC<ToothProps> = ({
         className={cn(
           'text-[10px] font-bold transition-colors',
           isSelected ? 'text-primary' : 'text-muted-foreground group-hover/tooth:text-primary',
+          isMissingTooth && 'line-through',
         )}
       >
         {number}
@@ -62,6 +75,29 @@ export const Tooth: React.FC<ToothProps> = ({
           <path d="M 10 10 L 10 90 L 30 70 L 30 30 Z" className={getFaceColor('mesial')} />
           {/* Occlusal (Center) */}
           <rect x="30" y="30" width="40" height="40" className={getFaceColor('occlusal')} />
+
+          {isMissingTooth && (
+            <>
+              <line
+                x1="18"
+                y1="18"
+                x2="82"
+                y2="82"
+                className="stroke-destructive/90"
+                strokeWidth="8"
+                strokeLinecap="round"
+              />
+              <line
+                x1="82"
+                y1="18"
+                x2="18"
+                y2="82"
+                className="stroke-destructive/90"
+                strokeWidth="8"
+                strokeLinecap="round"
+              />
+            </>
+          )}
         </svg>
       </div>
     </div>

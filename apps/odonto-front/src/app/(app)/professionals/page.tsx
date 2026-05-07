@@ -44,6 +44,7 @@ import { commonValidations } from '@/utils/validations';
 import { DeleteUserDialog } from './components/delete-user-dialog';
 import { EditUserDialog } from './components/edit-user-dialog';
 import { ProfessionalsTable } from './components/ProfessionalsTable';
+import { ProfessionalInvitation, ProfessionalUser } from './types';
 
 const localInviteSchema = z.object({
   email: commonValidations.email.min(1, 'Obrigatório'),
@@ -55,9 +56,9 @@ type InviteFormValues = z.infer<typeof localInviteSchema>;
 
 export default function ProfessionalsPage() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [userToEdit, setUserToEdit] = useState<unknown>(null);
+  const [userToEdit, setUserToEdit] = useState<ProfessionalUser | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<unknown>(null);
+  const [userToDelete, setUserToDelete] = useState<ProfessionalUser | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const {
@@ -65,14 +66,14 @@ export default function ProfessionalsPage() {
     isLoading: isLoadingUsers,
     refetch: refetchUsers,
   } = useUsersControllerFindAll();
-  const users = usersResponse?.data ?? [];
+  const users = (usersResponse?.data ?? []) as ProfessionalUser[];
 
   const {
     data: invitationsResponse,
     isLoading: isLoadingInvitations,
     refetch: refetchInvitations,
   } = useUsersControllerFindAllInvitations();
-  const invitations = invitationsResponse?.data ?? [];
+  const invitations = (invitationsResponse?.data ?? []) as ProfessionalInvitation[];
 
   const { mutate: inviteUser, isPending: isInviting } = useUsersControllerInvite();
 
@@ -105,7 +106,7 @@ export default function ProfessionalsPage() {
     );
   }
 
-  const handleActivate = async (user: unknown) => {
+  const handleActivate = async (user: ProfessionalUser) => {
     try {
       await api.patch(`/users/${user.id}`, { isActive: true });
       notificationService.success('Usuário reativado com sucesso!');
@@ -116,8 +117,8 @@ export default function ProfessionalsPage() {
     }
   };
 
-  const activeUsers = users.filter((u: unknown) => u.isActive);
-  const inactiveUsers = users.filter((u: unknown) => !u.isActive);
+  const activeUsers = users.filter((u) => u.isActive);
+  const inactiveUsers = users.filter((u) => !u.isActive);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -137,7 +138,7 @@ export default function ProfessionalsPage() {
               <span className="sm:hidden">Convidar</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-106.25">
             <DialogHeader>
               <DialogTitle>Convidar Profissional</DialogTitle>
               <DialogDescription>

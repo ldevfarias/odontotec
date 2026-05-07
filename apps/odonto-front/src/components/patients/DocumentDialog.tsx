@@ -57,6 +57,7 @@ export function DocumentDialog({
 }: DocumentDialogProps) {
   const { user } = useAuth();
   const { mutate: createDocument, isPending } = useDocumentsControllerCreate();
+  const isProfessionalUser = user?.role === 'DENTIST' || user?.role === 'ADMIN';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,7 +72,7 @@ export function DocumentDialog({
   // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form's watch() cannot be memoized safely; known React Compiler limitation
   const currentType = form.watch('type');
 
-  // Populate templates and dentist based on type
+  // Populate templates based on type
   useEffect(() => {
     if (currentType === 'ATESTADO') {
       form.setValue('title', 'Atestado Médico');
@@ -85,22 +86,30 @@ export function DocumentDialog({
         'content',
         'Uso Oral:\n1. Medicamento X --------- 1 caixa\nTomar 1 comprimido a cada 8 horas por 5 dias.',
       );
-
-      // Pre-fill with current logged-in user if they are a dentist/admin
-      if (user && (user.role === 'DENTIST' || user.role === 'ADMIN')) {
-        form.setValue('dentistId', user.id.toString());
-      }
     }
-  }, [currentType, user, form]);
+  }, [currentType, form]);
+
+  // Always pre-fill responsible professional with the logged-in ADMIN/DENTIST.
+  useEffect(() => {
+    if (!isOpen || !user || !isProfessionalUser) return;
+
+    form.setValue('dentistId', user.id.toString(), {
+      shouldDirty: false,
+      shouldTouch: false,
+      shouldValidate: true,
+    });
+  }, [isOpen, user, isProfessionalUser, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const resolvedDentistId = user && isProfessionalUser ? user.id : Number(values.dentistId);
+
     createDocument(
       {
         data: {
           ...values,
           type: values.type as CreatePatientDocumentDtoTypeEnumKey,
           patientId,
-          dentistId: Number(values.dentistId),
+          dentistId: resolvedDentistId,
         },
       },
       {
@@ -115,7 +124,7 @@ export function DocumentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="text-primary h-5 w-5" />
@@ -189,7 +198,7 @@ export function DocumentDialog({
                   <FormControl>
                     <Textarea
                       {...field}
-                      className="min-h-[200px]"
+                      className="min-h-50"
                       placeholder="Descreva as orientações ou o atestado..."
                     />
                   </FormControl>

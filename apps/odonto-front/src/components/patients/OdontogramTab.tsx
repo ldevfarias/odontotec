@@ -6,7 +6,6 @@ import { format, parseISO } from 'date-fns';
 import { Eye, History, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { OdontogramTabSkeleton } from '@/components/skeletons';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,14 +42,15 @@ interface ToothObservationRecord {
   toothFaces?: string;
 }
 
+const MISSING_TOOTH_TOKEN = 'AUSENTE';
+
 export function OdontogramTab({ patientId }: OdontogramTabProps) {
   const [selectedTooth, setSelectedTooth] = useState<string | null>(null);
   const [isPediatric, setIsPediatric] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
-  const { data: observations = [], isLoading } =
-    useToothObservationsControllerFindAllByPatient(patientId);
+  const { data: observations = [] } = useToothObservationsControllerFindAllByPatient(patientId);
   const { mutate: removeObservation } = useToothObservationsControllerRemove();
 
   const allObservations = useMemo<ToothObservationRecord[]>(() => {
@@ -82,8 +82,6 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
     );
   };
 
-  if (isLoading) return <OdontogramTabSkeleton />;
-
   return (
     <div className="space-y-6">
       {/* Odontogram Card */}
@@ -95,27 +93,35 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
               Clique em um dente para registrar uma observação clínica.
             </CardDescription>
           </div>
-          <div className="bg-muted flex rounded-lg border p-1">
+          <div className="bg-muted/40 flex rounded-lg border p-1">
             <Button
-              variant={!isPediatric ? 'secondary' : 'ghost'}
+              variant="ghost"
               size="sm"
-              className={!isPediatric ? 'shadow-sm' : ''}
+              className={
+                !isPediatric
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-primary border shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }
               onClick={() => setIsPediatric(false)}
             >
               Adulto
             </Button>
             <Button
-              variant={isPediatric ? 'secondary' : 'ghost'}
+              variant="ghost"
               size="sm"
-              className={isPediatric ? 'shadow-sm' : ''}
+              className={
+                isPediatric
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-primary border shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }
               onClick={() => setIsPediatric(true)}
             >
-              Infantil
+              Decíduos
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="overflow-x-auto p-0 md:p-4">
-          <div className="flex flex-col items-center gap-3 py-3">
+        <CardContent className="overflow-x-auto">
+          <div className="flex flex-col items-center gap-3">
             <div className="w-full max-w-5xl">
               <Odontogram
                 observations={allObservations}
@@ -212,7 +218,9 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                                   </Badge>
                                   {item.toothFaces && (
                                     <span className="text-muted-foreground text-[10px]">
-                                      Faces: {item.toothFaces}
+                                      {item.toothFaces.includes(MISSING_TOOTH_TOKEN)
+                                        ? 'Marcar como ausente'
+                                        : `Faces: ${item.toothFaces}`}
                                     </span>
                                   )}
                                 </div>

@@ -31,6 +31,8 @@ import { notificationService } from '@/services/notification.service';
 
 export type ToothFace = 'occlusal' | 'mesial' | 'distal' | 'buccal' | 'lingual';
 
+const MISSING_TOOTH_TOKEN = 'AUSENTE';
+
 const FACE_LABELS: { face: ToothFace; short: string; label: string }[] = [
   { face: 'occlusal', short: 'O', label: 'Oclusal' },
   { face: 'mesial', short: 'M', label: 'Mesial' },
@@ -60,6 +62,7 @@ export function ToothPopover({
 }: ToothPopoverProps) {
   const [open, setOpen] = useState(false);
   const [selectedFaces, setSelectedFaces] = useState<ToothFace[]>([]);
+  const [isMissingTooth, setIsMissingTooth] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -87,15 +90,36 @@ export function ToothPopover({
     if (!open) {
       form.reset(defaultValues);
       setSelectedFaces([]);
+      setIsMissingTooth(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const toggleFace = (face: ToothFace) => {
+    if (isMissingTooth) return;
+
     setSelectedFaces((prev) => {
       const next = prev.includes(face) ? prev.filter((f) => f !== face) : [...prev, face];
       form.setValue('toothFaces', next.map((f) => f.charAt(0).toUpperCase()).join(','));
       return next;
+    });
+  };
+
+  const toggleMissingTooth = () => {
+    setIsMissingTooth((prev) => {
+      const nextIsMissing = !prev;
+
+      if (nextIsMissing) {
+        setSelectedFaces([]);
+        form.setValue('toothFaces', MISSING_TOOTH_TOKEN);
+        if (!form.getValues('description').trim()) {
+          form.setValue('description', 'Dente ausente', { shouldValidate: true });
+        }
+      } else {
+        form.setValue('toothFaces', '');
+      }
+
+      return nextIsMissing;
     });
   };
 
@@ -156,9 +180,20 @@ export function ToothPopover({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Face selector */}
             <div className="space-y-2">
-              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                Faces Afetadas
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  Faces Afetadas
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={isMissingTooth ? 'default' : 'outline'}
+                  className="h-7 text-[10px] font-bold"
+                  onClick={toggleMissingTooth}
+                >
+                  Marcar como ausente
+                </Button>
+              </div>
               <TooltipProvider delayDuration={300}>
                 <div className="flex gap-1.5">
                   {FACE_LABELS.map(({ face, short, label }) => {
@@ -169,11 +204,14 @@ export function ToothPopover({
                           <button
                             type="button"
                             onClick={() => toggleFace(face)}
+                            disabled={isMissingTooth}
                             className={cn(
                               'h-9 flex-1 rounded-md border text-xs font-bold transition-all',
                               isActive
                                 ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                                 : 'bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5',
+                              isMissingTooth &&
+                              'hover:border-border hover:text-muted-foreground hover:bg-background cursor-not-allowed opacity-40',
                             )}
                           >
                             {short}
@@ -193,6 +231,11 @@ export function ToothPopover({
                     .join(', ')}
                 </p>
               )}
+              {isMissingTooth && (
+                <p className="text-muted-foreground text-[10px]">
+                  Este dente sera marcado como ausente.
+                </p>
+              )}
             </div>
 
             {/* Observação clínica */}
@@ -207,7 +250,7 @@ export function ToothPopover({
                   <FormControl>
                     <Textarea
                       placeholder="Descreva a condição do dente..."
-                      className="min-h-[72px] resize-none text-sm"
+                      className="min-h-18 resize-none text-sm"
                       {...field}
                     />
                   </FormControl>

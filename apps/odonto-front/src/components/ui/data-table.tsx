@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       )}
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface overflow-hidden [&_td]:border-0 [&_th]:border-0 [&_tr]:border-0">
         <Table>
           <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (

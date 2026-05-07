@@ -2109,6 +2109,56 @@
         ]
       }
     },
+    "/treatment-plans/patient/{patientId}": {
+      "get": {
+        "operationId": "TreatmentPlansController_findByPatient",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all treatment plans for a patient",
+        "tags": [
+          "Treatment Plans"
+        ]
+      }
+    },
     "/treatment-plans/{id}": {
       "get": {
         "operationId": "TreatmentPlansController_findOne",

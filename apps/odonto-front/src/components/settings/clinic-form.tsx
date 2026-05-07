@@ -22,6 +22,8 @@ import { Input } from '@/components/ui/input';
 import { api } from '@/lib/api';
 import { formatCnpj, stripCnpj, validateCnpj } from '@/lib/validators/cnpj';
 import { notificationService } from '@/services/notification.service';
+import { phoneMask } from '@/utils/masks';
+import { commonValidations } from '@/utils/validations';
 
 const clinicFormSchema = z.object({
   name: z.string().min(2, {
@@ -34,7 +36,7 @@ const clinicFormSchema = z.object({
     })
     .optional()
     .or(z.literal('')),
-  phone: z.string().optional(),
+  phone: commonValidations.phone.optional().or(z.literal('')),
   address: z.string().optional(),
   cnpj: z
     .string()
@@ -73,7 +75,7 @@ export function ClinicForm() {
         form.reset({
           name: clinic.name || '',
           email: clinic.email || '',
-          phone: clinic.phone || '',
+          phone: clinic.phone ? phoneMask(clinic.phone) : '',
           address: clinic.address || '',
           cnpj: clinic.cnpj ? formatCnpj(clinic.cnpj) : '',
         });
@@ -260,7 +262,12 @@ export function ClinicForm() {
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(11) 99999-9999" {...field} />
+                      <Input
+                        placeholder="(00) 00000-0000"
+                        maxLength={15}
+                        {...field}
+                        onChange={(e) => field.onChange(phoneMask(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

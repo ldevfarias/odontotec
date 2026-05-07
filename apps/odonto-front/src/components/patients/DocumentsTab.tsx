@@ -1,121 +1,42 @@
 'use client';
 
-import { format, subHours } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { FileText, Plus, Printer, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { FileText, Plus } from 'lucide-react';
 
-import { DocumentsTabSkeleton } from '@/components/skeletons';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { useDocumentsControllerFindAll } from '@/generated/hooks/useDocumentsControllerFindAll';
-import { useDocumentsControllerRemove } from '@/generated/hooks/useDocumentsControllerRemove';
-import { notificationService } from '@/services/notification.service';
 
 import { DocumentDialog } from './DocumentDialog';
+import { printPatientDocument } from './documents/documentPrint';
+import { DocumentsDesktopTable } from './documents/DocumentsDesktopTable';
+import { DocumentsMobileList } from './documents/DocumentsMobileList';
+import { PatientDocumentItem } from './documents/types';
+import { useDocumentsTab } from './hooks/useDocumentsTab';
 
 interface DocumentsTabProps {
   patientId: number;
 }
 
-interface PatientDocumentItem {
-  id: number;
-  date?: string;
-  type: 'ATESTADO' | 'RECEITA' | 'OUTRO' | string;
-  title: string;
-  content: string;
-  dentist?: {
-    name?: string;
-  };
-}
-
 export function DocumentsTab({ patientId }: DocumentsTabProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
-    data: documentsResponse,
-    refetch,
-    isLoading,
-  } = useDocumentsControllerFindAll({ patientId: String(patientId) });
-  const documents = (documentsResponse?.data ?? []) as PatientDocumentItem[];
-  const { mutate: removeDocument } = useDocumentsControllerRemove();
+    documents,
+    isDialogOpen,
+    setIsDialogOpen,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    openDeleteDialog,
+    removeSelectedDocument,
+    refetchDocuments,
+  } = useDocumentsTab(patientId);
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
-
-  const handleRemove = (id: number) => {
-    removeDocument(
-      { id: id.toString() },
-      {
-        onSuccess: () => {
-          notificationService.success('Documento excluído com sucesso!');
-          setIsDeleteDialogOpen(false);
-          setDocumentToDelete(null);
-          refetch();
-        },
-        onError: () => {
-          notificationService.error('Erro ao excluir documento.');
-        },
-      },
-    );
-  };
-
-  const escapeHtml = (unsafe: string) => {
-    return unsafe
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  };
-
-  const handlePrint = (content: string, title: string) => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      const safeTitle = escapeHtml(title);
-      const safeContent = escapeHtml(content).replace(/\n/g, '<br/>');
-
-      printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>${safeTitle}</title>
-                        <style>
-                            body { font-family: sans-serif; padding: 40px; line-height: 1.6; }
-                            .header { text-align: center; margin-bottom: 50px; border-bottom: 2px solid #333; padding-bottom: 20px; }
-                            .footer { margin-top: 100px; text-align: center; border-top: 1px solid #ccc; padding-top: 20px; }
-                            .signature { margin-top: 50px; text-align: center; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <h1>Documento Clínico</h1>
-                        </div>
-                        <h2>${safeTitle}</h2>
-                        <div>${safeContent}</div>
-                        <div class="footer">
-                            <p>Emitido em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
-                        </div>
-                    </body>
-                </html>
-            `);
-      printWindow.document.close();
-      printWindow.print();
-    }
+  const handlePrint = (doc: PatientDocumentItem) => {
+    printPatientDocument(doc.content, doc.title);
   };
 
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="mb-4 flex items-center justify-between sm:mb-6">
+      <CardContent className="">
+        <div className="flex items-center justify-between sm:mb-6">
           <div className="flex items-center gap-2">
             <FileText className="text-primary h-5 w-5" />
             <h2 className="text-base font-semibold sm:text-xl">Documentos e Receitas</h2>
@@ -127,9 +48,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
           </Button>
         </div>
 
-        {isLoading ? (
-          <DocumentsTabSkeleton />
-        ) : documents.length === 0 ? (
+        {documents.length === 0 ? (
           <div className="space-y-3 rounded-lg border-2 border-dashed py-10 text-center">
             <FileText className="text-muted-foreground mx-auto h-10 w-10" />
             <p className="text-muted-foreground">Nenhum documento gerado para este paciente.</p>
@@ -139,108 +58,17 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
           </div>
         ) : (
           <>
-            {/* Desktop table */}
-            <div className="hidden sm:block">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Profissional</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {documents.map((doc) => (
-                    <TableRow key={doc.id}>
-                      <TableCell className="font-medium">
-                        {doc.date &&
-                          format(subHours(new Date(doc.date), 3), 'dd/MM/yyyy HH:mm', {
-                            locale: ptBR,
-                          })}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={doc.type === 'ATESTADO' ? 'default' : 'secondary'}>
-                          {doc.type}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{doc.title}</TableCell>
-                      <TableCell>{doc.dentist?.name || 'N/A'}</TableCell>
-                      <TableCell className="space-x-2 text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Imprimir"
-                          onClick={() => handlePrint(doc.content, doc.title)}
-                        >
-                          <Printer className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => {
-                            setDocumentToDelete(doc.id);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <DocumentsDesktopTable
+              documents={documents}
+              onPrint={handlePrint}
+              onRequestDelete={openDeleteDialog}
+            />
 
-            {/* Mobile card list */}
-            <div className="divide-border border-border flex flex-col divide-y overflow-hidden rounded-xl border sm:hidden">
-              {documents.map((doc) => (
-                <div key={doc.id} className="bg-card flex items-center gap-3 px-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        variant={doc.type === 'ATESTADO' ? 'default' : 'secondary'}
-                        className="text-[10px]"
-                      >
-                        {doc.type}
-                      </Badge>
-                      <span className="text-muted-foreground text-xs">
-                        {doc.date &&
-                          format(subHours(new Date(doc.date), 3), 'dd/MM/yyyy', { locale: ptBR })}
-                      </span>
-                    </div>
-                    <p className="text-foreground mt-0.5 truncate text-sm font-semibold">
-                      {doc.title}
-                    </p>
-                    <p className="text-muted-foreground text-xs">{doc.dentist?.name || 'N/A'}</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      title="Imprimir"
-                      onClick={() => handlePrint(doc.content, doc.title)}
-                    >
-                      <Printer className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive h-8 w-8"
-                      onClick={() => {
-                        setDocumentToDelete(doc.id);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <DocumentsMobileList
+              documents={documents}
+              onPrint={handlePrint}
+              onRequestDelete={openDeleteDialog}
+            />
           </>
         )}
 
@@ -248,7 +76,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
           isOpen={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           patientId={patientId}
-          onSuccess={() => refetch()}
+          onSuccess={refetchDocuments}
         />
 
         <ConfirmDialog
@@ -256,9 +84,7 @@ export function DocumentsTab({ patientId }: DocumentsTabProps) {
           onOpenChange={setIsDeleteDialogOpen}
           title="Excluir Documento"
           description="Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita."
-          onConfirm={() => {
-            if (documentToDelete) handleRemove(documentToDelete);
-          }}
+          onConfirm={removeSelectedDocument}
           confirmText="Excluir"
           variant="destructive"
         />
