@@ -17,7 +17,7 @@ export const AppDataSource = new DataSource({
   migrationsRun: false,
   migrationsTableName: 'typeorm_migrations',
   ssl:
-    process.env.NODE_ENV === 'production'
+    process.env.NODE_ENV === 'production' && process.env.POSTGRES_SSL !== 'false'
       ? { rejectUnauthorized: false }
       : false,
 });
