@@ -12,16 +12,28 @@ import { useUsersControllerFindAll } from '@/generated/hooks/useUsersControllerF
 
 import { DentistCard } from './DentistCard';
 
+interface User {
+  id: number;
+  name: string;
+  role: string;
+  avatarUrl?: string;
+}
+
+interface Patient {
+  id: number;
+  name?: string;
+}
+
 export function DentistQuickBook() {
   const { user: currentUser } = useAuth();
   const { data: usersResponse } = useUsersControllerFindAll();
   const { data: patientsResponse } = usePatientsControllerFindAll();
 
-  const users = usersResponse?.data || [];
-  const allPatients = (patientsResponse?.data as unknown[]) || [];
+  const users = (usersResponse?.data || []) as User[];
+  const allPatients = (patientsResponse?.data || []) as Patient[];
 
   const allowedRoles = ['DENTIST', 'ADMIN', 'OWNER'];
-  let professionals = (users as unknown[])
+  let professionals = users
     .filter((u) => u.role && allowedRoles.includes(u.role.toUpperCase()))
     .sort((a, b) => {
       const roleA = a.role.toUpperCase();

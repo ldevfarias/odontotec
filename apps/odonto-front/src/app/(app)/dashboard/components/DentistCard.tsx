@@ -27,9 +27,21 @@ const DURATIONS = [
   { label: '1h30', value: 90 },
 ];
 
+interface Dentist {
+  id: number;
+  name: string;
+  role: string;
+  avatarUrl?: string;
+}
+
+interface Patient {
+  id: number;
+  name?: string;
+}
+
 interface DentistCardProps {
-  dentist: unknown;
-  patients: unknown[];
+  dentist: Dentist;
+  patients: Patient[];
 }
 
 export function DentistCard({ dentist, patients }: DentistCardProps) {
