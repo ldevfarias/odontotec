@@ -1,13 +1,21 @@
 'use client';
 
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
 import { FileDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-
 import type { BudgetPdfClinic, BudgetPdfPatient, BudgetPlan } from './budget-types';
-import { BudgetPdfDocument } from './BudgetPdfDocument';
+
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then((m) => ({ default: m.PDFDownloadLink })),
+  { ssr: false },
+);
+
+const BudgetPdfDocument = dynamic(
+  () => import('./BudgetPdfDocument').then((m) => ({ default: m.BudgetPdfDocument })),
+  { ssr: false },
+);
 
 interface BudgetPdfButtonProps {
   plan: BudgetPlan;
@@ -23,7 +31,7 @@ export function BudgetPdfButton({ plan, patient, clinic }: BudgetPdfButtonProps)
       document={<BudgetPdfDocument plan={plan} patient={patient} clinic={clinic} />}
       fileName={filename}
     >
-      {({ loading }) => (
+      {({ loading }: { loading: boolean }) => (
         <Button
           size="sm"
           variant="outline"
