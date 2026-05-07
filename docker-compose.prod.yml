@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -30,7 +28,7 @@ services:
       - internal
       - web
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health']
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:3000',r=>process.exit(r.statusCode>=500?1:0)).on('error',()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -46,7 +44,7 @@ services:
     networks:
       - web
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001']
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:3001',r=>process.exit(r.statusCode>=500?1:0)).on('error',()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -60,7 +58,7 @@ services:
     networks:
       - web
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:3002']
+      test: ['CMD', 'node', '-e', "require('http').get('http://localhost:3002',r=>process.exit(r.statusCode>=500?1:0)).on('error',()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5
