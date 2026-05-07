@@ -11,6 +11,9 @@ COPY apps/landing ./apps/landing
 
 WORKDIR /app/apps/landing
 
+ARG NEXT_PUBLIC_APP_URL=https://app.odontoehtec.com
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+
 RUN npm run build
 
 FROM node:22-alpine
