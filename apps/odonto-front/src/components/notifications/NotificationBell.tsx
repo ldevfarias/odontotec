@@ -21,11 +21,18 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
 
   const { data: notificationsResponse } = useNotificationsControllerFindAll();
-  const notifications = (notificationsResponse?.data ?? []) as unknown[];
+  type NotificationItem = {
+    id: number;
+    read: boolean;
+    type: string;
+    message: string;
+    createdAt: string;
+  };
+  const notifications = (notificationsResponse?.data ?? []) as NotificationItem[];
   const { mutate: markAsRead } = useNotificationsControllerMarkAsRead();
   const { mutate: markAllAsRead } = useNotificationsControllerMarkAllAsRead();
 
-  const unreadCount = notifications.filter((n: unknown) => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleMarkAsRead = (id: number) => {
     markAsRead(
@@ -94,7 +101,7 @@ export function NotificationBell() {
             </div>
           ) : (
             <div className="flex flex-col">
-              {notifications.map((n: unknown) => (
+              {notifications.map((n) => (
                 <button
                   key={n.id}
                   className={cn(

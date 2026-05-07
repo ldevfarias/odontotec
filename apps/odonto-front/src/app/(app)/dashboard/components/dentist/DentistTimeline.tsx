@@ -10,10 +10,20 @@ const START_HOUR = 8;
 const END_HOUR = 18;
 const HOUR_HEIGHT = 72; // px per hour
 
+type AppointmentItem = {
+  id?: number;
+  date?: string;
+  duration?: number;
+  status?: string;
+  procedure?: string;
+  patient?: { name?: string };
+  patientName?: string;
+};
+
 interface DentistTimelineProps {
-  appointments: unknown[];
+  appointments: AppointmentItem[];
   isLoading?: boolean;
-  onEditAppointment?: (appointment: unknown) => void;
+  onEditAppointment?: (appointment: AppointmentItem) => void;
 }
 
 export function DentistTimeline({

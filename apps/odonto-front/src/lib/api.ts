@@ -1,9 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // Export types that Kubb-generated clients expect
-export type RequestConfig<TData = unknown> = AxiosRequestConfig<TData>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RequestConfig<TData = unknown> = Omit<AxiosRequestConfig<TData>, 'data'> & { data?: TData | FormData | any };
 export type ResponseErrorConfig<TError = unknown> = TError;
-export type Client = typeof fetch;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Client = <TData = unknown, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>) => Promise<AxiosResponse<TData>>;
 
 export const api: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',

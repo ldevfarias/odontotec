@@ -30,7 +30,8 @@ export default function TermsPage() {
       router.push('/onboarding/clinic');
     } catch (error: unknown) {
       console.error(error);
-      notificationService.error(error.response?.data?.message || 'Erro ao aceitar os termos.');
+      const err = error as { response?: { data?: { message?: string } } };
+      notificationService.error(err.response?.data?.message || 'Erro ao aceitar os termos.');
     } finally {
       setIsLoading(false);
     }

@@ -7,8 +7,14 @@ import Link from 'next/link';
 
 import { Skeleton } from '@/components/ui/skeleton';
 
+type AppointmentItem = {
+  id?: number;
+  date?: string;
+  patient?: { id?: number; name?: string };
+};
+
 interface DentistRecentPatientsProps {
-  appointments: unknown[];
+  appointments: AppointmentItem[];
   isLoading?: boolean;
 }
 

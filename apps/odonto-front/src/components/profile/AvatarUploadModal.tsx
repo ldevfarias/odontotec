@@ -10,8 +10,9 @@ import { authControllerGetMeQueryKey } from '@/generated/hooks/useAuthController
 import { usersControllerFindAllQueryKey } from '@/generated/hooks/useUsersControllerFindAll';
 import { useUsersControllerRemoveAvatar } from '@/generated/hooks/useUsersControllerRemoveAvatar';
 import { useUsersControllerUploadAvatar } from '@/generated/hooks/useUsersControllerUploadAvatar';
-import { ClinicUserDto } from '@/generated/ts/ClinicUserDto';
 import { notificationService } from '@/services/notification.service';
+
+type ClinicUserDto = { id: number; avatarUrl?: string | null; [key: string]: unknown };
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];

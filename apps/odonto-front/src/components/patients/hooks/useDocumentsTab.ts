@@ -24,7 +24,7 @@ export function useDocumentsTab(patientId: number): UseDocumentsTabReturn {
   const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
 
   const { data: documentsResponse, refetch } = useDocumentsControllerFindAll({
-    patientId: String(patientId),
+    patientId: patientId,
   });
 
   const documents = (documentsResponse?.data ?? []) as PatientDocumentItem[];

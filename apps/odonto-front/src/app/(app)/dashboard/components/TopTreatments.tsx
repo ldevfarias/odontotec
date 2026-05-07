@@ -14,7 +14,9 @@ export function TopTreatments() {
     { id: '5', name: 'Aparelho' },
   ];
 
-  const procedures = proceduresResponse?.data?.length ? proceduresResponse.data : mockProcedures;
+  const procedures: { id?: string | number; name?: string }[] = proceduresResponse?.data?.length
+    ? proceduresResponse.data
+    : mockProcedures;
 
   // Map index to a specific icon and color scheme to maintain the UI design
   const getTreatmentStyle = (name: string) => {

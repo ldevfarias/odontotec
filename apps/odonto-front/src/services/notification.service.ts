@@ -9,7 +9,7 @@ export const notificationService = {
   /**
    * Exibe uma mensagem de sucesso.
    */
-  success: (message: string, description?: string, options?: unknown) => {
+  success: (message: string, description?: string, options?: Record<string, unknown>) => {
     toast.success(message, {
       description,
       ...options,
@@ -19,7 +19,7 @@ export const notificationService = {
   /**
    * Exibe uma mensagem de erro.
    */
-  error: (message: string, description?: string, options?: unknown) => {
+  error: (message: string, description?: string, options?: Record<string, unknown>) => {
     toast.error(message, {
       description,
       ...options,
@@ -29,7 +29,7 @@ export const notificationService = {
   /**
    * Exibe uma mensagem de informação.
    */
-  info: (message: string, description?: string, options?: unknown) => {
+  info: (message: string, description?: string, options?: Record<string, unknown>) => {
     toast.info(message, {
       description,
       ...options,
@@ -39,7 +39,7 @@ export const notificationService = {
   /**
    * Exibe uma mensagem de alerta.
    */
-  warning: (message: string, description?: string, options?: unknown) => {
+  warning: (message: string, description?: string, options?: Record<string, unknown>) => {
     toast.warning(message, {
       description,
       ...options,
@@ -50,7 +50,7 @@ export const notificationService = {
    * Exibe uma mensagem de carregamento que pode ser atualizada.
    * Retorna o ID da notificação para que possa ser usada com .dismiss() ou .success()/.error()
    */
-  loading: (message: string, description?: string, options?: unknown) => {
+  loading: (message: string, description?: string, options?: Record<string, unknown>) => {
     return toast.loading(message, {
       description,
       ...options,
@@ -60,7 +60,7 @@ export const notificationService = {
   /**
    * Dispara um toast customizado ou genérico
    */
-  message: (message: string, description?: string, options?: unknown) => {
+  message: (message: string, description?: string, options?: Record<string, unknown>) => {
     toast(message, {
       description,
       ...options,
@@ -78,7 +78,8 @@ export const notificationService = {
    * Atalho para lidar com erros de API
    */
   apiError: (error: unknown, defaultMessage: string = 'Ocorreu um erro inesperado') => {
-    const message = error?.response?.data?.message || error?.message || defaultMessage;
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err?.response?.data?.message || err?.message || defaultMessage;
     toast.error(message);
   },
 };

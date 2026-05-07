@@ -24,10 +24,10 @@ const STATUS_LABELS: Record<string, string> = {
 interface SubscriptionData {
   status: string;
   plan?: string;
-  trialEndsAt?: string;
-  currentPeriodEnd?: string;
+  trialEndsAt?: string | null;
+  currentPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean;
-  cancelAt?: string;
+  cancelAt?: string | null;
 }
 
 interface PlanCardProps {

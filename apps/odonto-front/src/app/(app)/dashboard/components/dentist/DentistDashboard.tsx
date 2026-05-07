@@ -29,9 +29,13 @@ export function DentistDashboard() {
 
   const { mutate: updateAppointment } = useAppointmentsControllerUpdate();
 
-  const handleStatusChange = (appointment: unknown, status: string) => {
+  const handleEditAppointment = (appointment: unknown) => {
+    const apt = appointment as { id: number; status?: string };
     updateAppointment(
-      { id: appointment.id, data: { status: status as UpdateAppointmentDtoStatusEnumKey } },
+      {
+        id: apt.id,
+        data: { status: apt.status as UpdateAppointmentDtoStatusEnumKey },
+      },
       {
         onSuccess: () => {
           notificationService.success('Status atualizado!');
@@ -87,7 +91,7 @@ export function DentistDashboard() {
             <DentistTimeline
               appointments={appointments}
               isLoading={isLoading}
-              onStatusChange={handleStatusChange}
+              onEditAppointment={handleEditAppointment}
             />
           </div>
         </div>

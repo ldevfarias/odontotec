@@ -8,7 +8,7 @@ interface SubscriptionData {
   status: string;
   daysRemaining?: number;
   cancelAtPeriodEnd?: boolean;
-  cancelAt?: string;
+  cancelAt?: string | null;
 }
 
 interface BillingStatusBannerProps {

@@ -65,11 +65,12 @@ export default function ClinicSetupPage() {
       }
     } catch (error: unknown) {
       console.error(error);
+      const err = error as { response?: { data?: { message?: string } } };
       // Se o setup já foi concluído anteriormente (ex: erro de state loop), redirecione
-      if (error.response?.data?.message === 'Clinic setup already completed') {
+      if (err.response?.data?.message === 'Clinic setup already completed') {
         router.push('/dashboard');
       } else {
-        notificationService.error(error.response?.data?.message || 'Erro ao configurar clínica');
+        notificationService.error(err.response?.data?.message || 'Erro ao configurar clínica');
       }
     } finally {
       setIsLoading(false);

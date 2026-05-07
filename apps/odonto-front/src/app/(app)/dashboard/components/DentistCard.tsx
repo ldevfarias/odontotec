@@ -283,7 +283,7 @@ export function DentistCard({ dentist, patients }: DentistCardProps) {
                         Nenhum paciente encontrado
                       </div>
                     ) : (
-                      filteredPatients.map((p: unknown) => (
+                      filteredPatients.map((p) => (
                         <button
                           key={p.id}
                           onClick={() => {

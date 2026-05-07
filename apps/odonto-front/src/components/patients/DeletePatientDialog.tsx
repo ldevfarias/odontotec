@@ -39,7 +39,7 @@ export function DeletePatientDialog({
           // Update cache to remove patient from list
           queryClient.setQueryData(patientsControllerFindAllQueryKey(), (oldData: unknown) => {
             if (Array.isArray(oldData)) {
-              return oldData.filter((patient: unknown) => patient.id !== patientId);
+              return oldData.filter((patient: { id?: number }) => patient.id !== patientId);
             }
             return oldData;
           });

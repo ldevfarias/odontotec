@@ -30,7 +30,7 @@ export function DentistQuickBook() {
   const { data: patientsResponse } = usePatientsControllerFindAll();
 
   const users = (usersResponse?.data || []) as User[];
-  const allPatients = (patientsResponse?.data || []) as Patient[];
+  const allPatients = (patientsResponse?.data || []) as unknown as Patient[];
 
   const allowedRoles = ['DENTIST', 'ADMIN', 'OWNER'];
   let professionals = users
@@ -77,7 +77,7 @@ export function DentistQuickBook() {
       ) : (
         <TooltipProvider delayDuration={300}>
           <div className="scrollbar-hide -mx-1 flex items-center gap-5 overflow-x-auto px-1 pt-1 pb-3">
-            {professionals.map((dentist: unknown) => (
+            {professionals.map((dentist) => (
               <DentistCard key={dentist.id} dentist={dentist} patients={allPatients} />
             ))}
           </div>
