@@ -31,7 +31,14 @@ import { notificationService } from '@/services/notification.service';
 const registerFormSchema = z.object({
   token: z.string(),
   name: z.string().min(1, 'Nome é obrigatório'),
-  password: z.string().min(8, 'Senha deve ter no mínimo 8 caracteres'),
+  password: z
+    .string()
+    .min(8, 'Senha deve ter no mínimo 8 caracteres')
+    .max(128, 'Senha muito longa')
+    .regex(
+      /(?=.*[A-Z])|(?=.*[0-9])|(?=.*[^a-zA-Z0-9])/,
+      'A senha deve conter ao menos uma letra maiúscula, um número ou um caractere especial.',
+    ),
 });
 
 type RegisterFormValues = z.infer<typeof registerFormSchema>;
