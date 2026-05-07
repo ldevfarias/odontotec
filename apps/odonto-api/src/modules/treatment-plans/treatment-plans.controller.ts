@@ -60,6 +60,22 @@ export class TreatmentPlansController {
     );
   }
 
+  @Get('patient/:patientId')
+  @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
+  @ApiOperation({ summary: 'Get all treatment plans for a patient' })
+  findByPatient(
+    @Param('patientId', ParseIntPipe) patientId: number,
+    @Tenant() clinicId: number,
+    @Query() pagination: PaginationDto,
+  ) {
+    return this.treatmentPlansService.findByPatient(
+      patientId,
+      clinicId,
+      pagination.page,
+      pagination.limit,
+    );
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.DENTIST, UserRole.SIMPLE)
   @ApiOperation({ summary: 'Get a treatment plan by id' })

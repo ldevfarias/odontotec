@@ -1,35 +1,35 @@
 import {
-  Injectable,
-  ConflictException,
-  BadRequestException,
-  NotFoundException,
-  Inject,
+    BadRequestException,
+    ConflictException,
+    Inject,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Repository,
-  IsNull,
-  Not,
-  DataSource,
-  EntityManager,
-  FindOptionsWhere,
-} from 'typeorm';
-import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User } from './entities/user.entity';
-import { UserInvitation } from './entities/user-invitation.entity';
-import { PendingRegistration } from './entities/pending-registration.entity';
-import { Clinic } from '../clinics/entities/clinic.entity';
-import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { UserRole } from './enums/role.enum';
-import { ClinicRole } from '../clinics/enums/clinic-role.enum';
-import { InviteUserDto } from './dto/invite-user.dto';
-import { ClinicUserDto } from './dto/clinic-user.dto';
-import { EmailService } from '../email/email.service';
-import { STORAGE_PROVIDER } from '../../common/providers/storage/storage.provider.interface';
+import {
+    DataSource,
+    EntityManager,
+    FindOptionsWhere,
+    IsNull,
+    Not,
+    Repository,
+} from 'typeorm';
+import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
 import type { IStorageProvider } from '../../common/providers/storage/storage.provider.interface';
+import { STORAGE_PROVIDER } from '../../common/providers/storage/storage.provider.interface';
+import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
+import { Clinic } from '../clinics/entities/clinic.entity';
+import { ClinicRole } from '../clinics/enums/clinic-role.enum';
+import { EmailService } from '../email/email.service';
+import { ClinicUserDto } from './dto/clinic-user.dto';
+import { InviteUserDto } from './dto/invite-user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { PendingRegistration } from './entities/pending-registration.entity';
+import { UserInvitation } from './entities/user-invitation.entity';
+import { User } from './entities/user.entity';
+import { UserRole } from './enums/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -234,7 +234,7 @@ export class UsersService {
 
     try {
       return await repo.save(user);
-    } catch (error: any) {
+    } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Email already in use');
       }
@@ -297,7 +297,7 @@ export class UsersService {
 
       Object.assign(user, updateUserDto);
       return await repo.save(user);
-    } catch (error: any) {
+    } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Email already in use');
       }

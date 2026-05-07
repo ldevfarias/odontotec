@@ -1,10 +1,16 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
 
 import { Tooth } from './Tooth';
 import { ToothPopover } from './ToothPopover';
 
+interface ToothObservation {
+  toothNumber?: string | number;
+  toothFaces?: string;
+}
+
 interface OdontogramProps {
-  observations?: any[];
+  observations?: ToothObservation[];
   isPediatric?: boolean;
   patientId: number;
   highlightedTooth?: string | null;
@@ -36,9 +42,9 @@ export const Odontogram: React.FC<OdontogramProps> = ({
   const renderToothGrid = (teeth: string[]) => (
     <div className="flex justify-center gap-0.5 sm:gap-1">
       {teeth.map((num) => {
-        const toothObservations = (observations as any[]).filter(
-          (o: any) => String(o.toothNumber) === num,
-        );
+        const toothObservations = observations.filter((observation) => {
+          return String(observation.toothNumber) === num;
+        });
         const isHighlighted = highlightedTooth === num;
 
         return (
@@ -55,7 +61,7 @@ export const Odontogram: React.FC<OdontogramProps> = ({
               className={
                 isHighlighted ? 'ring-primary bg-primary/10 rounded-md p-1 shadow-sm ring-2' : 'p-1'
               }
-              onToothClick={() => {}}
+              onToothClick={() => { }}
             />
           </ToothPopover>
         );

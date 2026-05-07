@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -20,7 +20,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { api } from '@/lib/api';
+import { formatCnpj, stripCnpj, validateCnpj } from '@/lib/validators/cnpj';
 import { notificationService } from '@/services/notification.service';
+import { phoneMask } from '@/utils/masks';
+import { commonValidations } from '@/utils/validations';
 
 const clinicFormSchema = z.object({
   name: z.string().min(2, {
@@ -33,8 +36,15 @@ const clinicFormSchema = z.object({
     })
     .optional()
     .or(z.literal('')),
-  phone: z.string().optional(),
+  phone: commonValidations.phone.optional().or(z.literal('')),
   address: z.string().optional(),
+  cnpj: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine((val) => !val || validateCnpj(stripCnpj(val)), {
+      message: 'CNPJ inválido.',
+    }),
 });
 
 type ClinicFormValues = z.infer<typeof clinicFormSchema>;
@@ -53,6 +63,7 @@ export function ClinicForm() {
       email: '',
       phone: '',
       address: '',
+      cnpj: '',
     },
   });
 
@@ -64,8 +75,9 @@ export function ClinicForm() {
         form.reset({
           name: clinic.name || '',
           email: clinic.email || '',
-          phone: clinic.phone || '',
+          phone: clinic.phone ? phoneMask(clinic.phone) : '',
           address: clinic.address || '',
+          cnpj: clinic.cnpj ? formatCnpj(clinic.cnpj) : '',
         });
         if (clinic.logoUrl) {
           setLogoPreview(`${process.env.NEXT_PUBLIC_API_URL}${clinic.logoUrl}`);
@@ -115,10 +127,28 @@ export function ClinicForm() {
     reader.readAsDataURL(file);
   };
 
+  const handleCnpjChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    onChange: (val: string) => void,
+  ) => {
+    const raw = e.target.value
+      .replace(/[^A-Za-z0-9]/g, '')
+      .slice(0, 14)
+      .toUpperCase();
+    // Positions 12–13 (check digits) must be numeric only
+    const validated =
+      raw.length > 12 ? raw.slice(0, 12) + raw.slice(12).replace(/[^0-9]/g, '') : raw;
+    onChange(formatCnpj(validated));
+  };
+
   async function onSubmit(data: ClinicFormValues) {
     setIsSaving(true);
     try {
-      await api.patch('/clinics/active', data);
+      const cnpjRaw = stripCnpj(data.cnpj || '');
+      await api.patch('/clinics/active', {
+        ...data,
+        cnpj: cnpjRaw || undefined,
+      });
 
       if (logoFile) {
         const formData = new FormData();
@@ -193,6 +223,26 @@ export function ClinicForm() {
 
               <FormField
                 control={form.control}
+                name="cnpj"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      CNPJ <span className="text-muted-foreground">(opcional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="AB.222.333/0001-01"
+                        {...field}
+                        onChange={(e) => handleCnpjChange(e, field.onChange)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -212,7 +262,12 @@ export function ClinicForm() {
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(11) 99999-9999" {...field} />
+                      <Input
+                        placeholder="(00) 00000-0000"
+                        maxLength={15}
+                        {...field}
+                        onChange={(e) => field.onChange(phoneMask(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

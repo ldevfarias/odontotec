@@ -1,63 +1,60 @@
-import { Activity, Calendar as CalendarIcon, TrendingUp, Users } from 'lucide-react';
+import { BadgeCheck, CalendarDays, DollarSign, Users } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DashboardStats } from '@/hooks/useDashboardStats';
+import { DashboardStats, DashboardTrend } from '@/hooks/useDashboardStats';
+
+import { MetricCard } from './MetricCard';
+
+function formatRevenue(val: number): string {
+  if (val >= 1000) {
+    return `R$${(val / 1000).toFixed(1).replace('.', ',')}k`;
+  }
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+}
+
+// Mock trends — replace with real API data when backend exposes these fields
+const MOCK_TRENDS: {
+  patients: DashboardTrend;
+  appointments: DashboardTrend;
+  revenue: DashboardTrend;
+  occupancy: DashboardTrend;
+} = {
+  patients: { value: 12, isPositive: true, label: 'vs mês ant.' },
+  appointments: { value: 8, isPositive: true, label: 'semana atual' },
+  revenue: { value: 3, isPositive: false, label: 'semana atual' },
+  occupancy: { value: 5, isPositive: true, label: 'vs semana ant.' },
+};
 
 interface StatsCardsProps {
   stats: DashboardStats;
 }
 
-export const StatsCards = ({ stats }: StatsCardsProps) => {
+export function StatsCards({ stats }: StatsCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pacientes Hoje</CardTitle>
-          <Users className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.patientsToday}</div>
-          <p className="text-muted-foreground text-xs">Agendados para hoje</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Ocupação</CardTitle>
-          <Activity className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.occupancyRate}%</div>
-          <p className="text-muted-foreground text-xs">Da capacidade total (20/dia)</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Faturamento Hoje</CardTitle>
-          <TrendingUp className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-              stats.revenue,
-            )}
-          </div>
-          <p className="text-muted-foreground text-xs">Recebido (Pagamentos)</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Vendas Hoje</CardTitle>
-          <CalendarIcon className="text-muted-foreground h-4 w-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-              stats.expectedRevenue,
-            )}
-          </div>
-          <p className="text-muted-foreground text-xs">Tratamentos Criados</p>
-        </CardContent>
-      </Card>
+      <MetricCard
+        title="Pacientes"
+        value={stats.patientsToday}
+        icon={<Users className="h-5 w-5" />}
+        trend={stats.patientsTrend ?? MOCK_TRENDS.patients}
+      />
+      <MetricCard
+        title="Consultas"
+        value={stats.appointments}
+        icon={<CalendarDays className="h-5 w-5" />}
+        trend={stats.appointmentsTrend ?? MOCK_TRENDS.appointments}
+      />
+      <MetricCard
+        title="Receita"
+        value={formatRevenue(stats.revenue)}
+        icon={<DollarSign className="h-5 w-5" />}
+        trend={stats.revenueTrend ?? MOCK_TRENDS.revenue}
+      />
+      <MetricCard
+        title="Taxa Presença"
+        value={`${stats.occupancyRate}%`}
+        icon={<BadgeCheck className="h-5 w-5" />}
+        trend={stats.occupancyTrend ?? MOCK_TRENDS.occupancy}
+      />
     </div>
   );
-};
+}

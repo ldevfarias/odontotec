@@ -1,15 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Req,
-  Body,
-  UseGuards,
-  BadRequestException,
+    BadRequestException,
+    Body,
+    Controller,
+    Get,
+    Post,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
-import { SubscriptionService } from './subscription.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Tenant } from '../../common/decorators/tenant.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SubscriptionService } from './subscription.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('subscription')
@@ -17,13 +17,13 @@ export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
   @Get('status')
-  async getStatus(@Req() req: any, @Tenant() clinicId: number) {
+  async getStatus(@Req() req, @Tenant() clinicId: number) {
     return this.subscriptionService.getStatus(req.user, clinicId);
   }
 
   @Post('checkout')
   async createCheckoutSession(
-    @Req() req: any,
+    @Req() req,
     @Tenant() clinicId: number,
     @Body() body: { cancelUrl?: string },
   ) {
@@ -50,7 +50,7 @@ export class SubscriptionController {
   }
 
   @Post('portal')
-  async createPortalSession(@Req() req: any, @Tenant() clinicId: number) {
+  async createPortalSession(@Req() req, @Tenant() clinicId: number) {
     return this.subscriptionService.createPortalSession(req.user, clinicId);
   }
 }

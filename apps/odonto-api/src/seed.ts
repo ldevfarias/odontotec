@@ -7,7 +7,500 @@ import { ClinicProcedure } from './modules/clinic-procedures/entities/clinic-pro
 import { ClinicRole } from './modules/clinics/enums/clinic-role.enum';
 import { UserRole } from './modules/users/enums/role.enum';
 import * as bcrypt from 'bcrypt';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Patient } from './modules/patients/entities/patient.entity';
+import { Procedure } from './modules/patients/entities/procedure.entity';
+import { Anamnesis } from './modules/patients/entities/anamnesis.entity';
+import { Payment, PaymentMethod, PaymentStatus } from './modules/patients/entities/payment.entity';
+import { Appointment, AppointmentStatus } from './modules/appointments/entities/appointment.entity';
+import { ToothObservation } from './modules/patients/entities/tooth-observation.entity';
+import { Budget, BudgetStatus } from './modules/budgets/entities/budget.entity';
+import { BudgetItem } from './modules/budgets/entities/budget-item.entity';
+import { TreatmentPlan } from './modules/treatment-plans/entities/treatment-plan.entity';
+import { TreatmentPlanItem } from './modules/treatment-plans/entities/treatment-plan-item.entity';
+import {
+  TreatmentPlanStatus,
+  TreatmentPlanItemStatus,
+} from './modules/treatment-plans/enums/status.enum';
+
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function daysAgo(days: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  d.setHours(randInt(8, 17), randInt(0, 59), 0, 0);
+  return d;
+}
+
+function daysFromNow(days: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(randInt(8, 17), randInt(0, 59), 0, 0);
+  return d;
+}
+
+function weightedPick<T>(options: { value: T; weight: number }[]): T {
+  const total = options.reduce((sum, o) => sum + o.weight, 0);
+  let r = Math.random() * total;
+  for (const o of options) {
+    r -= o.weight;
+    if (r <= 0) return o.value;
+  }
+  return options[options.length - 1].value;
+}
+
+const PATIENT_NAMES = [
+  'Ana Clara Souza', 'Bruno Ferreira', 'Carla Mendes', 'Diego Oliveira',
+  'Elaine Santos', 'Fábio Costa', 'Gabriela Lima', 'Henrique Alves',
+  'Isabela Rocha', 'João Pedro Silva', 'Karen Nascimento', 'Lucas Martins',
+  'Mariana Pereira', 'Nicolas Barbosa', 'Olivia Cardoso', 'Paulo Ribeiro',
+  'Queila Teixeira', 'Rafael Gomes', 'Sandra Moura', 'Thiago Azevedo',
+  'Úrsula Correia', 'Vinícius Machado', 'Wanessa Cunha', 'Xavier Pinto',
+  'Yasmin Cavalcanti', 'Zeca Carvalho', 'Alice Freitas', 'Bernardo Lopes',
+  'Camila Dias', 'Daniel Nunes', 'Eduarda Monteiro', 'Fernando Araújo',
+  'Giovana Campos', 'Humberto Vieira', 'Ingrid Santana', 'Jorge Farias',
+  'Kátia Borges', 'Leonardo Ramos', 'Mônica Andrade', 'Nelson Batista',
+  'Orlanda Peixoto', 'Pedro Henrique Luz', 'Quênia Marques', 'Rodrigo Sousa',
+  'Simone Tavares', 'Tarcísio Neto', 'Uriel Fonseca', 'Vera Cruz',
+  'William Leite', 'Ximena Bastos', 'Yuri Medeiros', 'Zilda Matos',
+  'Adriana Pinheiro', 'Benedito Queiroz', 'Cecília Drummond', 'Davi Rezende',
+  'Emilia Torres', 'Francisco Brito', 'Graça Nogueira', 'Hélio Sampaio',
+];
+
+const COMPLAINTS = [
+  'Dor de dente no lado direito',
+  'Sensibilidade ao frio e calor',
+  'Gengiva sangrando ao escovar',
+  'Dente quebrado',
+  'Quero fazer limpeza e avaliação geral',
+  'Dor ao morder',
+  'Manchas nos dentes e desejo de clareamento',
+  'Mau hálito persistente',
+];
+
+const PROCEDURE_TYPES = [
+  { type: 'Restauração', cost: 180 },
+  { type: 'Extração', cost: 150 },
+  { type: 'Tratamento de Canal', cost: 450 },
+  { type: 'Limpeza / Profilaxia', cost: 120 },
+  { type: 'Aplicação de Flúor', cost: 80 },
+  { type: 'Clareamento Dental', cost: 350 },
+];
+
+const TOOTH_FACES = ['M', 'D', 'V', 'L', 'O', null];
+
+const TOOTH_DESCRIPTIONS = [
+  'Cárie incipiente observada',
+  'Fratura de esmalte',
+  'Desgaste oclusal por bruxismo',
+  'Restauração antiga com infiltração',
+  'Lesão periapical visível em radiografia',
+  'Hipersensibilidade dentinária',
+];
+
+const ADDRESSES = [
+  'Rua das Acácias, 45 - São Paulo, SP',
+  'Av. Paulista, 1200 - São Paulo, SP',
+  'Rua do Comércio, 78 - Campinas, SP',
+  'Travessa das Flores, 12 - Belo Horizonte, MG',
+  'Rua Sete de Setembro, 300 - Rio de Janeiro, RJ',
+  'Alameda Santos, 55 - São Paulo, SP',
+  'Rua XV de Novembro, 88 - Curitiba, PR',
+];
+
+const CANCELLATION_REASONS = [
+  'Compromisso de trabalho',
+  'Problema de saúde',
+  'Viagem',
+  'Esqueceu o agendamento',
+];
+
+async function seedDemoData(
+  clinic: Clinic,
+  dentist: { id: number },
+  clinicProcs: ClinicProcedure[],
+  dataSource: DataSource,
+): Promise<void> {
+  const patientRepo = dataSource.getRepository(Patient);
+  const procedureRepo = dataSource.getRepository(Procedure);
+  const anamnesisRepo = dataSource.getRepository(Anamnesis);
+  const paymentRepo = dataSource.getRepository(Payment);
+  const appointmentRepo = dataSource.getRepository(Appointment);
+  const toothObsRepo = dataSource.getRepository(ToothObservation);
+  const budgetRepo = dataSource.getRepository(Budget);
+  const budgetItemRepo = dataSource.getRepository(BudgetItem);
+  const treatmentPlanRepo = dataSource.getRepository(TreatmentPlan);
+  const treatmentPlanItemRepo = dataSource.getRepository(TreatmentPlanItem);
+
+  console.log('\nSeeding demo patients...');
+
+  for (let i = 0; i < PATIENT_NAMES.length; i++) {
+    const name = PATIENT_NAMES[i];
+
+    // Idempotência: skip se já existe
+    const existing = await patientRepo.findOne({
+      where: { name, clinicId: clinic.id },
+    });
+
+    let patient: Patient;
+    if (existing) {
+      patient = existing;
+      console.log(`  → [${i + 1}/${PATIENT_NAMES.length}] Paciente já existe: ${name}`);
+    } else {
+      const birthYear = new Date().getFullYear() - randInt(18, 80);
+      const cpfNums = Array.from({ length: 11 }, () => randInt(0, 9));
+      const cpf = `${cpfNums.slice(0, 3).join('')}.${cpfNums.slice(3, 6).join('')}.${cpfNums.slice(6, 9).join('')}-${cpfNums.slice(9).join('')}`;
+      const emailSlug = name
+        .toLowerCase()
+        .replace(/\s+/g, '.')
+        .replace(/[áàâã]/g, 'a')
+        .replace(/[éê]/g, 'e')
+        .replace(/[í]/g, 'i')
+        .replace(/[óô]/g, 'o')
+        .replace(/[ú]/g, 'u')
+        .replace(/[ç]/g, 'c');
+
+      patient = patientRepo.create({
+        name,
+        birthDate: new Date(birthYear, randInt(0, 11), randInt(1, 28)),
+        document: cpf,
+        email: `${emailSlug}${randInt(1, 99)}@email.com`,
+        phone: `(${randInt(11, 99)}) 9${randInt(1000, 9999)}-${randInt(1000, 9999)}`,
+        address: pick(ADDRESSES),
+        clinicId: clinic.id,
+      });
+      patient = await patientRepo.save(patient);
+      console.log(`  → [${i + 1}/${PATIENT_NAMES.length}] Paciente criado: ${name}`);
+    }
+
+    // Dados relacionados — cada bloco é idempotente
+    await seedProcedures(procedureRepo, patient, clinic.id);
+    await seedAnamnesis(anamnesisRepo, patient, clinic.id, i);
+    await seedPayments(paymentRepo, patient, clinic.id);
+    await seedAppointments(appointmentRepo, patient, clinic.id, dentist.id, i);
+    await seedToothObservations(toothObsRepo, patient, clinic.id);
+    await seedBudget(budgetRepo, budgetItemRepo, patient, clinic.id, clinicProcs);
+    await seedTreatmentPlan(treatmentPlanRepo, treatmentPlanItemRepo, patient, clinic.id, dentist.id);
+  }
+
+  console.log('Demo seeding complete!\n');
+}
+
+async function seedProcedures(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const qty = randInt(2, 4);
+  for (let j = 0; j < qty; j++) {
+    const proc = pick(PROCEDURE_TYPES);
+    const toothNums = [
+      '11','12','13','14','15','16','17','18',
+      '21','22','23','24','25','26','27','28',
+      '31','32','33','34','35','36','37','38',
+      '41','42','43','44','45','46','47','48',
+    ];
+    const face = pick(TOOTH_FACES);
+    const record = repo.create({
+      description: proc.type,
+      type: proc.type,
+      date: daysAgo(randInt(1, 180)),
+      cost: proc.cost + randInt(-20, 50),
+      toothNumber: pick(toothNums),
+      toothFaces: face,
+      patientId: patient.id,
+      clinicId,
+    });
+    await repo.save(record);
+  }
+}
+async function seedAnamnesis(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  idx: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const medications = pick([
+    [],
+    ['Losartana 50mg'],
+    ['Metformina 850mg', 'Atenolol 25mg'],
+    ['Sinvastatina 20mg'],
+  ]);
+  const allergies = pick([
+    'Nenhuma conhecida',
+    'Penicilina',
+    'Dipirona',
+    'Anti-inflamatórios',
+    'Látex',
+  ]);
+  const medicalHistory = pick([
+    'Sem histórico relevante',
+    'Hipertensão arterial controlada',
+    'Diabetes tipo 2',
+    'Cardiopatia — usa marcapasso',
+    'Coagulopatia — uso de anticoagulante',
+    'Gestante — 2º trimestre',
+  ]);
+
+  const record = repo.create({
+    complaint: COMPLAINTS[idx % COMPLAINTS.length],
+    data: {
+      medications,
+      allergies,
+      medicalHistory,
+      smoker: pick([true, false, false, false]),
+      pregnant: medicalHistory.includes('Gestante'),
+    },
+    patientId: patient.id,
+    clinicId,
+  });
+  await repo.save(record);
+}
+async function seedPayments(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const qty = randInt(2, 3);
+  for (let j = 0; j < qty; j++) {
+    const status = weightedPick([
+      { value: PaymentStatus.COMPLETED, weight: 60 },
+      { value: PaymentStatus.PENDING, weight: 25 },
+      { value: PaymentStatus.CANCELLED, weight: 15 },
+    ]);
+    const record = repo.create({
+      amount: randInt(100, 600),
+      method: pick([
+        PaymentMethod.PIX,
+        PaymentMethod.CREDIT_CARD,
+        PaymentMethod.DEBIT_CARD,
+        PaymentMethod.CASH,
+      ]),
+      status,
+      date: daysAgo(randInt(1, 180)),
+      patientId: patient.id,
+      clinicId,
+    });
+    await repo.save(record);
+  }
+}
+async function seedAppointments(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  dentistId: number,
+  idx: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const qty = randInt(2, 5);
+  for (let j = 0; j < qty; j++) {
+    const dayOffset = idx * 3 + j * 7;
+    const isPast = dayOffset <= 180;
+    const appointmentDate = isPast
+      ? daysAgo(180 - dayOffset)
+      : daysFromNow(dayOffset - 180);
+
+    appointmentDate.setHours(8 + (j % 9), (idx % 2) * 30, 0, 0);
+
+    let status: AppointmentStatus;
+    let cancelledBy: 'PATIENT' | 'CLINIC' | null = null;
+    let cancellationReason: string | null = null;
+
+    if (isPast) {
+      status = weightedPick([
+        { value: AppointmentStatus.COMPLETED, weight: 60 },
+        { value: AppointmentStatus.CANCELLED, weight: 25 },
+        { value: AppointmentStatus.ABSENT, weight: 15 },
+      ]);
+      if (status === AppointmentStatus.CANCELLED) {
+        cancelledBy = pick(['PATIENT', 'CLINIC'] as const);
+        cancellationReason = pick(CANCELLATION_REASONS);
+      }
+    } else {
+      status = weightedPick([
+        { value: AppointmentStatus.SCHEDULED, weight: 70 },
+        { value: AppointmentStatus.CONFIRMED, weight: 30 },
+      ]);
+    }
+
+    const record = repo.create({
+      date: appointmentDate,
+      duration: pick([30, 60]),
+      status,
+      cancelledBy,
+      cancellationReason,
+      clinicId,
+      dentistId,
+      patientId: patient.id,
+    });
+
+    try {
+      await repo.save(record);
+    } catch (e: any) {
+      if (e?.code === '23505') {
+        console.warn(`    ⚠ Appointment slot conflict for patient ${patient.id}, skipping`);
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+async function seedToothObservations(
+  repo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const toothNums = [
+    '11','12','13','14','15','16','17','18',
+    '21','22','23','24','25','26','27','28',
+    '31','32','33','34','35','36','37','38',
+    '41','42','43','44','45','46','47','48',
+  ];
+
+  const qty = randInt(1, 2);
+  for (let j = 0; j < qty; j++) {
+    const record = repo.create({
+      toothNumber: pick(toothNums),
+      toothFaces: pick(TOOTH_FACES),
+      description: pick(TOOTH_DESCRIPTIONS),
+      date: daysAgo(randInt(1, 180)),
+      patientId: patient.id,
+      clinicId,
+    });
+    await repo.save(record);
+  }
+}
+async function seedBudget(
+  repo: Repository<any>,
+  itemRepo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  clinicProcs: ClinicProcedure[],
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const status = weightedPick([
+    { value: BudgetStatus.PENDING, weight: 40 },
+    { value: BudgetStatus.APPROVED, weight: 45 },
+    { value: BudgetStatus.REJECTED, weight: 15 },
+  ]);
+
+  const budget = repo.create({
+    clinicId,
+    patientId: patient.id,
+    status,
+    notes: pick([null, null, 'Aguardando confirmação do plano', 'Paciente pediu desconto']),
+    total: 0,
+  });
+  const savedBudget = await repo.save(budget);
+
+  const itemQty = randInt(2, 3);
+  let total = 0;
+  for (let j = 0; j < itemQty; j++) {
+    const proc = pick(clinicProcs);
+    const quantity = pick([1, 1, 2]);
+    const unitPrice = Number(proc.baseValue);
+    const subtotal = unitPrice * quantity;
+    total += subtotal;
+
+    const item = itemRepo.create({
+      budgetId: savedBudget.id,
+      clinicProcedureId: proc.id,
+      quantity,
+      unitPrice,
+      subtotal,
+    });
+    await itemRepo.save(item);
+  }
+
+  savedBudget.total = total;
+  await repo.save(savedBudget);
+}
+async function seedTreatmentPlan(
+  repo: Repository<any>,
+  itemRepo: Repository<any>,
+  patient: Patient,
+  clinicId: number,
+  dentistId: number,
+): Promise<void> {
+  const count = await repo.count({ where: { patientId: patient.id } });
+  if (count > 0) return;
+
+  const status = weightedPick([
+    { value: TreatmentPlanStatus.DRAFT, weight: 30 },
+    { value: TreatmentPlanStatus.APPROVED, weight: 50 },
+    { value: TreatmentPlanStatus.COMPLETED, weight: 20 },
+  ]);
+  const discount = pick([0, 0, 0, 50]);
+  const titles = [
+    'Plano de Tratamento Completo',
+    'Reabilitação Oral',
+    'Plano Preventivo',
+    'Tratamento Estético',
+  ];
+
+  const plan = repo.create({
+    title: pick(titles),
+    status,
+    discount,
+    totalAmount: 0,
+    notes: pick([null, null, 'Iniciar após aprovação do orçamento', 'Dividido em 3 sessões']),
+    patientId: patient.id,
+    dentistId,
+    clinicId,
+  });
+  const savedPlan = await repo.save(plan);
+
+  const itemQty = randInt(2, 3);
+  const procDescriptions = PROCEDURE_TYPES.map((p) => p.type);
+  const toothNums = ['11','16','21','26','31','36','41','46'];
+  const surfaces = ['M', 'D', 'V', 'L', 'O', null];
+  const itemStatuses = [
+    TreatmentPlanItemStatus.PLANNED,
+    TreatmentPlanItemStatus.IN_PROGRESS,
+    TreatmentPlanItemStatus.COMPLETED,
+  ];
+
+  let totalAmount = 0;
+  for (let j = 0; j < itemQty; j++) {
+    const value = randInt(150, 500);
+    totalAmount += value;
+
+    const item = itemRepo.create({
+      description: pick(procDescriptions),
+      value,
+      toothNumber: parseInt(pick(toothNums), 10),
+      surface: pick(surfaces),
+      status: pick(itemStatuses),
+      treatmentPlanId: savedPlan.id,
+    });
+    await itemRepo.save(item);
+  }
+
+  savedPlan.totalAmount = Math.max(0, totalAmount - discount);
+  await repo.save(savedPlan);
+}
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
@@ -152,6 +645,14 @@ async function bootstrap() {
       );
     }
   }
+
+  // Buscar procedimentos criados para passar ao seedDemoData
+  const clinicProcsForSeed = await procRepo.find({ where: { clinicId: clinic.id } });
+
+  // Buscar dentista para passar ao seedDemoData
+  const dentistUser = await userRepo.findOne({ where: { email: 'dentist@odontotec.com' } });
+
+  await seedDemoData(clinic, dentistUser!, clinicProcsForSeed, dataSource);
 
   await app.close();
   console.log('Seeding complete!');

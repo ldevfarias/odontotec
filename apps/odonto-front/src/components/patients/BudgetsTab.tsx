@@ -1,83 +1,31 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import {
-  Banknote,
-  Check,
-  CheckCircle2,
-  ChevronsUpDown,
-  Clock,
-  FileText,
-  Plus,
-  ShoppingCart,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
-import React, { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FileText } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
-import { BudgetsTabSkeleton } from '@/components/skeletons';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+import { Form } from '@/components/ui/form';
+import { useAuth } from '@/contexts/AuthContext';
+import { useClinicsControllerGetActive } from '@/generated/hooks/useClinicsControllerGetActive';
 import { useClinicProceduresControllerFindAll } from '@/generated/hooks/useClinicProceduresControllerFindAll';
 import { useTreatmentPlansControllerCreate } from '@/generated/hooks/useTreatmentPlansControllerCreate';
-import { useTreatmentPlansControllerFindAll } from '@/generated/hooks/useTreatmentPlansControllerFindAll';
-import { treatmentPlansControllerFindAllQueryKey } from '@/generated/hooks/useTreatmentPlansControllerFindAll';
 import { useTreatmentPlansControllerRemove } from '@/generated/hooks/useTreatmentPlansControllerRemove';
 import { useTreatmentPlansControllerUpdate } from '@/generated/hooks/useTreatmentPlansControllerUpdate';
-import { cn } from '@/lib/utils';
+import type { CreateTreatmentPlanDto } from '@/generated/ts/CreateTreatmentPlanDto';
+import type { TreatmentPlanItemDtoStatusEnumKey } from '@/generated/ts/TreatmentPlanItemDto';
+import type { UpdateTreatmentPlanDtoStatusEnumKey } from '@/generated/ts/UpdateTreatmentPlanDto';
+import { api } from '@/lib/api';
 import { notificationService } from '@/services/notification.service';
-import { formatCurrencyInput, parseCurrencyInput } from '@/utils/masks';
 
-// FDI Tooth Numbers
-const ADULT_TEETH = [
-  18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 48, 47, 46, 45, 44, 43, 42, 41,
-  31, 32, 33, 34, 35, 36, 37, 38,
-].sort();
-
-const PEDIATRIC_TEETH = [
-  55, 54, 53, 52, 51, 61, 62, 63, 64, 65, 85, 84, 83, 82, 81, 71, 72, 73, 74, 75,
-].sort();
-
-const ALL_TEETH = [...ADULT_TEETH, ...PEDIATRIC_TEETH];
+import type { BudgetPlan, CartItem, ProcedureCatalogItem } from './budget-types';
+import { BudgetCartSidebar } from './BudgetCartSidebar';
+import { BudgetFormCard } from './BudgetFormCard';
+import { BudgetHistoryList } from './BudgetHistoryList';
 
 const budgetFormSchema = z.object({
   title: z.string().min(1, 'O título é obrigatório'),
@@ -86,105 +34,137 @@ const budgetFormSchema = z.object({
   discount: z.number().min(0, 'Desconto não pode ser negativo'),
 });
 
-type BudgetFormValues = z.infer<typeof budgetFormSchema>;
+export type BudgetFormValues = z.infer<typeof budgetFormSchema>;
 
-interface CartItem {
-  id: string;
-  description: string;
-  value: number;
-  toothNumber?: number;
+interface QueryDataShape<T> {
+  data?: T[];
 }
+
+const treatmentPlansByPatientQueryKey = (patientId: number) =>
+  ['treatment-plans', 'patient', patientId] as const;
+
+const extractArrayData = <T,>(response: unknown): T[] => {
+  if (Array.isArray(response)) return response as T[];
+  if (
+    typeof response === 'object' &&
+    response !== null &&
+    'data' in response &&
+    Array.isArray((response as QueryDataShape<T>).data)
+  ) {
+    return (response as QueryDataShape<T>).data ?? [];
+  }
+  return [];
+};
 
 interface BudgetsTabProps {
   patientId: number;
+  patientName: string;
+  patientPhone?: string;
 }
 
-const STATUS_CONFIG = {
-  DRAFT: { label: 'Rascunho', color: 'bg-gray-500', icon: Clock },
-  APPROVED: { label: 'Aprovado', color: 'bg-blue-500', icon: CheckCircle2 },
-  COMPLETED: { label: 'Finalizado', color: 'bg-green-500', icon: CheckCircle2 },
-  CANCELLED: { label: 'Cancelado', color: 'bg-red-500', icon: XCircle },
-  REJECTED: { label: 'Rejeitado', color: 'bg-orange-500', icon: XCircle },
-};
+export function BudgetsTab({ patientId, patientName, patientPhone }: BudgetsTabProps) {
+  'use no memo';
 
-export function BudgetsTab({ patientId }: BudgetsTabProps) {
+  const { user } = useAuth();
+  const { data: activeClinicData } = useClinicsControllerGetActive();
   const queryClient = useQueryClient();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [toothComboboxOpen, setToothComboboxOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<number | null>(null);
 
-  // API Hooks
   const { data: catalogResponse } = useClinicProceduresControllerFindAll();
-  const catalog = (catalogResponse as any) ?? [];
-  const { data: allPlansResponse, isLoading: isLoadingPlans } =
-    useTreatmentPlansControllerFindAll();
-  const allPlans = (allPlansResponse as any)?.data ?? [];
+  const { data: allPlansResponse, isLoading: isLoadingPlans } = useQuery({
+    queryKey: treatmentPlansByPatientQueryKey(patientId),
+    queryFn: async () => {
+      const response = await api.get(
+        '/treatment-plans/patient/:patientId'.replace(':patientId', String(patientId)),
+        {
+          params: { page: 1, limit: 100 },
+        },
+      );
+
+      return response.data;
+    },
+    enabled: Number.isFinite(patientId) && patientId > 0,
+  });
   const { mutate: createPlan, isPending: isCreating } = useTreatmentPlansControllerCreate();
   const { mutate: updatePlan, isPending: isUpdating } = useTreatmentPlansControllerUpdate();
   const { mutate: removePlan, isPending: isDeleting } = useTreatmentPlansControllerRemove();
 
-  const isSaving = isCreating || isUpdating;
+  const catalog = useMemo(
+    () => extractArrayData<ProcedureCatalogItem>(catalogResponse),
+    [catalogResponse],
+  );
 
   const patientPlans = useMemo(() => {
-    return (allPlans as any[])
-      .filter((plan) => plan.patientId === patientId)
+    const all = extractArrayData<BudgetPlan>(allPlansResponse);
+    return all
+      .filter((p) => Number(p.patientId) === Number(patientId))
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [allPlans, patientId]);
+  }, [allPlansResponse, patientId]);
+
+  const isSaving = isCreating || isUpdating;
+
+  const clinicData = activeClinicData as Record<string, unknown> | undefined;
+  const pdfClinic = {
+    name: typeof clinicData?.name === 'string' ? clinicData.name : '',
+    logoUrl: typeof clinicData?.logoUrl === 'string' ? clinicData.logoUrl : null,
+    cnpj: typeof clinicData?.cnpj === 'string' ? clinicData.cnpj : null,
+    phone: typeof clinicData?.phone === 'string' ? clinicData.phone : null,
+  };
+
+  const pdfPatient = { name: patientName, phone: patientPhone };
 
   const form = useForm<BudgetFormValues>({
     resolver: zodResolver(budgetFormSchema),
-    defaultValues: {
-      title: '',
-      procedureName: '',
-      toothNumber: '',
-      discount: 0,
-    },
+    defaultValues: { title: '', procedureName: '', toothNumber: '', discount: 0 },
   });
 
-  const discount = form.watch('discount') || 0;
+  const [watchTitle, watchProcedureName, discount] = useWatch({
+    control: form.control,
+    name: ['title', 'procedureName', 'discount'],
+  });
+
   const subtotal = cart.reduce((acc, item) => acc + item.value, 0);
-  const total = Math.max(0, subtotal - discount);
+  const total = Math.max(0, subtotal - (discount || 0));
+
+  const invalidatePlans = () =>
+    queryClient.invalidateQueries({ queryKey: treatmentPlansByPatientQueryKey(patientId) });
 
   const addToCart = (values: BudgetFormValues) => {
-    const procedure = (catalog as any[]).find((p) => p.name === values.procedureName);
+    const procedure = catalog.find((item) => item.name === values.procedureName);
     if (!procedure) return;
 
-    const newItem: CartItem = {
-      id: crypto.randomUUID(),
-      description: procedure.name,
-      value: Number(procedure.baseValue),
-      toothNumber:
-        values.toothNumber && values.toothNumber !== 'general'
-          ? Number(values.toothNumber)
-          : undefined,
-    };
+    setCart((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        description: procedure.name,
+        value: Number(procedure.baseValue),
+        toothNumber:
+          values.toothNumber && values.toothNumber !== 'general'
+            ? Number(values.toothNumber)
+            : undefined,
+      },
+    ]);
 
-    setCart((prev) => [...prev, newItem]);
     notificationService.success('Item adicionado ao carrinho');
-
-    // Clear fields except title
     form.setValue('procedureName', '');
     form.setValue('toothNumber', '');
   };
 
-  const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleEdit = (plan: any) => {
+  const handleEdit = (plan: BudgetPlan) => {
     setEditingId(plan.id);
-    form.setValue('title', plan.title || '');
-    form.setValue('discount', Number(plan.discount || 0));
-
-    const newCart = plan.items.map((item: any) => ({
-      id: item.id || crypto.randomUUID(),
-      description: item.description,
-      value: Number(item.value),
-      toothNumber: item.toothNumber,
-    }));
-
-    setCart(newCart);
+    form.setValue('title', plan.title ?? '');
+    form.setValue('discount', Number(plan.discount ?? 0));
+    setCart(
+      (plan.items ?? []).map((item) => ({
+        id: String(item.id ?? crypto.randomUUID()),
+        description: item.description,
+        value: Number(item.value),
+        toothNumber: item.toothNumber,
+      })),
+    );
     notificationService.info('Orçamento carregado para edição');
   };
 
@@ -195,25 +175,17 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
     notificationService.info('Edição cancelada');
   };
 
-  const handleApprove = (id: number) => {
+  const handleStatusChange = (id: number, status: UpdateTreatmentPlanDtoStatusEnumKey) => {
+    const labels: Partial<Record<UpdateTreatmentPlanDtoStatusEnumKey, string>> = {
+      APPROVED: 'aprovado',
+      CANCELLED: 'cancelado',
+    };
     updatePlan(
-      { id, data: { status: 'APPROVED' } as any },
+      { id, data: { status } },
       {
         onSuccess: () => {
-          notificationService.success('Orçamento aprovado!');
-          queryClient.invalidateQueries({ queryKey: treatmentPlansControllerFindAllQueryKey() });
-        },
-      },
-    );
-  };
-
-  const handleCancel = (id: number) => {
-    updatePlan(
-      { id, data: { status: 'CANCELLED' } as any },
-      {
-        onSuccess: () => {
-          notificationService.success('Orçamento cancelado!');
-          queryClient.invalidateQueries({ queryKey: treatmentPlansControllerFindAllQueryKey() });
+          notificationService.success(`Orçamento ${labels[status] ?? 'atualizado'}!`);
+          invalidatePlans();
         },
       },
     );
@@ -226,7 +198,7 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
         onSuccess: () => {
           notificationService.success('Orçamento removido!');
           setPlanToDelete(null);
-          queryClient.invalidateQueries({ queryKey: treatmentPlansControllerFindAllQueryKey() });
+          invalidatePlans();
         },
       },
     );
@@ -238,36 +210,39 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
       return;
     }
 
-    const title = form.getValues('title');
-    const discount = form.getValues('discount') || 0;
+    const { title, discount: discountValue } = form.getValues();
+    const dentistId = user?.id ?? 0;
 
-    const planData = {
+    const items = cart.map((item) => ({
+      description: item.description,
+      value: item.value,
+      toothNumber: item.toothNumber,
+      status: 'PLANNED' as TreatmentPlanItemDtoStatusEnumKey,
+    }));
+
+    const basePayload = {
       patientId,
-      dentistId: 1, // Fix: Use actual dentist ID
+      dentistId,
       title,
-      discount,
-      status: 'DRAFT' as any,
-      items: cart.map((item) => ({
-        description: item.description,
-        value: item.value,
-        toothNumber: item.toothNumber,
-        status: 'PLANNED' as any,
-      })),
+      discount: discountValue || 0,
+      status: 'DRAFT' as const,
+      items,
+    };
+
+    const resetForm = () => {
+      setCart([]);
+      form.reset();
+      setEditingId(null);
+      invalidatePlans();
     };
 
     if (editingId) {
       updatePlan(
-        {
-          id: editingId,
-          data: planData as any,
-        },
+        { id: editingId, data: basePayload as CreateTreatmentPlanDto },
         {
           onSuccess: () => {
             notificationService.success('Orçamento atualizado com sucesso');
-            setCart([]);
-            form.reset();
-            setEditingId(null);
-            queryClient.invalidateQueries({ queryKey: treatmentPlansControllerFindAllQueryKey() });
+            resetForm();
           },
           onError: () => {
             notificationService.error('Erro ao atualizar orçamento');
@@ -276,15 +251,11 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
       );
     } else {
       createPlan(
-        {
-          data: planData as any,
-        },
+        { data: basePayload },
         {
           onSuccess: () => {
             notificationService.success('Orçamento criado com sucesso');
-            setCart([]);
-            form.reset();
-            queryClient.invalidateQueries({ queryKey: treatmentPlansControllerFindAllQueryKey() });
+            resetForm();
           },
           onError: () => {
             notificationService.error('Erro ao criar orçamento');
@@ -296,206 +267,15 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
 
   return (
     <Form {...form}>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Novo Orçamento
-              </CardTitle>
-              <CardDescription>
-                Monte um novo orçamento selecionando os procedimentos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={form.handleSubmit(addToCart)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Título do Orçamento</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ex: Tratamento do Canal, Reabilitação Oral..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="procedureName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Procedimento</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o procedimento" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {(catalog as any[]).map((proc) => (
-                              <SelectItem key={proc.id} value={proc.name}>
-                                {proc.name} -{' '}
-                                {new Intl.NumberFormat('pt-BR', {
-                                  style: 'currency',
-                                  currency: 'BRL',
-                                }).format(proc.baseValue)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="toothNumber"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col justify-end">
-                        <FormLabel>Dente (Opcional)</FormLabel>
-                        <Popover open={toothComboboxOpen} onOpenChange={setToothComboboxOpen}>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={toothComboboxOpen}
-                                className={cn(
-                                  'border-input flex h-9 w-full items-center justify-between gap-2 border px-3 py-2 text-sm shadow-xs transition-[color,box-shadow]',
-                                  'dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 bg-transparent font-normal focus-visible:ring-[3px]',
-                                  'hover:text-foreground hover:bg-transparent',
-                                  !field.value && 'text-muted-foreground',
-                                )}
-                              >
-                                {field.value
-                                  ? field.value === 'general'
-                                    ? 'Geral (Sem dente)'
-                                    : `Dente ${field.value}`
-                                  : 'Selecione o dente'}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[--radix-popover-trigger-width] p-0"
-                            align="start"
-                          >
-                            <Command
-                              filter={(value, search) => {
-                                if (value.includes(search)) return 1;
-                                return 0;
-                              }}
-                            >
-                              <CommandInput placeholder="Pesquisar dente..." />
-                              <CommandList>
-                                <CommandEmpty>Nenhum dente encontrado.</CommandEmpty>
-                                <CommandGroup>
-                                  <CommandItem
-                                    value="general"
-                                    keywords={['general', 'geral', 'sem', 'dente']}
-                                    onSelect={() => {
-                                      form.setValue('toothNumber', 'general');
-                                      setToothComboboxOpen(false);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        'mr-2 h-4 w-4',
-                                        field.value === 'general' ? 'opacity-100' : 'opacity-0',
-                                      )}
-                                    />
-                                    Geral (Sem dente)
-                                  </CommandItem>
-                                </CommandGroup>
-                                <CommandGroup heading="Dentes Permanentes">
-                                  {ADULT_TEETH.map((tooth) => (
-                                    <CommandItem
-                                      value={String(tooth)}
-                                      key={tooth}
-                                      keywords={[
-                                        String(tooth),
-                                        `dente ${tooth}`,
-                                        `dente ${tooth} permanente`,
-                                        'permanente',
-                                      ]}
-                                      onSelect={() => {
-                                        form.setValue('toothNumber', String(tooth));
-                                        setToothComboboxOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          field.value === String(tooth)
-                                            ? 'opacity-100'
-                                            : 'opacity-0',
-                                        )}
-                                      />
-                                      Dente {tooth}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                                <CommandGroup heading="Dentes Decíduos">
-                                  {PEDIATRIC_TEETH.map((tooth) => (
-                                    <CommandItem
-                                      value={String(tooth)}
-                                      key={tooth}
-                                      keywords={[
-                                        String(tooth),
-                                        `dente ${tooth}`,
-                                        `dente ${tooth} decíduo`,
-                                        'decíduo',
-                                        'deciduo',
-                                      ]}
-                                      onSelect={() => {
-                                        form.setValue('toothNumber', String(tooth));
-                                        setToothComboboxOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          field.value === String(tooth)
-                                            ? 'opacity-100'
-                                            : 'opacity-0',
-                                        )}
-                                      />
-                                      Dente {tooth}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  className="w-full"
-                  disabled={!form.watch('title') || !form.watch('procedureName')}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Adicionar ao Carrinho
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+      <div className="grid h-full min-h-0 grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left column: form + history */}
+        <div className="min-h-0 space-y-6 lg:col-span-2 lg:overflow-y-auto lg:pr-1">
+          <BudgetFormCard
+            control={form.control}
+            catalog={catalog}
+            isSubmitDisabled={!watchTitle || !watchProcedureName}
+            onSubmit={form.handleSubmit(addToCart)}
+          />
 
           <Card>
             <CardHeader>
@@ -505,286 +285,32 @@ export function BudgetsTab({ patientId }: BudgetsTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px] pr-4">
-                {isLoadingPlans ? (
-                  <BudgetsTabSkeleton />
-                ) : patientPlans.length === 0 ? (
-                  <div className="text-muted-foreground p-4 text-center italic">
-                    Nenhum orçamento encontrado.
-                  </div>
-                ) : (
-                  <Accordion type="single" collapsible className="w-full">
-                    {patientPlans.map((plan) => {
-                      const config =
-                        STATUS_CONFIG[plan.status as keyof typeof STATUS_CONFIG] ||
-                        STATUS_CONFIG.DRAFT;
-                      const StatusIcon = config.icon;
-                      return (
-                        <AccordionItem key={plan.id} value={`plan-${plan.id}`}>
-                          <AccordionTrigger className="hover:no-underline">
-                            <div className="flex w-full items-center justify-between pr-4">
-                              <div className="flex items-center gap-2">
-                                <div className={`rounded-full p-1 ${config.color} text-white`}>
-                                  <StatusIcon className="h-3 w-3" />
-                                </div>
-                                <span className="text-left font-semibold">
-                                  {plan.title || 'Orçamento'}
-                                </span>
-                              </div>
-                              <div className="text-muted-foreground flex items-center gap-4 text-sm">
-                                <span>{format(new Date(plan.createdAt), 'dd/MM/yyyy')}</span>
-                                <span className="text-primary font-bold">
-                                  {new Intl.NumberFormat('pt-BR', {
-                                    style: 'currency',
-                                    currency: 'BRL',
-                                  }).format(Number(plan.totalAmount) - Number(plan.discount || 0))}
-                                </span>
-                              </div>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="space-y-4 pt-2">
-                              <div className="bg-muted/20 rounded-md border p-3">
-                                <h5 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
-                                  Itens do Orçamento
-                                </h5>
-                                <div className="space-y-2">
-                                  {plan.items?.map((item: any) => (
-                                    <div key={item.id} className="flex justify-between text-sm">
-                                      <span>
-                                        {item.description}{' '}
-                                        {item.toothNumber && (
-                                          <span className="text-muted-foreground text-xs">
-                                            (Dente {item.toothNumber})
-                                          </span>
-                                        )}
-                                      </span>
-                                      <span className="font-medium">
-                                        {new Intl.NumberFormat('pt-BR', {
-                                          style: 'currency',
-                                          currency: 'BRL',
-                                        }).format(Number(item.value))}
-                                      </span>
-                                    </div>
-                                  ))}
-                                  {plan.discount > 0 && (
-                                    <div className="mt-2 flex justify-between border-t pt-2 text-sm font-medium text-red-500">
-                                      <span>Desconto</span>
-                                      <span>
-                                        -{' '}
-                                        {new Intl.NumberFormat('pt-BR', {
-                                          style: 'currency',
-                                          currency: 'BRL',
-                                        }).format(Number(plan.discount))}
-                                      </span>
-                                    </div>
-                                  )}
-                                  <div className="text-primary mt-2 flex justify-between border-t pt-2 text-base font-bold">
-                                    <span>Total Final</span>
-                                    <span>
-                                      {new Intl.NumberFormat('pt-BR', {
-                                        style: 'currency',
-                                        currency: 'BRL',
-                                      }).format(
-                                        Number(plan.totalAmount) - Number(plan.discount || 0),
-                                      )}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex justify-end gap-2">
-                                {plan.status === 'DRAFT' && (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleEdit(plan)}
-                                    >
-                                      Editar
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="border-green-200 text-green-600 hover:bg-green-50"
-                                      onClick={() => handleApprove(plan.id)}
-                                    >
-                                      <CheckCircle2 className="mr-2 h-4 w-4" />
-                                      Aprovar
-                                    </Button>
-                                  </>
-                                )}
-                                {(plan.status === 'APPROVED' || plan.status === 'DRAFT') && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="border-orange-200 text-orange-600 hover:bg-orange-50"
-                                    onClick={() => handleCancel(plan.id)}
-                                  >
-                                    <XCircle className="mr-2 h-4 w-4" />
-                                    Cancelar
-                                  </Button>
-                                )}
-                                {plan.status === 'DRAFT' && (
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="text-destructive hover:bg-destructive/10"
-                                    onClick={() => setPlanToDelete(plan.id)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      );
-                    })}
-                  </Accordion>
-                )}
-              </ScrollArea>
+              <BudgetHistoryList
+                plans={patientPlans}
+                isLoading={isLoadingPlans}
+                patient={pdfPatient}
+                clinic={pdfClinic}
+                onEdit={handleEdit}
+                onStatusChange={handleStatusChange}
+                onDeleteRequest={setPlanToDelete}
+              />
             </CardContent>
           </Card>
         </div>
 
-        <div className="space-y-6">
-          <Card className="border-border/40 sticky top-6 shadow-sm">
-            <CardHeader className="border-border/40 mb-0 border-b pb-3">
-              <CardTitle className="text-foreground/80 flex items-center gap-2 text-base font-semibold tracking-tight">
-                <ShoppingCart className="text-muted-foreground h-[18px] w-[18px] stroke-[1.5]" />
-                Resumo do Orçamento
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-6 pt-3">
-              {cart.length === 0 ? (
-                <div className="text-muted-foreground/50 flex h-52 flex-col items-center justify-center space-y-4">
-                  <ShoppingCart className="h-12 w-12 stroke-[1]" />
-                  <p className="text-sm font-light tracking-wide">Nenhum procedimento no momento</p>
-                </div>
-              ) : (
-                <div className="space-y-0">
-                  <ScrollArea className="-mx-4 mt-0 h-[320px] px-4">
-                    <div className="flex flex-col gap-2.5 pb-2">
-                      {cart.map((item) => (
-                        <div
-                          key={item.id}
-                          className="group from-card to-muted/30 border-border/40 hover:border-primary/20 relative rounded-lg border bg-gradient-to-r p-3 shadow-xs transition-all hover:shadow-sm"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0 flex-1">
-                              <p className="text-foreground/95 truncate text-sm leading-none font-semibold">
-                                {item.description}
-                              </p>
-                              {item.toothNumber && (
-                                <div className="bg-primary/10 text-primary mt-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
-                                  Dente <span className="text-foreground">{item.toothNumber}</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex flex-shrink-0 items-center gap-2">
-                              <p className="text-primary text-sm font-bold whitespace-nowrap">
-                                {new Intl.NumberFormat('pt-BR', {
-                                  style: 'currency',
-                                  currency: 'BRL',
-                                }).format(item.value)}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => removeFromCart(item.id)}
-                                className="text-muted-foreground hover:bg-destructive hover:text-destructive-foreground h-7 w-7 rounded-full opacity-0 transition-all group-hover:opacity-100"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-
-                  <div className="border-border/40 mt-2 space-y-4 border-t pt-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground font-light">Subtotal</span>
-                        <span className="text-foreground/80 font-medium">
-                          {new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          }).format(subtotal)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <span className="text-muted-foreground w-16 text-sm font-light">
-                          Desconto
-                        </span>
-                        <FormField
-                          control={form.control}
-                          name="discount"
-                          render={({ field }) => (
-                            <FormItem className="mb-0 flex-1">
-                              <FormControl>
-                                <div className="relative">
-                                  <span className="text-muted-foreground absolute top-2.5 left-3 text-xs font-medium">
-                                    R$
-                                  </span>
-                                  <Input
-                                    type="text"
-                                    className="text-destructive/90 bg-muted/40 hover:bg-muted/60 focus-visible:border-border/50 h-9 rounded-md border-transparent pl-8 text-right text-sm font-medium shadow-none transition-all focus-visible:bg-transparent"
-                                    placeholder="0,00"
-                                    {...field}
-                                    value={formatCurrencyInput(field.value)}
-                                    onChange={(e) =>
-                                      field.onChange(parseCurrencyInput(e.target.value))
-                                    }
-                                  />
-                                </div>
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="border-border/40 mt-5 flex items-baseline justify-between border-t pt-5">
-                        <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-                          Total
-                        </span>
-                        <div className="text-right">
-                          <p className="text-primary/90 text-[28px] font-bold tracking-tight">
-                            {new Intl.NumberFormat('pt-BR', {
-                              style: 'currency',
-                              currency: 'BRL',
-                            }).format(total)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      {editingId && (
-                        <Button variant="outline" onClick={handleCancelEdit} className="flex-1">
-                          Cancelar Edição
-                        </Button>
-                      )}
-                      <Button
-                        className={`h-10 shadow-md ${editingId ? 'flex-1' : 'w-full'}`}
-                        onClick={saveBudget}
-                        disabled={isSaving}
-                      >
-                        {isSaving
-                          ? 'Salvando...'
-                          : editingId
-                            ? 'Atualizar Orçamento'
-                            : 'Finalizar Orçamento'}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Right column: cart */}
+        <div className="space-y-6 lg:min-h-0">
+          <BudgetCartSidebar
+            cart={cart}
+            subtotal={subtotal}
+            total={total}
+            editingId={editingId}
+            isSaving={isSaving}
+            control={form.control}
+            onRemoveItem={(id) => setCart((prev) => prev.filter((item) => item.id !== id))}
+            onCancelEdit={handleCancelEdit}
+            onSave={saveBudget}
+          />
         </div>
       </div>
 

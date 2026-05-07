@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 
 import { api } from '@/lib/api';
 import { assertStripeUrl } from '@/lib/stripe-url';
@@ -45,8 +46,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     isLoading: true,
   });
 
-  const refreshStatus = async () => {
+  const refreshStatus = useCallback(async () => {
     if (!user) return;
+
     try {
       const { data } = await api.get('/subscription/status');
       const isCanceling = data.cancelAtPeriodEnd === true && data.status === 'ACTIVE';
@@ -59,7 +61,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       console.error('Failed to fetch subscription status:', error);
       setState((prev) => ({ ...prev, isLoading: false }));
     }
-  };
+  }, [user]);
 
   const upgradeToPro = async () => {
     try {
@@ -74,10 +76,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       } else {
         notificationService.error('Erro ao iniciar checkout.');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upgrade failed:', error);
       const message =
-        error.response?.status === 403
+        isAxiosError(error) && error.response?.status === 403
           ? 'Apenas administradores podem realizar upgrades.'
           : 'Falha ao conectar com o pagamento. Tente novamente.';
       notificationService.error(message);
@@ -87,20 +89,20 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user) {
-      refreshStatus();
+      void Promise.resolve().then(refreshStatus);
     }
-  }, [user]);
+  }, [user, refreshStatus]);
 
   // Re-sync subscription status when user returns to the tab (e.g. after Stripe portal)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && user) {
-        refreshStatus();
+        void refreshStatus();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [user]);
+  }, [user, refreshStatus]);
 
   const canceledWithNoGrace =
     state.status === 'CANCELED' &&

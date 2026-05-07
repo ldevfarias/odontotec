@@ -71,6 +71,22 @@ export class TreatmentPlansService {
       .getMany();
   }
 
+  async findByPatient(
+    patientId: number,
+    clinicId: number,
+    page = 1,
+    limit = 50,
+  ): Promise<PaginatedResponseDto<TreatmentPlan>> {
+    const [data, total] = await this.treatmentPlanRepository.findAndCount({
+      where: { clinicId, patientId },
+      relations: ['items', 'patient', 'dentist', 'payments'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+    return { data, total, page, limit };
+  }
+
   async findOne(id: number, clinicId: number): Promise<TreatmentPlan> {
     const plan = await this.treatmentPlanRepository.findOne({
       where: { id, clinicId },

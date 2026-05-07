@@ -1,7 +1,6 @@
 'use client';
 
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,21 +18,172 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   ANAMNESIS_TEMPLATE,
   AnamnesisCategory,
-  AnamnesisQuestion,
+  type AnamnesisQuestion,
   QuestionType,
 } from '@/constants/anamnesis-template';
 import { cn } from '@/lib/utils';
 
-interface Answer {
-  questionId: string;
-  value: any;
-  details?: string;
+import type { AnamnesisAnswer } from './anamnesis-helpers';
+import type { FormAnswer } from './use-anamnesis-form';
+import { useAnamnesisForm } from './use-anamnesis-form';
+
+// ---- Sub-components ----
+
+function BooleanField({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (val: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <span
+        className={cn('text-xs font-medium', !checked ? 'text-primary' : 'text-muted-foreground')}
+      >
+        Não
+      </span>
+      <Switch checked={checked} onCheckedChange={onChange} />
+      <span
+        className={cn('text-xs font-medium', checked ? 'text-primary' : 'text-muted-foreground')}
+      >
+        Sim
+      </span>
+    </div>
+  );
 }
 
+function SelectField({
+  value,
+  options = [],
+  onChange,
+}: {
+  value: string;
+  options?: string[];
+  onChange: (val: string) => void;
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="w-45">
+        <SelectValue placeholder="Selecione..." />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((opt) => (
+          <SelectItem key={opt} value={opt}>
+            {opt}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function MultiselectField({
+  values,
+  options = [],
+  onToggle,
+}: {
+  values: string[];
+  options?: string[];
+  onToggle: (opt: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const isSelected = values.includes(opt);
+        return (
+          <Badge
+            key={opt}
+            variant={isSelected ? 'default' : 'outline'}
+            className={cn(
+              'cursor-pointer px-3 py-1 text-sm transition-all',
+              isSelected ? 'bg-primary text-white' : 'hover:bg-muted',
+            )}
+            onClick={() => onToggle(opt)}
+          >
+            {opt} {isSelected && <CheckCircle2 className="ml-1 h-3 w-3" />}
+          </Badge>
+        );
+      })}
+    </div>
+  );
+}
+
+function shouldShowDetails(question: AnamnesisQuestion, answer: FormAnswer): boolean {
+  if (question.type === QuestionType.TEXT) return true;
+  if (answer.value === true) return true;
+  if (Array.isArray(answer.value) && answer.value.length > 0) return true;
+  if (typeof answer.value === 'string' && answer.value !== '' && answer.value !== 'Não')
+    return true;
+  return false;
+}
+
+interface QuestionItemProps {
+  question: AnamnesisQuestion;
+  answer: FormAnswer;
+  onValueChange: (questionId: string, value: FormAnswer['value']) => void;
+  onDetailsChange: (questionId: string, details: string) => void;
+  onToggle: (questionId: string, option: string) => void;
+}
+
+function QuestionItem({
+  question,
+  answer,
+  onValueChange,
+  onDetailsChange,
+  onToggle,
+}: QuestionItemProps) {
+  const showDetails = shouldShowDetails(question, answer);
+
+  return (
+    <div className="space-y-3 border-b pb-4 last:border-0 last:pb-0">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <Label className="flex-1 text-base font-medium">{question.label}</Label>
+
+        <div className="shrink-0">
+          {question.type === QuestionType.BOOLEAN && (
+            <BooleanField
+              checked={answer.value === true}
+              onChange={(val) => onValueChange(question.id, val)}
+            />
+          )}
+
+          {question.type === QuestionType.SELECT && (
+            <SelectField
+              value={typeof answer.value === 'string' ? answer.value : ''}
+              options={question.options}
+              onChange={(val) => onValueChange(question.id, val)}
+            />
+          )}
+        </div>
+      </div>
+
+      {question.type === QuestionType.MULTISELECT && (
+        <MultiselectField
+          values={Array.isArray(answer.value) ? answer.value : []}
+          options={question.options}
+          onToggle={(opt) => onToggle(question.id, opt)}
+        />
+      )}
+
+      {showDetails && (
+        <Textarea
+          placeholder="Detalhes adicionais (opcional)..."
+          value={answer.details}
+          onChange={(e) => onDetailsChange(question.id, e.target.value)}
+          className="mt-2 h-20 text-sm"
+        />
+      )}
+    </div>
+  );
+}
+
+// ---- Main component ----
+
 interface AnamnesisFormProps {
-  initialAnswers?: Answer[];
+  initialAnswers?: AnamnesisAnswer[];
   initialComplaint?: string;
-  onSubmit: (complaint: string, answers: Answer[]) => void;
+  onSubmit: (complaint: string, answers: AnamnesisAnswer[]) => void;
   isSubmitting?: boolean;
 }
 
@@ -43,54 +193,14 @@ export function AnamnesisForm({
   onSubmit,
   isSubmitting,
 }: AnamnesisFormProps) {
-  const [complaint, setComplaint] = useState(initialComplaint);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-
-  useEffect(() => {
-    // Initialize answers based on template and initial data
-    const merged = ANAMNESIS_TEMPLATE.map((q) => {
-      const existing = initialAnswers.find((a) => a.questionId === q.id);
-      return {
-        questionId: q.id,
-        value: existing
-          ? existing.value
-          : q.type === QuestionType.MULTISELECT
-            ? []
-            : q.type === QuestionType.BOOLEAN
-              ? false
-              : '',
-        details: existing?.details || '',
-      };
-    });
-    setAnswers(merged);
-  }, [initialAnswers]);
-
-  const updateAnswer = (questionId: string, value: any, details?: string) => {
-    setAnswers((prev) =>
-      prev.map((a) =>
-        a.questionId === questionId
-          ? {
-              ...a,
-              value: value !== undefined ? value : a.value,
-              details: details !== undefined ? details : a.details,
-            }
-          : a,
-      ),
-    );
-  };
-
-  const toggleMultiselect = (questionId: string, option: string) => {
-    const current = answers.find((a) => a.questionId === questionId);
-    if (!current) return;
-
-    const newValue = Array.isArray(current.value)
-      ? current.value.includes(option)
-        ? current.value.filter((v) => v !== option)
-        : [...current.value, option]
-      : [option];
-
-    updateAnswer(questionId, newValue);
-  };
+  const {
+    complaint,
+    setComplaint,
+    answers,
+    updateAnswerValue,
+    updateAnswerDetails,
+    toggleMultiselect,
+  } = useAnamnesisForm(initialAnswers, initialComplaint);
 
   const categories = Object.values(AnamnesisCategory);
 
@@ -102,7 +212,7 @@ export function AnamnesisForm({
           placeholder="Qual o motivo da consulta hoje?"
           value={complaint}
           onChange={(e) => setComplaint(e.target.value)}
-          className="min-h-[100px] text-base"
+          className="min-h-25 text-base"
         />
       </div>
 
@@ -117,92 +227,14 @@ export function AnamnesisForm({
               if (!answer) return null;
 
               return (
-                <div key={question.id} className="space-y-3 border-b pb-4 last:border-0 last:pb-0">
-                  <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-                    <Label className="flex-1 text-base font-medium">{question.label}</Label>
-
-                    <div className="flex-shrink-0">
-                      {question.type === QuestionType.BOOLEAN && (
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={cn(
-                              'text-xs font-medium',
-                              !answer.value ? 'text-primary' : 'text-muted-foreground',
-                            )}
-                          >
-                            Não
-                          </span>
-                          <Switch
-                            checked={answer.value}
-                            onCheckedChange={(val) => updateAnswer(question.id, val)}
-                          />
-                          <span
-                            className={cn(
-                              'text-xs font-medium',
-                              answer.value ? 'text-primary' : 'text-muted-foreground',
-                            )}
-                          >
-                            Sim
-                          </span>
-                        </div>
-                      )}
-
-                      {question.type === QuestionType.SELECT && (
-                        <Select
-                          value={answer.value}
-                          onValueChange={(val) => updateAnswer(question.id, val)}
-                        >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Selecione..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {question.options?.map((opt) => (
-                              <SelectItem key={opt} value={opt}>
-                                {opt}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
-                  </div>
-
-                  {question.type === QuestionType.MULTISELECT && (
-                    <div className="flex flex-wrap gap-2">
-                      {question.options?.map((opt) => {
-                        const isSelected =
-                          Array.isArray(answer.value) && answer.value.includes(opt);
-                        return (
-                          <Badge
-                            key={opt}
-                            variant={isSelected ? 'default' : 'outline'}
-                            className={cn(
-                              'cursor-pointer px-3 py-1 text-sm transition-all',
-                              isSelected ? 'bg-primary text-white' : 'hover:bg-muted',
-                            )}
-                            onClick={() => toggleMultiselect(question.id, opt)}
-                          >
-                            {opt} {isSelected && <CheckCircle2 className="ml-1 h-3 w-3" />}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {(question.type === QuestionType.TEXT ||
-                    answer.value === true ||
-                    (Array.isArray(answer.value) && answer.value.length > 0) ||
-                    (typeof answer.value === 'string' &&
-                      answer.value !== 'Não' &&
-                      answer.value !== '')) && (
-                    <Textarea
-                      placeholder="Detalhes adicionais (opcional)..."
-                      value={answer.details}
-                      onChange={(e) => updateAnswer(question.id, undefined, e.target.value)}
-                      className="mt-2 h-20 text-sm"
-                    />
-                  )}
-                </div>
+                <QuestionItem
+                  key={question.id}
+                  question={question}
+                  answer={answer}
+                  onValueChange={updateAnswerValue}
+                  onDetailsChange={updateAnswerDetails}
+                  onToggle={toggleMultiselect}
+                />
               );
             })}
           </CardContent>

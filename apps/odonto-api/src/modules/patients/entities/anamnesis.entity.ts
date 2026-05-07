@@ -1,14 +1,14 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
-import { Patient } from './patient.entity';
 import { Clinic } from '../../clinics/entities/clinic.entity';
+import { Patient } from './patient.entity';
 
 @Entity('anamnesis')
 export class Anamnesis {
@@ -19,7 +19,7 @@ export class Anamnesis {
   complaint: string; // Main complaint
 
   @Column('jsonb', { nullable: true })
-  data: Record<string, any>; // Flexible data (history, medications, allergies, etc.)
+  data: Record<string, unknown>; // Flexible data (history, medications, allergies, etc.)
 
   @Column({ name: 'patient_id' })
   patientId: number;

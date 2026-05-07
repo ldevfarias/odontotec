@@ -19,7 +19,7 @@ export function MetricCard({ title, value, icon, trend, className }: MetricCardP
   return (
     <div
       className={cn(
-        'relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-gray-100 bg-white p-6 shadow-sm',
+        'relative flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 shadow-sm',
         className,
       )}
     >

@@ -29,6 +29,18 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
+      { protocol: 'https', hostname: '*.r2.dev' },
+      { protocol: 'http', hostname: 'localhost', port: '3000' },
+      { protocol: 'https', hostname: '*.fly.dev' },
+      { protocol: 'https', hostname: 'odontoehtec.com' },
+    ],
+  },
+
   async headers() {
     return [
       {

@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             api.defaults.headers.common['X-Clinic-Id'] = String(response.data.clinics[0].id);
           }
         }
-      } catch (error) {
+      } catch {
         // Not authenticated or failed to hydrate
       } finally {
         setIsLoading(false);

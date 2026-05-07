@@ -1,16 +1,8 @@
 'use client';
 
-import { TrendingUp } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  TooltipProps,
-  XAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis } from 'recharts';
 
 import {
   type ChartConfig,
@@ -18,14 +10,22 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RevenueDataPoint, RevenuePeriod, useRevenueHistory } from '@/hooks/useRevenueHistory';
+import { RevenuePeriod, useRevenueHistory } from '@/hooks/useRevenueHistory';
 import { cn } from '@/lib/utils';
 
-interface RevenueChartProps {
-  revenue: number;
-  period: RevenuePeriod;
-}
+const PERIOD_OPTIONS: { value: RevenuePeriod; label: string }[] = [
+  { value: 'last_month', label: 'Último mês' },
+  { value: 'this_week', label: 'Semana atual' },
+  { value: 'last_week', label: 'Semana anterior' },
+];
 
 const chartConfig = {
   value: {
@@ -42,13 +42,8 @@ function formatCurrency(val: number) {
   }).format(val);
 }
 
-function formatValue(val: number) {
-  if (val >= 1_000_000) return `R$ ${(val / 1_000_000).toFixed(1)}M`;
-  if (val >= 1_000) return `R$ ${(val / 1_000).toFixed(1)}k`;
-  return `R$ ${val}`;
-}
-
-export function RevenueChart({ revenue, period }: RevenueChartProps) {
+export function RevenueChart() {
+  const [period, setPeriod] = useState<RevenuePeriod>('last_month');
   const { data: apiData = [], isLoading } = useRevenueHistory(period);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -57,25 +52,19 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
   const isMonthly = period === 'last_month';
   const totalRevenue = revenueHistory.reduce((sum, d) => sum + d.value, 0);
 
-  const activeData =
-    activeIndex !== null ? revenueHistory[activeIndex] : revenueHistory[revenueHistory.length - 1];
-
   if (isLoading) {
     return (
-      <div className="flex h-full min-h-[340px] w-full flex-col rounded-[24px] border border-gray-100 bg-white px-7 py-6 shadow-sm">
+      <div className="flex h-full w-full flex-col rounded-3xl border border-gray-100 bg-white px-7 py-6 shadow-sm">
         <div className="mb-4 flex justify-between">
           <div className="space-y-2">
             <Skeleton className="h-5 w-36" />
             <Skeleton className="h-3 w-24" />
           </div>
+          <Skeleton className="h-8 w-37 rounded-full" />
         </div>
         <div className="flex flex-1 items-end gap-3 pb-6">
-          {Array.from({ length: 7 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-full w-full"
-              style={{ maxHeight: `${30 + Math.random() * 60}%` }}
-            />
+          {[55, 70, 45, 80, 60, 75, 50].map((height, i) => (
+            <Skeleton key={i} className="h-full w-full" style={{ maxHeight: `${height}%` }} />
           ))}
         </div>
       </div>
@@ -83,16 +72,33 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
   }
 
   return (
-    <div className="relative flex h-full min-h-[340px] w-full flex-col overflow-hidden rounded-[24px] border border-gray-100 bg-white px-7 py-6 shadow-sm">
+    <div className="relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white px-7 py-6 shadow-sm">
       {/* Header */}
       <div className="z-10 mb-6 flex w-full items-start justify-between">
         <div>
-          <h3 className="text-[17px] font-bold tracking-tight text-gray-900">Visão de Receita</h3>
+          <h3 className="text-[17px] font-bold tracking-tight text-gray-900">Receita mensal</h3>
           <p className="mt-0.5 text-[12px] font-medium text-gray-400">
             Total:{' '}
             <span className="font-semibold text-gray-700">{formatCurrency(totalRevenue)}</span>
           </p>
         </div>
+        <Select value={period} onValueChange={(v) => setPeriod(v as RevenuePeriod)}>
+          <SelectTrigger className="focus:ring-primary/20 h-8 w-auto min-w-37 gap-1.5 rounded-full border-gray-200 bg-white px-4 text-[13px] font-medium shadow-sm hover:border-gray-300 focus:ring-1">
+            <CalendarDays className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="end" className="min-w-45 rounded-xl border-gray-100 p-1 shadow-lg">
+            {PERIOD_OPTIONS.map((opt) => (
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                className="cursor-pointer rounded-lg text-[13px] font-medium"
+              >
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col pt-4">
@@ -166,7 +172,7 @@ export function RevenueChart({ revenue, period }: RevenueChartProps) {
                 content={
                   <ChartTooltipContent
                     hideLabel
-                    className="w-[120px] border-slate-800 bg-slate-900"
+                    className="w-30 border-slate-800 bg-slate-900"
                     formatter={(value) => (
                       <div className="flex flex-col gap-0.5">
                         <span className="text-[10px] font-medium tracking-wider text-slate-400 uppercase">

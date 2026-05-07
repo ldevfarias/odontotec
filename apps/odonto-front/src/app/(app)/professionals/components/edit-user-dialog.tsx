@@ -33,16 +33,19 @@ import {
 import { api } from '@/lib/api';
 import { notificationService } from '@/services/notification.service';
 
+import { ProfessionalUser } from '../types';
+import { isAdminRole } from './professionals-display.utils';
+
 const editUserSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
-  role: z.enum(['ADMIN', 'DENTIST', 'SIMPLE']),
+  role: z.enum(['OWNER', 'ADMIN', 'DENTIST', 'SIMPLE']),
 });
 
 type EditUserFormValues = z.infer<typeof editUserSchema>;
 
 interface EditUserDialogProps {
-  user: any;
+  user: ProfessionalUser | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -50,6 +53,7 @@ interface EditUserDialogProps {
 
 export function EditUserDialog({ user, open, onOpenChange, onSuccess }: EditUserDialogProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const isAdminUser = isAdminRole(user?.role);
 
   const form = useForm<EditUserFormValues>({
     resolver: zodResolver(editUserSchema),
@@ -61,19 +65,25 @@ export function EditUserDialog({ user, open, onOpenChange, onSuccess }: EditUser
   });
 
   useEffect(() => {
-    if (user) {
-      form.reset({
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      });
-    }
+    if (!user) return;
+
+    form.reset({
+      name: user.name ?? '',
+      email: user.email,
+      role: (user.role?.toUpperCase() as EditUserFormValues['role']) ?? 'DENTIST',
+    });
   }, [user, form]);
 
   async function onSubmit(data: EditUserFormValues) {
+    if (!user) return;
+
     setIsSaving(true);
     try {
-      await api.patch(`/users/${user.id}`, data);
+      const payload = isAdminUser
+        ? { name: data.name, email: data.email }
+        : { name: data.name, email: data.email, role: data.role };
+
+      await api.patch(`/users/${user.id}`, payload);
       notificationService.success('Usuário atualizado com sucesso!');
       onSuccess();
       onOpenChange(false);
@@ -87,7 +97,7 @@ export function EditUserDialog({ user, open, onOpenChange, onSuccess }: EditUser
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Editar Profissional</DialogTitle>
           <DialogDescription>Atualize as informações do membro da equipe.</DialogDescription>
@@ -120,14 +130,14 @@ export function EditUserDialog({ user, open, onOpenChange, onSuccess }: EditUser
                 </FormItem>
               )}
             />
-            {user?.role !== 'ADMIN' && (
+            {!isAdminUser && (
               <FormField
                 control={form.control}
                 name="role"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cargo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione um cargo" />

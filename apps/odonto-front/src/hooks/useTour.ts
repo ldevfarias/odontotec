@@ -121,8 +121,7 @@ export function useTour() {
           element: '[data-tour="create-appointment-btn"]',
           popover: {
             title: '🗓️ Novo Agendamento',
-            description:
-              'Crie seu primeiro agendamento e comece a usar o OdontoTec!',
+            description: 'Crie seu primeiro agendamento e comece a usar o OdontoTec!',
             side: 'left',
             align: 'start',
             onNextClick: () => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { Camera, ChevronDown, LogOut, Menu, Search, Settings } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -24,10 +25,10 @@ export function DashboardHeader() {
 
   const initials = user?.name
     ? user.name
-      .split(' ')
-      .slice(0, 2)
-      .map((n) => n[0].toUpperCase())
-      .join('')
+        .split(' ')
+        .slice(0, 2)
+        .map((n) => n[0].toUpperCase())
+        .join('')
     : '?';
 
   return (
@@ -84,9 +85,11 @@ export function DashboardHeader() {
             <button className="group flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5 transition-colors outline-none hover:bg-gray-50">
               <div className="bg-primary/10 text-primary border-primary/20 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border text-sm font-bold shadow-sm">
                 {activeClinic?.avatarUrl ? (
-                  <img
+                  <Image
                     src={activeClinic.avatarUrl}
                     alt="avatar"
+                    width={36}
+                    height={36}
                     className="h-full w-full object-cover"
                   />
                 ) : (

@@ -40,3 +40,6 @@ export const parseCurrencyInput = (value: string): number => {
   const numericValue = value.replace(/\D/g, '');
   return Number(numericValue) / 100;
 };
+
+export const formatBRL = (value: number): string =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);

@@ -131,6 +131,7 @@ export function AvatarUploadModal({ open, onOpenChange }: AvatarUploadModalProps
           {/* Avatar preview */}
           <div className="bg-primary/10 text-primary border-primary/20 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 text-2xl font-bold">
             {currentAvatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- blob/data URL from FileReader, not optimizable
               <img src={currentAvatarUrl} alt="preview" className="h-full w-full object-cover" />
             ) : (
               initials

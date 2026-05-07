@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
-import { UserInvitation } from './entities/user-invitation.entity';
-import { PendingRegistration } from './entities/pending-registration.entity';
-import { Clinic } from '../clinics/entities/clinic.entity';
-import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
 import { STORAGE_PROVIDER } from '../../common/providers/storage/storage.provider.interface';
+import { ClinicMembership } from '../clinics/entities/clinic-membership.entity';
+import { Clinic } from '../clinics/entities/clinic.entity';
 import { EmailService } from '../email/email.service';
+import { PendingRegistration } from './entities/pending-registration.entity';
+import { UserInvitation } from './entities/user-invitation.entity';
+import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -24,10 +24,10 @@ const mockRepo = () => ({
 
 describe('UsersService', () => {
   let service: UsersService;
-  let mockMembershipRepo: any;
+  let mockMembershipRepo: unknown;
   let mockStorage: { upload: jest.Mock; delete: jest.Mock };
 
-  async function createTestModule(membershipRepo: any, storage: any) {
+  async function createTestModule(membershipRepo: unknown, storage: unknown) {
     const mockDS = {
       getRepository: jest.fn(),
       transaction: jest.fn(async (cb) => {

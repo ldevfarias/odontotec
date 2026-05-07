@@ -6,8 +6,10 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { api } from '@/lib/api';
 import { notificationService } from '@/services/notification.service';
 
+import { ProfessionalUser } from '../types';
+
 interface DeleteUserDialogProps {
-  user: any;
+  user: ProfessionalUser | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -15,6 +17,7 @@ interface DeleteUserDialogProps {
 
 export function DeleteUserDialog({ user, open, onOpenChange, onSuccess }: DeleteUserDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const userName = user?.name || 'este usuário';
 
   async function onConfirm() {
     if (!user) return;
@@ -40,7 +43,7 @@ export function DeleteUserDialog({ user, open, onOpenChange, onSuccess }: Delete
       title="Desativar usuário?"
       description={
         <>
-          Tem certeza que deseja desativar <b>{user?.name}</b>? O usuário perderá o acesso ao
+          Tem certeza que deseja desativar <b>{userName}</b>? O usuário perderá o acesso ao
           sistema imediatamente.
         </>
       }

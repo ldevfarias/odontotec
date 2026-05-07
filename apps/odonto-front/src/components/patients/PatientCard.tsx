@@ -12,7 +12,20 @@ import {
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
-import { PatientResponseDto } from '@/generated/ts/PatientResponseDto';
+
+interface PatientAlert {
+  label: string;
+}
+
+interface PatientCardData {
+  name: string;
+  phone?: string;
+  document?: string;
+  email?: string;
+  birthDate?: string;
+  address?: string;
+  alerts?: PatientAlert[];
+}
 
 function getInitials(name: string) {
   if (!name) return 'PT';
@@ -25,8 +38,7 @@ function getInitials(name: string) {
 }
 
 interface PatientCardProps {
-  patient: PatientResponseDto;
-  onBack?: () => void;
+  patient: PatientCardData;
 }
 
 export function PatientCard({ patient }: PatientCardProps) {
@@ -74,7 +86,7 @@ export function PatientCard({ patient }: PatientCardProps) {
 
         {/* Collapsible Details Area */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0'}`}
         >
           <div className="px-4 pt-2 pb-2 md:px-5">
             <div className="text-muted-foreground/80 grid grid-cols-1 gap-x-6 gap-y-3 text-[0.85rem] sm:grid-cols-2 lg:grid-cols-3">
@@ -135,9 +147,9 @@ export function PatientCard({ patient }: PatientCardProps) {
             </div>
 
             {/* Alerts */}
-            {(patient as any).alerts && (patient as any).alerts.length > 0 && (
+            {patient.alerts && patient.alerts.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-4">
-                {(patient as any).alerts.map((alert: any, idx: number) => (
+                {patient.alerts.map((alert, idx) => (
                   <Badge
                     key={idx}
                     variant="outline"

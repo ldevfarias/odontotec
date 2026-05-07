@@ -17,7 +17,6 @@ import {
 import { Search } from 'lucide-react';
 import * as React from 'react';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
 import {
@@ -48,6 +47,8 @@ export function DataTable<TData, TValue>({
   rowSelection: controlledRowSelection,
   setRowSelection: setControlledRowSelection,
 }: DataTableProps<TData, TValue>) {
+  'use no memo';
+
   const [internalRowSelection, setInternalRowSelection] = React.useState({});
   const rowSelection =
     controlledRowSelection !== undefined ? controlledRowSelection : internalRowSelection;
@@ -57,6 +58,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table returns functions that cannot be memoized safely; known React Compiler limitation
   const table = useReactTable({
     data,
     columns,
@@ -98,7 +100,7 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       )}
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface overflow-hidden [&_td]:border-0 [&_th]:border-0 [&_tr]:border-0">
         <Table>
           <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (

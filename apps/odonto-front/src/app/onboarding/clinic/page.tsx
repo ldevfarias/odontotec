@@ -63,7 +63,7 @@ export default function ClinicSetupPage() {
       } else {
         router.push('/dashboard');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       // Se o setup já foi concluído anteriormente (ex: erro de state loop), redirecione
       if (error.response?.data?.message === 'Clinic setup already completed') {

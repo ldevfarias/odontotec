@@ -2,7 +2,7 @@
 
 import { Calendar, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,13 +12,7 @@ function AppointmentCancelContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const token = searchParams.get('token');
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-
-  const {
-    isLoading: isQueryLoading,
-    isError: isQueryError,
-    isSuccess,
-  } = useAppointmentsControllerPublicCancel(
+  const { isError: isQueryError, isSuccess } = useAppointmentsControllerPublicCancel(
     { id: id!, token: token! },
     {
       query: {
@@ -28,17 +22,8 @@ function AppointmentCancelContent() {
     },
   );
 
-  useEffect(() => {
-    if (!id || !token) {
-      setStatus('error');
-    } else if (isSuccess) {
-      setStatus('success');
-    } else if (isQueryError) {
-      setStatus('error');
-    } else if (isQueryLoading) {
-      setStatus('loading');
-    }
-  }, [id, token, isSuccess, isQueryError, isQueryLoading]);
+  const status: 'loading' | 'success' | 'error' =
+    !id || !token ? 'error' : isSuccess ? 'success' : isQueryError ? 'error' : 'loading';
 
   return (
     <div className="bg-muted/30 flex min-h-screen items-center justify-center p-4">

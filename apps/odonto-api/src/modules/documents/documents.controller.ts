@@ -8,21 +8,19 @@ import {
   Delete,
   UseGuards,
   Query,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
 import {
   CreatePatientDocumentDto,
+  FindAllDocumentsQueryDto,
   UpdatePatientDocumentDto,
 } from './dto/patient-document.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/enums/role.enum';
-import { CurrentUser } from '../../common/decorators/user.decorator';
 import { Tenant } from '../../common/decorators/tenant.decorator';
-import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('documents')
 @ApiBearerAuth()
@@ -46,14 +44,13 @@ export class DocumentsController {
   @ApiOperation({ summary: 'List all documents in the clinic' })
   findAll(
     @Tenant() clinicId: number,
-    @Query('patientId') patientId?: string,
-    @Query() pagination: PaginationDto = new PaginationDto(),
+    @Query() query: FindAllDocumentsQueryDto,
   ) {
     return this.documentsService.findAll(
       clinicId,
-      patientId ? Number(patientId) : undefined,
-      pagination.page,
-      pagination.limit,
+      query.patientId,
+      query.page,
+      query.limit,
     );
   }
 

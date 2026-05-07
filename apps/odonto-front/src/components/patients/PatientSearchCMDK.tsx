@@ -68,7 +68,7 @@ export function PatientSearchCMDK({ open, onOpenChange }: PatientSearchCMDKProps
           </CommandEmpty>
           <CommandGroup heading="Pacientes">
             {Array.isArray(patients) &&
-              patients.map((patient: any) => (
+              patients.map((patient: unknown) => (
                 <CommandItem
                   key={patient.id}
                   value={patient.name}

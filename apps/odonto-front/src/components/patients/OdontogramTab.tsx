@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -5,7 +6,6 @@ import { format, parseISO } from 'date-fns';
 import { Eye, History, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { OdontogramTabSkeleton } from '@/components/skeletons';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,8 +21,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useToothObservationsControllerFindAllByPatient } from '@/generated/hooks/useToothObservationsControllerFindAllByPatient';
-import { toothObservationsControllerFindAllByPatientQueryKey } from '@/generated/hooks/useToothObservationsControllerFindAllByPatient';
+import {
+  toothObservationsControllerFindAllByPatientQueryKey,
+  useToothObservationsControllerFindAllByPatient,
+} from '@/generated/hooks/useToothObservationsControllerFindAllByPatient';
 import { useToothObservationsControllerRemove } from '@/generated/hooks/useToothObservationsControllerRemove';
 import { notificationService } from '@/services/notification.service';
 
@@ -32,22 +34,29 @@ interface OdontogramTabProps {
   patientId: number;
 }
 
+interface ToothObservationRecord {
+  id: number;
+  date: string;
+  description?: string;
+  toothNumber?: string | number;
+  toothFaces?: string;
+}
+
+const MISSING_TOOTH_TOKEN = 'AUSENTE';
+
 export function OdontogramTab({ patientId }: OdontogramTabProps) {
   const [selectedTooth, setSelectedTooth] = useState<string | null>(null);
   const [isPediatric, setIsPediatric] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
-  const { data: observations = [], isLoading } =
-    useToothObservationsControllerFindAllByPatient(patientId);
+  const { data: observations = [] } = useToothObservationsControllerFindAllByPatient(patientId);
   const { mutate: removeObservation } = useToothObservationsControllerRemove();
 
-  const allObservations = useMemo(() => {
-    type Obs = { date: string; id: number };
-    return (observations as Obs[]).slice().sort((a, b) => {
+  const allObservations = useMemo<ToothObservationRecord[]>(() => {
+    return (observations as ToothObservationRecord[]).slice().sort((a, b) => {
       const dateDiff =
-        parseISO((b.date as string).substring(0, 10)).getTime() -
-        parseISO((a.date as string).substring(0, 10)).getTime();
+        parseISO(b.date.substring(0, 10)).getTime() - parseISO(a.date.substring(0, 10)).getTime();
       return dateDiff !== 0 ? dateDiff : b.id - a.id;
     });
   }, [observations]);
@@ -66,14 +75,12 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
           });
           setDeleteId(null);
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           notificationService.apiError(error, 'Erro ao excluir observação.');
         },
       },
     );
   };
-
-  if (isLoading) return <OdontogramTabSkeleton />;
 
   return (
     <div className="space-y-6">
@@ -86,30 +93,38 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
               Clique em um dente para registrar uma observação clínica.
             </CardDescription>
           </div>
-          <div className="bg-muted flex rounded-lg border p-1">
+          <div className="bg-muted/40 flex rounded-lg border p-1">
             <Button
-              variant={!isPediatric ? 'secondary' : 'ghost'}
+              variant="ghost"
               size="sm"
-              className={!isPediatric ? 'shadow-sm' : ''}
+              className={
+                !isPediatric
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-primary border shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }
               onClick={() => setIsPediatric(false)}
             >
               Adulto
             </Button>
             <Button
-              variant={isPediatric ? 'secondary' : 'ghost'}
+              variant="ghost"
               size="sm"
-              className={isPediatric ? 'shadow-sm' : ''}
+              className={
+                isPediatric
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-primary border shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }
               onClick={() => setIsPediatric(true)}
             >
-              Infantil
+              Decíduos
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="overflow-x-auto p-0 md:p-4">
-          <div className="flex flex-col items-center gap-3 py-3">
+        <CardContent className="overflow-x-auto">
+          <div className="flex flex-col items-center gap-3">
             <div className="w-full max-w-5xl">
               <Odontogram
-                observations={observations as any[]}
+                observations={allObservations}
                 isPediatric={isPediatric}
                 patientId={patientId}
                 highlightedTooth={selectedTooth}
@@ -141,15 +156,12 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
               Nenhuma observação registrada. Clique em um dente no odontograma para começar.
             </div>
           ) : (
-            <ScrollArea className="h-[420px]">
+            <ScrollArea className="h-105">
               <div className="space-y-6 px-1 pb-1">
                 {(() => {
-                  const eventsByDate: Record<string, any[]> = {};
+                  const eventsByDate: Record<string, ToothObservationRecord[]> = {};
                   allObservations.forEach((o) => {
-                    const dateKey = format(
-                      parseISO((o.date as string).substring(0, 10)),
-                      'dd/MM/yyyy',
-                    );
+                    const dateKey = format(parseISO(o.date.substring(0, 10)), 'dd/MM/yyyy');
                     if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
                     eventsByDate[dateKey].push(o);
                   });
@@ -180,11 +192,10 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                           return (
                             <div
                               key={item.id || `${date}-${idx}`}
-                              className={`group bg-card hover:bg-muted/50 relative cursor-pointer rounded-lg border p-3 transition-all ${
-                                isHighlighted
-                                  ? 'ring-primary border-primary z-20 shadow-sm ring-2'
-                                  : 'opacity-80 hover:opacity-100'
-                              }`}
+                              className={`group bg-card hover:bg-muted/50 relative cursor-pointer rounded-lg border p-3 transition-all ${isHighlighted
+                                ? 'ring-primary border-primary z-20 shadow-sm ring-2'
+                                : 'opacity-80 hover:opacity-100'
+                                }`}
                               onClick={() => {
                                 if (!item.toothNumber) return;
                                 const num = String(item.toothNumber);
@@ -196,11 +207,10 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                                   <Eye className="text-muted-foreground h-3 w-3" />
                                   <Badge
                                     variant={item.toothNumber ? 'default' : 'outline'}
-                                    className={`py-0 text-[10px] ${
-                                      item.toothNumber
-                                        ? 'bg-primary/10 text-primary border-none'
-                                        : 'text-muted-foreground'
-                                    }`}
+                                    className={`py-0 text-[10px] ${item.toothNumber
+                                      ? 'bg-primary/10 text-primary border-none'
+                                      : 'text-muted-foreground'
+                                      }`}
                                   >
                                     {item.toothNumber
                                       ? `Dente ${item.toothNumber}`
@@ -208,7 +218,9 @@ export function OdontogramTab({ patientId }: OdontogramTabProps) {
                                   </Badge>
                                   {item.toothFaces && (
                                     <span className="text-muted-foreground text-[10px]">
-                                      Faces: {item.toothFaces}
+                                      {item.toothFaces.includes(MISSING_TOOTH_TOKEN)
+                                        ? 'Marcar como ausente'
+                                        : `Faces: ${item.toothFaces}`}
                                     </span>
                                   )}
                                 </div>

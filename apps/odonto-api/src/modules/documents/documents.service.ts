@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { PatientDocument } from './entities/patient-document.entity';
-import {
-  CreatePatientDocumentDto,
-  UpdatePatientDocumentDto,
-} from './dto/patient-document.dto';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
+import {
+    CreatePatientDocumentDto,
+    UpdatePatientDocumentDto,
+} from './dto/patient-document.dto';
+import { PatientDocument } from './entities/patient-document.entity';
 
 @Injectable()
 export class DocumentsService {
@@ -32,7 +32,7 @@ export class DocumentsService {
     page = 1,
     limit = 50,
   ): Promise<PaginatedResponseDto<PatientDocument>> {
-    const where: any = { clinicId };
+    const where: FindOptionsWhere<PatientDocument> = { clinicId };
     if (patientId) {
       where.patientId = patientId;
     }
