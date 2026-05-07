@@ -29,6 +29,12 @@ services:
     networks:
       - internal
       - web
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   front:
     build:
@@ -39,6 +45,12 @@ services:
     restart: always
     networks:
       - web
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   landing:
     build:
@@ -47,21 +59,27 @@ services:
     restart: always
     networks:
       - web
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3002']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   nginx:
     image: nginx:alpine
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - '80:80'
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
       front:
-        condition: service_started
+        condition: service_healthy
       landing:
-        condition: service_started
+        condition: service_healthy
     networks:
       - web
 
