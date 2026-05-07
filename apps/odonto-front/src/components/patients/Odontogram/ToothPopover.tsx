@@ -25,7 +25,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToothObservationsControllerCreate } from '@/generated/hooks/useToothObservationsControllerCreate';
 import { toothObservationsControllerFindAllByPatientQueryKey } from '@/generated/hooks/useToothObservationsControllerFindAllByPatient';
-import { createToothObservationDtoSchema } from '@/generated/zod/createToothObservationDtoSchema';
 import { cn } from '@/lib/utils';
 import { notificationService } from '@/services/notification.service';
 
@@ -41,8 +40,12 @@ const FACE_LABELS: { face: ToothFace; short: string; label: string }[] = [
   { face: 'lingual', short: 'L', label: 'Lingual' },
 ];
 
-const observationFormSchema = createToothObservationDtoSchema.extend({
+const observationFormSchema = z.object({
+  toothNumber: z.string(),
+  toothFaces: z.string().optional(),
   description: z.string().min(1, 'A descrição da observação é obrigatória'),
+  date: z.string(),
+  patientId: z.number(),
 });
 
 type ObservationFormValues = z.infer<typeof observationFormSchema>;

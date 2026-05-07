@@ -26,10 +26,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAuthControllerRegister } from '@/generated/hooks/useAuthControllerRegister';
 import { useUsersControllerFindInvitation } from '@/generated/hooks/useUsersControllerFindInvitation';
-import { authControllerRegisterMutationRequestSchema } from '@/generated/zod/authControllerRegisterSchema';
 import { notificationService } from '@/services/notification.service';
 
-type RegisterFormValues = z.infer<typeof authControllerRegisterMutationRequestSchema>;
+const registerFormSchema = z.object({
+  token: z.string(),
+  name: z.string().min(1, 'Nome é obrigatório'),
+  password: z.string().min(8, 'Senha deve ter no mínimo 8 caracteres'),
+});
+
+type RegisterFormValues = z.infer<typeof registerFormSchema>;
 
 const invitationSchema = z.object({
   email: z.string(),
@@ -53,7 +58,7 @@ export default function RegisterInvitationPage() {
   const { mutate: register, isPending: isRegistering } = useAuthControllerRegister();
 
   const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(authControllerRegisterMutationRequestSchema),
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       token: token,
       name: '',

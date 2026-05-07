@@ -16,7 +16,6 @@ import { pluginClient } from '../../node_modules/@kubb/plugin-client/dist/index.
 import { pluginOas } from '../../node_modules/@kubb/plugin-oas/dist/index.js';
 import { pluginReactQuery } from '../../node_modules/@kubb/plugin-react-query/dist/index.js';
 import { pluginTs } from '../../node_modules/@kubb/plugin-ts/dist/index.js';
-import { pluginZod } from '../../node_modules/@kubb/plugin-zod/dist/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,7 +35,6 @@ async function generate() {
         plugins: [
           pluginOas({ validate: true }),
           pluginTs({ output: { path: './ts' } }),
-          pluginZod({ output: { path: './zod' } }),
           pluginClient({
             output: { path: './clients' },
             importPath: '@/lib/api',
