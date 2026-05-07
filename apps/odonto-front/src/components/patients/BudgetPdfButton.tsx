@@ -9,7 +9,15 @@ import type { BudgetPdfClinic, BudgetPdfPatient, BudgetPlan } from './budget-typ
 
 const PDFDownloadLink = dynamic(
   () => import('@react-pdf/renderer').then((m) => ({ default: m.PDFDownloadLink })),
-  { ssr: false },
+  {
+    ssr: false,
+    loading: () => (
+      <Button size="sm" variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50" disabled>
+        <FileDown className="mr-2 h-4 w-4" />
+        Preparando...
+      </Button>
+    ),
+  },
 );
 
 const BudgetPdfDocument = dynamic(
