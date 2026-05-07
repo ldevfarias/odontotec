@@ -31,6 +31,10 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: 'standalone',
 
+  experimental: {
+    optimizePackageImports: ['@react-pdf/renderer'],
+  },
+
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
